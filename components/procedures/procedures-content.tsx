@@ -9,20 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import type { Procedure } from "@/lib/types/database"
+import { useLanguage } from "@/lib/i18n"
 
 interface ProcedureWithIcon extends Procedure {
   icon: React.ElementType
 }
-
-const CATEGORIES = [
-  { id: "all", label: "Toutes", icon: FileText },
-  { id: "identite", label: "Identité & État civil", icon: FileText },
-  { id: "entreprise", label: "Entreprise", icon: Building2 },
-  { id: "foncier", label: "Foncier", icon: Home },
-  { id: "transport", label: "Transport", icon: Car },
-  { id: "education", label: "Éducation", icon: GraduationCap },
-  { id: "justice", label: "Justice", icon: Scale },
-]
 
 const getCategoryIcon = (category: string): React.ElementType => {
   switch (category) {
@@ -44,10 +35,21 @@ const getCategoryIcon = (category: string): React.ElementType => {
 }
 
 export function ProceduresContent() {
+  const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [procedures, setProcedures] = useState<Procedure[]>([])
   const [loading, setLoading] = useState(true)
+
+  const CATEGORIES = [
+    { id: "all", label: t('procedures.category.all'), icon: FileText },
+    { id: "identite", label: t('procedures.category.identity'), icon: FileText },
+    { id: "entreprise", label: t('procedures.category.business'), icon: Building2 },
+    { id: "foncier", label: t('procedures.category.land'), icon: Home },
+    { id: "transport", label: t('procedures.category.transport'), icon: Car },
+    { id: "education", label: t('procedures.category.education'), icon: GraduationCap },
+    { id: "justice", label: t('procedures.category.justice'), icon: Scale },
+  ]
 
   useEffect(() => {
     async function fetchProcedures() {
@@ -83,15 +85,35 @@ export function ProceduresContent() {
   const filteredProcedures = proceduresWithIcons
 
   const getDifficultyColor = (difficulty: string) => {
+    const easyLabel = t('procedures.difficulty.easy')
+    const mediumLabel = t('procedures.difficulty.medium')
+    const hardLabel = t('procedures.difficulty.hard')
+
     switch (difficulty) {
       case "Facile":
+      case easyLabel:
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
       case "Moyen":
+      case mediumLabel:
         return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
       case "Difficile":
+      case hardLabel:
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
       default:
         return ""
+    }
+  }
+
+  const translateDifficulty = (difficulty: string) => {
+    switch (difficulty) {
+      case "Facile":
+        return t('procedures.difficulty.easy')
+      case "Moyen":
+        return t('procedures.difficulty.medium')
+      case "Difficile":
+        return t('procedures.difficulty.hard')
+      default:
+        return difficulty
     }
   }
 
@@ -101,10 +123,10 @@ export function ProceduresContent() {
       <div className="border-b border-border bg-gradient-to-b from-muted/20 to-background">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <h1 className="text-balance text-3xl font-bold text-foreground sm:text-4xl">
-            Guide des démarches administratives
+            {t('procedures.title')}
           </h1>
           <p className="mt-2 text-pretty text-muted-foreground">
-            Toutes les procédures expliquées étape par étape avec les documents requis et les coûts
+            {t('procedures.subtitle')}
           </p>
 
           {/* Search Bar */}
@@ -112,7 +134,7 @@ export function ProceduresContent() {
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Rechercher une procédure..."
+              placeholder={t('procedures.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -139,8 +161,7 @@ export function ProceduresContent() {
 
           <TabsContent value={activeCategory} className="mt-0">
             <div className="mb-4 text-sm text-muted-foreground">
-              {filteredProcedures.length} procédure{filteredProcedures.length > 1 ? "s" : ""} disponible
-              {filteredProcedures.length > 1 ? "s" : ""}
+              {filteredProcedures.length} {t('procedures.available')}
             </div>
 
             {loading ? (
@@ -171,7 +192,7 @@ export function ProceduresContent() {
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                         <procedure.icon className="h-6 w-6 text-primary" />
                       </div>
-                      <Badge className={getDifficultyColor(procedure.difficulty)}>{procedure.difficulty}</Badge>
+                      <Badge className={getDifficultyColor(procedure.difficulty)}>{translateDifficulty(procedure.difficulty)}</Badge>
                     </div>
 
                     <h3 className="mt-4 font-semibold text-card-foreground group-hover:text-primary">{procedure.name}</h3>
@@ -188,7 +209,7 @@ export function ProceduresContent() {
                     </div>
 
                     <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">
-                      Voir les détails
+                      {t('procedures.viewDetails')}
                       <TrendingUp className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>
                   </Link>

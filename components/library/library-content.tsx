@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import type { Document } from "@/lib/types/database"
+import { useLanguage } from "@/lib/i18n"
 
 export function LibraryContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -17,6 +18,8 @@ export function LibraryContent() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
+
+  const { t } = useLanguage()
 
   const documentTypes = ["CODE", "LOI", "DÉCRET", "ORDONNANCE"]
 
@@ -56,20 +59,20 @@ export function LibraryContent() {
     <div className="min-h-screen bg-background">
       {/* Header Section */}
       <div className="border-b border-border bg-muted/20">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-foreground">Bibliothèque Juridique</h1>
-          <p className="mt-2 text-muted-foreground">Accédez à tous les documents juridiques officiels du Cameroun</p>
+        <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-8 lg:px-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t('library.title')}</h1>
+          <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-muted-foreground">{t('library.subtitle')}</p>
 
           {/* Search and View Toggle */}
-          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 sm:mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Rechercher un document..."
+                placeholder={t('library.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="h-10 sm:h-11 pl-9 sm:pl-10 text-base"
               />
             </div>
 
@@ -78,6 +81,7 @@ export function LibraryContent() {
                 variant={viewMode === "grid" ? "default" : "outline"}
                 size="icon"
                 onClick={() => setViewMode("grid")}
+                className="h-10 w-10 sm:h-10 sm:w-10 touch-manipulation shrink-0"
               >
                 <Grid3x3 className="h-4 w-4" />
               </Button>
@@ -85,6 +89,7 @@ export function LibraryContent() {
                 variant={viewMode === "list" ? "default" : "outline"}
                 size="icon"
                 onClick={() => setViewMode("list")}
+                className="h-10 w-10 sm:h-10 sm:w-10 touch-manipulation shrink-0"
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -94,13 +99,13 @@ export function LibraryContent() {
       </div>
 
       {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
+      <div className="mx-auto max-w-7xl px-3 py-6 sm:px-4 sm:py-8 lg:px-8">
+        <div className="flex flex-col gap-6 sm:gap-8 lg:flex-row">
           {/* Filters Sidebar */}
           <aside className="w-full lg:w-64">
-            <div className="sticky top-24 space-y-6 rounded-lg border border-border bg-card p-6">
+            <div className="space-y-4 sm:space-y-6 rounded-lg border border-border bg-card p-4 sm:p-6 lg:sticky lg:top-24">
               <div>
-                <h3 className="mb-4 font-semibold text-card-foreground">Type de document</h3>
+                <h3 className="mb-4 font-semibold text-card-foreground">{t('library.filters.documentType')}</h3>
                 <div className="space-y-3">
                   {documentTypes.map((type) => (
                     <div key={type} className="flex items-center space-x-2">
@@ -124,83 +129,82 @@ export function LibraryContent() {
               </div>
 
               <div>
-                <h3 className="mb-4 font-semibold text-card-foreground">Catégorie</h3>
+                <h3 className="mb-4 font-semibold text-card-foreground">{t('library.filters.category')}</h3>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Toutes les catégories</SelectItem>
-                    <SelectItem value="Droit pénal">Droit pénal</SelectItem>
-                    <SelectItem value="Droit civil">Droit civil</SelectItem>
-                    <SelectItem value="Droit du travail">Droit du travail</SelectItem>
-                    <SelectItem value="Finances publiques">Finances publiques</SelectItem>
-                    <SelectItem value="Protection des données">Protection des données</SelectItem>
+                    <SelectItem value="all">{t('library.filters.allCategories')}</SelectItem>
+                    <SelectItem value="Droit pénal">{t('library.filters.criminalLaw')}</SelectItem>
+                    <SelectItem value="Droit civil">{t('library.filters.civilLaw')}</SelectItem>
+                    <SelectItem value="Droit du travail">{t('library.filters.laborLaw')}</SelectItem>
+                    <SelectItem value="Finances publiques">{t('library.filters.publicFinances')}</SelectItem>
+                    <SelectItem value="Protection des données">{t('library.filters.dataProtection')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <Button
                 variant="outline"
-                className="w-full bg-transparent"
+                className="w-full bg-transparent touch-manipulation"
                 onClick={() => {
                   setSelectedTypes([])
                   setSelectedCategory("all")
                   setSearchQuery("")
                 }}
               >
-                Réinitialiser les filtres
+                {t('library.filters.reset')}
               </Button>
             </div>
           </aside>
 
           {/* Documents Grid/List */}
           <div className="flex-1">
-            <div className="mb-4 text-sm text-muted-foreground">
-              {filteredDocuments.length} document{filteredDocuments.length > 1 ? "s" : ""} trouvé
-              {filteredDocuments.length > 1 ? "s" : ""}
+            <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">
+              {filteredDocuments.length} {t('library.documentsFound')}
             </div>
 
             {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2">
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="animate-pulse rounded-lg border border-border bg-card p-6">
+                  <div key={i} className="animate-pulse rounded-lg border border-border bg-card p-4 sm:p-6">
                     <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-muted rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
             ) : viewMode === "grid" ? (
-              <div className="grid gap-6 sm:grid-cols-2">
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
                 {filteredDocuments.map((doc) => (
                   <Link
                     key={doc.id}
                     href={`/bibliotheque/${doc.slug}`}
-                    className="group rounded-lg border border-border bg-card p-6 transition-all hover:shadow-lg"
+                    className="group rounded-lg border border-border bg-card p-4 sm:p-6 transition-all hover:shadow-lg active:scale-[0.98] touch-manipulation"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <Badge variant="secondary" className="shrink-0">
+                    <div className="flex items-start justify-between gap-2 sm:gap-4">
+                      <Badge variant="secondary" className="shrink-0 text-xs">
                         {doc.type}
                       </Badge>
-                      <Badge variant={doc.status === "ACTIVE" ? "default" : "destructive"} className="shrink-0">
-                        {doc.status === 'ACTIVE' ? 'Actif' : 'Abrogé'}
+                      <Badge variant={doc.status === "ACTIVE" ? "default" : "destructive"} className="shrink-0 text-xs">
+                        {doc.status === 'ACTIVE' ? t('library.status.active') : t('library.status.repealed')}
                       </Badge>
                     </div>
 
-                    <h3 className="mt-4 font-semibold text-card-foreground group-hover:text-primary">{doc.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{doc.reference || 'Sans référence'}</p>
-                    <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{doc.summary || doc.content.substring(0, 150) + '...'}</p>
+                    <h3 className="mt-3 sm:mt-4 text-base sm:text-lg font-semibold text-card-foreground group-hover:text-primary">{doc.title}</h3>
+                    <p className="mt-1 text-xs sm:text-sm text-muted-foreground">{doc.reference || t('library.noReference')}</p>
+                    <p className="mt-2 sm:mt-3 line-clamp-2 text-xs sm:text-sm text-muted-foreground">{doc.summary || doc.content.substring(0, 150) + '...'}</p>
 
-                    <div className="mt-4 flex items-center justify-between">
+                    <div className="mt-3 sm:mt-4 flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
                         {doc.dateEnacted ? new Date(doc.dateEnacted).toLocaleDateString("fr-FR", {
                           day: "numeric",
                           month: "long",
                           year: "numeric",
-                        }) : 'Date inconnue'}
+                        }) : t('library.unknownDate')}
                       </span>
-                      <Button variant="ghost" size="sm" className="h-8">
-                        Consulter
+                      <Button variant="ghost" size="sm" className="h-7 sm:h-8 text-xs sm:text-sm touch-manipulation">
+                        {t('library.consult')}
                       </Button>
                     </div>
                   </Link>
@@ -219,13 +223,13 @@ export function LibraryContent() {
                         {doc.type}
                       </Badge>
                       <Badge variant={doc.status === "ACTIVE" ? "default" : "destructive"} className="w-fit">
-                        {doc.status === 'ACTIVE' ? 'Actif' : 'Abrogé'}
+                        {doc.status === 'ACTIVE' ? t('library.status.active') : t('library.status.repealed')}
                       </Badge>
                     </div>
 
                     <div className="flex-1">
                       <h3 className="font-semibold text-card-foreground group-hover:text-primary">{doc.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{doc.reference || 'Sans référence'}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{doc.reference || t('library.noReference')}</p>
                       <p className="mt-2 text-sm text-muted-foreground">{doc.summary || doc.content.substring(0, 150) + '...'}</p>
                     </div>
 
@@ -235,11 +239,11 @@ export function LibraryContent() {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
-                        }) : 'N/A'}
+                        }) : t('library.unknownDate')}
                       </span>
                       <Button variant="ghost" size="sm">
                         <Download className="mr-2 h-4 w-4" />
-                        Télécharger
+                        {t('library.download')}
                       </Button>
                     </div>
                   </Link>

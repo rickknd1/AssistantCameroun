@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Récupérer la procédure
     const { data, error } = await supabase
@@ -60,7 +60,7 @@ export async function PUT(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const body = await request.json()
 
     // TODO: Add authentication check

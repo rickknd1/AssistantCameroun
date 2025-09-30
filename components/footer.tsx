@@ -1,13 +1,18 @@
+"use client"
+
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { useLanguage } from "@/lib/i18n"
 
 export function Footer() {
+  const { t } = useLanguage()
+
   const footerLinks = {
     legal: [
-      { name: "À propos", href: "/about" },
-      { name: "Contact", href: "/contact" },
-      { name: "Mentions légales", href: "/legal" },
-      { name: "Confidentialité", href: "/privacy" },
+      { name: t('footer.about'), href: "/about" },
+      { name: t('footer.contact'), href: "/contact" },
+      { name: t('footer.legal'), href: "/legal" },
+      { name: t('footer.privacy'), href: "/privacy" },
     ],
     social: [
       { name: "Facebook", icon: Facebook, href: "#" },
@@ -27,17 +32,16 @@ export function Footer() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-secondary to-accent">
                 <span className="text-xl font-bold text-white">AC</span>
               </div>
-              <span className="text-lg font-semibold text-foreground">Assistant National du Cameroun</span>
+              <span className="text-lg font-semibold text-foreground">{t('footer.brand')}</span>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              Votre guide intelligent pour naviguer au Cameroun. Droit, procédures administratives, culture - Toutes les
-              réponses dont vous avez besoin.
+              {t('footer.description')}
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Liens utiles</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('footer.links')}</h3>
             <ul className="mt-4 space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -54,7 +58,7 @@ export function Footer() {
 
           {/* Social */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Suivez-nous</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('footer.followUs')}</h3>
             <div className="mt-4 flex gap-3">
               {footerLinks.social.map((social) => (
                 <Link
@@ -72,8 +76,7 @@ export function Footer() {
 
         <div className="mt-8 border-t border-border pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            Propulsé par l'IA Gemini • © {new Date().getFullYear()} Assistant National du Cameroun. Tous droits
-            réservés.
+            {t('footer.designedBy')} <a href="https://eoweb.site" className="hover:text-foreground">eoweb</a> • © {new Date().getFullYear()} {t('footer.brand')}. {t('footer.rights')}
           </p>
         </div>
       </div>

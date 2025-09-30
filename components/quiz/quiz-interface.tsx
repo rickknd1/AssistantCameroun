@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import type { QuizQuestion } from "@/lib/types/database"
+import { useLanguage } from "@/lib/i18n"
 
 interface QuizInterfaceProps {
   categoryId: string
@@ -15,6 +16,7 @@ interface QuizInterfaceProps {
 }
 
 export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfaceProps) {
+  const { language, t } = useLanguage()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showExplanation, setShowExplanation] = useState(false)
@@ -206,11 +208,13 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
 
         {/* Question Card */}
         <Card className="p-8">
-          <h2 className="text-balance text-xl font-bold text-card-foreground sm:text-2xl">{question.question}</h2>
+          <h2 className="text-balance text-xl font-bold text-card-foreground sm:text-2xl">
+            {language === 'en' && question.questionEn ? question.questionEn : question.question}
+          </h2>
 
           {/* Options */}
           <div className="mt-8 space-y-3">
-            {question.options.map((option, index) => {
+            {(language === 'en' && question.optionsEn ? question.optionsEn : question.options).map((option, index) => {
               const isSelected = selectedAnswer === index
               const isCorrect = index === question.correctAnswerIndex
               const showResult = showExplanation
@@ -252,8 +256,10 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
           {/* Explanation */}
           {showExplanation && (
             <div className="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-              <h3 className="font-semibold text-foreground">Explication :</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{question.explanation}</p>
+              <h3 className="font-semibold text-foreground">{t('quiz.explanation')}:</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {language === 'en' && question.explanationEn ? question.explanationEn : question.explanation}
+              </p>
             </div>
           )}
 

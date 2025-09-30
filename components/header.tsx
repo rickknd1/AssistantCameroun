@@ -5,11 +5,13 @@ import Link from "next/link"
 import { Menu, X, Globe, Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useLanguage } from "@/lib/i18n"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
   const [theme, setTheme] = useState<"light" | "dark">("light")
-  const [language, setLanguage] = useState<"fr" | "en">("fr")
+  const { language, setLanguage, t } = useLanguage()
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light"
@@ -18,34 +20,34 @@ export function Header() {
   }
 
   const navigation = [
-    { name: "Accueil", href: "/" },
-    { name: "Assistant IA", href: "/assistant" },
-    { name: "Bibliothèque", href: "/bibliotheque" },
-    { name: "Procédures", href: "/procedures" },
-    { name: "Actualités", href: "/actualites" },
-    { name: "Quiz", href: "/quiz" },
+    { name: t('header.home'), href: "/" },
+    { name: t('header.assistant'), href: "/assistant" },
+    { name: t('header.library'), href: "/bibliotheque" },
+    { name: t('header.procedures'), href: "/procedures" },
+    { name: t('header.news'), href: "/actualites" },
+    { name: t('header.quiz'), href: "/quiz" },
   ]
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 p-4 lg:px-8">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-x-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
         {/* Logo */}
         <div className="flex lg:flex-1">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-secondary to-accent">
-              <span className="text-xl font-bold text-white">AC</span>
+          <Link href="/" className="flex items-center gap-2 touch-manipulation">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-secondary to-accent">
+              <span className="text-lg sm:text-xl font-bold text-white">AC</span>
             </div>
-            <span className="hidden text-lg font-semibold text-foreground sm:block">Assistant National</span>
+            <span className="hidden text-base sm:text-lg font-semibold text-foreground sm:block">Assistant National</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex lg:gap-x-8">
+        <div className="hidden lg:flex lg:gap-x-6">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground touch-manipulation"
             >
               {item.name}
             </Link>
@@ -53,49 +55,81 @@ export function Header() {
         </div>
 
         {/* Right Actions */}
-        <div className="flex flex-1 items-center justify-end gap-x-3">
+        <div className="flex flex-1 items-center justify-end gap-x-1.5 sm:gap-x-2">
           {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <Globe className="h-4 w-4" />
-                <span className="sr-only">Changer de langue</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLanguage("fr")}>Français</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage("en")}>English</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 touch-manipulation shrink-0"
+              onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+            >
+              <Globe className="h-4 w-4" />
+              <span className="sr-only">{t('header.changeLanguage')}</span>
+            </Button>
+
+            {languageMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setLanguageMenuOpen(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 z-50 w-36 rounded-md border border-border bg-popover p-1 shadow-md">
+                  <button
+                    onClick={() => {
+                      setLanguage("fr")
+                      setLanguageMenuOpen(false)
+                    }}
+                    className={`w-full rounded-sm px-2 py-1.5 text-sm text-left transition-colors hover:bg-accent hover:text-accent-foreground touch-manipulation ${
+                      language === 'fr' ? 'bg-accent text-accent-foreground' : ''
+                    }`}
+                  >
+                    🇫🇷 Français
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLanguage("en")
+                      setLanguageMenuOpen(false)
+                    }}
+                    className={`w-full rounded-sm px-2 py-1.5 text-sm text-left transition-colors hover:bg-accent hover:text-accent-foreground touch-manipulation ${
+                      language === 'en' ? 'bg-accent text-accent-foreground' : ''
+                    }`}
+                  >
+                    🇬🇧 English
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Theme Toggle */}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 touch-manipulation shrink-0">
             {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            <span className="sr-only">Changer de thème</span>
+            <span className="sr-only">{t('header.changeTheme')}</span>
           </Button>
 
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 lg:hidden"
+            className="h-9 w-9 lg:hidden touch-manipulation shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <span className="sr-only">Menu</span>
+            <span className="sr-only">{t('header.menu')}</span>
           </Button>
         </div>
       </nav>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden">
-          <div className="space-y-1 border-t border-border px-4 pb-3 pt-2">
+        <div className="lg:hidden border-t border-border">
+          <div className="space-y-0.5 px-3 pb-3 pt-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="block rounded-md px-3 py-2.5 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted/80 touch-manipulation"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}

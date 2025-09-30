@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChatSidebar } from "./chat-sidebar"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
 import { WelcomeScreen } from "./welcome-screen"
+import { getConversations, saveConversation, generateConversationTitle, detectCategory } from "@/lib/utils/conversations"
+import { getSessionId } from "@/lib/utils/session"
+import { useLanguage } from "@/lib/i18n"
 
 export interface Message {
   id: string
@@ -28,27 +31,48 @@ export interface Conversation {
 }
 
 export function ChatInterface() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false) // Fermé par défaut sur mobile
   const [messages, setMessages] = useState<Message[]>([])
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: "1",
-      title: "Obtenir une CNI",
-      lastMessage: "Merci pour ces informations détaillées",
-      timestamp: new Date(Date.now() - 86400000),
-      category: "Identité",
-    },
-    {
-      id: "2",
-      title: "Créer une entreprise",
-      lastMessage: "Quels sont les coûts ?",
-      timestamp: new Date(Date.now() - 172800000),
-      category: "Entreprise",
-    },
-  ])
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [isTyping, setIsTyping] = useState(false)
+  const [conversationId, setConversationId] = useState<string>(() => `conv_${Date.now()}`)
+  const [sessionId, setSessionId] = useState<string>("")
+  const { language } = useLanguage()
+
+  // Load conversations from localStorage on mount
+  useEffect(() => {
+    const loadedConversations = getConversations()
+    setConversations(loadedConversations)
+    setSessionId(getSessionId())
+  }, [])
+
+  // Track analytics event
+  const trackEvent = async (
+    event: string,
+    data?: Record<string, any>
+  ) => {
+    try {
+      await fetch("/api/analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event,
+          sessionId,
+          data,
+          language: language.toUpperCase(),
+          userAgent: navigator.userAgent,
+        }),
+      })
+    } catch (error) {
+      console.error("Analytics tracking error:", error)
+      // Ne pas bloquer l'application si analytics échoue
+    }
+  }
 
   const handleSendMessage = async (content: string) => {
+    const isNewConversation = messages.length === 0
+    const startTime = Date.now()
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -58,6 +82,22 @@ export function ChatInterface() {
 
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
+
+    // Track conversation start
+    if (isNewConversation) {
+      await trackEvent("CONVERSATION_START", {
+        conversationId,
+        firstQuestion: content,
+        category: detectCategory(content),
+      })
+    }
+
+    // Track message sent
+    await trackEvent("MESSAGE_SENT", {
+      conversationId,
+      messageLength: content.length,
+      messageNumber: messages.length + 1,
+    })
 
     try {
       // Appel à l'API réelle
@@ -80,6 +120,7 @@ export function ChatInterface() {
       }
 
       const data = await response.json()
+      const responseTime = Date.now() - startTime
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -91,6 +132,30 @@ export function ChatInterface() {
       }
 
       setMessages((prev) => [...prev, assistantMessage])
+
+      // Track message received
+      await trackEvent("MESSAGE_RECEIVED", {
+        conversationId,
+        responseTime,
+        confidence: data.confidence,
+        sourcesCount: data.sources?.length || 0,
+      })
+
+      // Save conversation to localStorage
+      const updatedMessages = [...messages, userMessage, assistantMessage]
+      const title = generateConversationTitle(updatedMessages)
+      const category = detectCategory(content)
+
+      saveConversation(
+        conversationId,
+        title,
+        content,
+        category
+      )
+
+      // Update conversations list
+      setConversations(getConversations())
+
     } catch (error) {
       console.error('Error sending message:', error)
       const errorMessage: Message = {
@@ -100,6 +165,12 @@ export function ChatInterface() {
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
+
+      // Track error
+      await trackEvent("MESSAGE_ERROR", {
+        conversationId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      })
     } finally {
       setIsTyping(false)
     }
@@ -107,6 +178,7 @@ export function ChatInterface() {
 
   const handleNewConversation = () => {
     setMessages([])
+    setConversationId(`conv_${Date.now()}`)
   }
 
   return (
@@ -116,9 +188,25 @@ export function ChatInterface() {
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onNewConversation={handleNewConversation}
+        onQuestionClick={handleSendMessage}
       />
 
       <div className="flex flex-1 flex-col min-h-0 h-full">
+        {/* Header with sidebar toggle button for mobile */}
+        <div className="flex-shrink-0 border-b border-border bg-background px-3 py-2.5 sm:px-4 sm:py-3 lg:hidden">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors touch-manipulation"
+            >
+              <svg className="h-5 w-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-base font-semibold text-foreground">Assistant IA</h1>
+          </div>
+        </div>
+
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
             <WelcomeScreen onQuestionClick={handleSendMessage} />
@@ -127,7 +215,7 @@ export function ChatInterface() {
           )}
         </div>
 
-        <div className="flex-shrink-0 border-t border-border bg-background">
+        <div className="flex-shrink-0">
           <ChatInput onSendMessage={handleSendMessage} isTyping={isTyping} />
         </div>
       </div>

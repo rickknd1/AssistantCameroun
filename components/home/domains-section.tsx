@@ -1,22 +1,60 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { DOMAINS } from "@/lib/constants"
+import { useLanguage } from "@/lib/i18n"
 
 export function DomainsSection() {
+  const { t } = useLanguage()
+
+  const domains = [
+    {
+      ...DOMAINS[0],
+      title: t('home.domains.lawJustice.title'),
+      description: t('home.domains.lawJustice.description'),
+    },
+    {
+      ...DOMAINS[1],
+      title: t('home.domains.adminProcedures.title'),
+      description: t('home.domains.adminProcedures.description'),
+    },
+    {
+      ...DOMAINS[2],
+      title: t('home.domains.businessCommerce.title'),
+      description: t('home.domains.businessCommerce.description'),
+    },
+    {
+      ...DOMAINS[3],
+      title: t('home.domains.landProperty.title'),
+      description: t('home.domains.landProperty.description'),
+    },
+    {
+      ...DOMAINS[4],
+      title: t('home.domains.educationCulture.title'),
+      description: t('home.domains.educationCulture.description'),
+    },
+    {
+      ...DOMAINS[5],
+      title: t('home.domains.healthSocial.title'),
+      description: t('home.domains.healthSocial.description'),
+    },
+  ]
+
   return (
     <section className="border-b border-border bg-muted/20 py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Domaines couverts
+            {t('home.domains.title')}
           </h2>
           <p className="mt-4 text-pretty text-lg text-muted-foreground">
-            Une expertise complète sur tous les aspects de la vie au Cameroun
+            {t('home.domains.subtitle')}
           </p>
         </div>
 
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {DOMAINS.map((domain) => (
+          {domains.map((domain) => (
             <Link
               key={domain.title}
               href={domain.href}
@@ -32,7 +70,7 @@ export function DomainsSection() {
                   <p className="mt-2 text-sm text-muted-foreground">{domain.description}</p>
 
                   <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
-                    En savoir plus
+                    {t('home.domains.learnMore')}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>

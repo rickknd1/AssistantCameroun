@@ -6,12 +6,14 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { QUIZ_CATEGORIES } from "./quiz-content"
 import { useState } from "react"
+import { useLanguage } from "@/lib/i18n"
 
 interface QuizSelectionProps {
   onStartQuiz: (categoryId: string, difficulty: "facile" | "moyen" | "difficile") => void
 }
 
 export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
+  const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   return (
@@ -23,7 +25,7 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent">
               <Brain className="h-8 w-8 text-white" />
             </div>
-            <h1 className="mt-6 text-balance text-3xl font-bold text-foreground sm:text-4xl">Quiz Interactifs</h1>
+            <h1 className="mt-6 text-balance text-3xl font-bold text-foreground sm:text-4xl">{t('quiz.title')}</h1>
             <p className="mt-2 text-pretty text-muted-foreground">
               Testez vos connaissances sur le droit et les procédures au Cameroun
             </p>
@@ -47,7 +49,7 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                   <h3 className="mt-4 font-semibold text-card-foreground group-hover:text-primary">{category.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{category.description}</p>
                   <Badge variant="secondary" className="mt-4">
-                    {category.questionCount} questions
+                    {category.questionCount} {t('quiz.question')}s
                   </Badge>
                 </Card>
               ))}
@@ -56,7 +58,7 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
         ) : (
           <>
             <Button variant="ghost" onClick={() => setSelectedCategory(null)} className="mb-6">
-              ← Retour aux catégories
+              ← {t('quiz.back')}
             </Button>
 
             <div className="mx-auto max-w-2xl">
@@ -82,11 +84,11 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Target className="h-6 w-6 text-green-600 dark:text-green-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">Facile</h4>
+                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.easy')}</h4>
                       <p className="text-sm text-muted-foreground">Questions de base, idéal pour débuter</p>
                     </div>
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                      10 questions
+                      10 {t('quiz.question')}s
                     </Badge>
                   </button>
 
@@ -98,11 +100,11 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Brain className="h-6 w-6 text-amber-600 dark:text-amber-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">Moyen</h4>
+                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.medium')}</h4>
                       <p className="text-sm text-muted-foreground">Questions intermédiaires, bon challenge</p>
                     </div>
                     <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-                      15 questions
+                      15 {t('quiz.question')}s
                     </Badge>
                   </button>
 
@@ -114,10 +116,10 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Trophy className="h-6 w-6 text-red-600 dark:text-red-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">Difficile</h4>
+                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.hard')}</h4>
                       <p className="text-sm text-muted-foreground">Questions avancées pour les experts</p>
                     </div>
-                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">20 questions</Badge>
+                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">20 {t('quiz.question')}s</Badge>
                   </button>
                 </div>
               </Card>

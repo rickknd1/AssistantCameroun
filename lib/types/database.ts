@@ -141,13 +141,14 @@ export interface QuizQuestion {
   questionEn?: string
 
   options: string[]
+  optionsEn?: string[]
   answer: string // Index de la bonne réponse
 
   explanation: string
   explanationEn?: string
 
   // Catégorie
-  category: 'droit-penal' | 'procedures-admin' | 'droit-travail' | 'entreprise' | 'foncier' | 'culture' | 'autre'
+  category: 'droit-penal' | 'procedures-admin' | 'droit-travail' | 'entreprise' | 'foncier' | 'culture' | 'autre' | 'identite' | 'juridique' | 'education'
   difficulty: 'Facile' | 'Moyen' | 'Difficile'
 
   // Source

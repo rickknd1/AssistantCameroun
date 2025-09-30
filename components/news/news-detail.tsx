@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import type { NewsArticle } from '@/lib/types/database'
+import { useLanguage } from '@/lib/i18n'
 
 interface NewsDetailProps {
   slug: string
@@ -14,6 +15,7 @@ interface NewsDetailProps {
 
 export function NewsDetail({ slug }: NewsDetailProps) {
   const router = useRouter()
+  const { language, t } = useLanguage()
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -106,10 +108,12 @@ export function NewsDetail({ slug }: NewsDetailProps) {
                 )}
               </div>
               <h1 className="text-balance text-3xl font-bold text-foreground sm:text-4xl">
-                {article.title}
+                {language === 'en' && article.titleEn ? article.titleEn : article.title}
               </h1>
-              {article.summary && (
-                <p className="mt-4 text-lg text-muted-foreground">{article.summary}</p>
+              {(article.summary || article.summaryEn) && (
+                <p className="mt-4 text-lg text-muted-foreground">
+                  {language === 'en' && article.summaryEn ? article.summaryEn : article.summary}
+                </p>
               )}
             </div>
 
@@ -160,7 +164,7 @@ export function NewsDetail({ slug }: NewsDetailProps) {
         <Card className="p-6">
           <div className="prose prose-sm max-w-none dark:prose-invert">
             <div className="whitespace-pre-wrap text-sm leading-relaxed">
-              {article.content}
+              {language === 'en' && article.contentEn ? article.contentEn : article.content}
             </div>
           </div>
         </Card>

@@ -1,3 +1,5 @@
+"use client"
+
 import { Header } from "@/components/header"
 import { ChatInterface } from "@/components/assistant/chat-interface"
 

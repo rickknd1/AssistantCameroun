@@ -7,23 +7,52 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import type { NewsArticle } from "@/lib/types/database"
-
-const CATEGORIES = ["Tous", "Juridique", "Administratif", "Entreprise", "Foncier", "Social"]
+import { useLanguage } from "@/lib/i18n"
 
 export function NewsContent() {
+  const { t, language } = useLanguage()
   const [activeCategory, setActiveCategory] = useState("Tous")
+
+  const CATEGORIES = [
+    t('news.category.all'),
+    t('news.category.legal'),
+    t('news.category.administrative'),
+    t('news.category.business'),
+    t('news.category.land'),
+    t('news.category.social'),
+  ]
+
   const [currentPage, setCurrentPage] = useState(1)
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
   const articlesPerPage = 6
+
+  // Map displayed category to database category
+  const getCategoryForAPI = (displayCategory: string) => {
+    const mapping: Record<string, string> = {
+      "Tous": "Tous",
+      "All": "Tous",
+      "Juridique": "Juridique",
+      "Legal": "Juridique",
+      "Administratif": "Administratif",
+      "Administrative": "Administratif",
+      "Entreprise": "Entreprise",
+      "Business": "Entreprise",
+      "Foncier": "Foncier",
+      "Land": "Foncier",
+      "Social": "Social",
+    }
+    return mapping[displayCategory] || displayCategory
+  }
 
   useEffect(() => {
     async function fetchArticles() {
       setLoading(true)
       const params = new URLSearchParams()
 
-      if (activeCategory !== "Tous") {
-        params.append("category", activeCategory)
+      const apiCategory = getCategoryForAPI(activeCategory)
+      if (apiCategory !== "Tous") {
+        params.append("category", apiCategory)
       }
 
       try {
@@ -68,9 +97,9 @@ export function NewsContent() {
       {/* Header */}
       <div className="border-b border-border bg-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-foreground">Actualités</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('news.title')}</h1>
           <p className="mt-2 text-muted-foreground">
-            Restez informé des dernières nouvelles juridiques et administratives du Cameroun
+            {t('news.subtitle')}
           </p>
         </div>
       </div>
@@ -127,12 +156,14 @@ export function NewsContent() {
 
                       <div className="flex flex-col justify-center p-6 lg:p-8">
                         <Badge variant="secondary" className="w-fit">
-                          À la une
+                          {t('news.featured')}
                         </Badge>
                         <h2 className="mt-4 text-balance text-2xl font-bold text-card-foreground group-hover:text-primary lg:text-3xl">
-                          {featuredArticle.title}
+                          {language === 'en' && featuredArticle.titleEn ? featuredArticle.titleEn : featuredArticle.title}
                         </h2>
-                        <p className="mt-4 text-pretty text-muted-foreground">{featuredArticle.summary}</p>
+                        <p className="mt-4 text-pretty text-muted-foreground">
+                          {language === 'en' && featuredArticle.summaryEn ? featuredArticle.summaryEn : featuredArticle.summary}
+                        </p>
 
                         <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
@@ -176,9 +207,11 @@ export function NewsContent() {
 
                       <div className="p-6">
                         <h3 className="line-clamp-2 text-balance font-semibold text-card-foreground group-hover:text-primary">
-                          {article.title}
+                          {language === 'en' && article.titleEn ? article.titleEn : article.title}
                         </h3>
-                        <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{article.summary}</p>
+                        <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                          {language === 'en' && article.summaryEn ? article.summaryEn : article.summary}
+                        </p>
 
                         <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                           <div className="flex items-center gap-1">
@@ -209,7 +242,7 @@ export function NewsContent() {
                   disabled={currentPage === 1}
                   className="bg-transparent"
                 >
-                  Précédent
+                  {t('news.previous')}
                 </Button>
 
                 <div className="flex items-center gap-2">
@@ -231,7 +264,7 @@ export function NewsContent() {
                   disabled={currentPage === totalPages}
                   className="bg-transparent"
                 >
-                  Suivant
+                  {t('news.next')}
                 </Button>
               </div>
             )}
