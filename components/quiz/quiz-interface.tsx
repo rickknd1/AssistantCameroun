@@ -1,51 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Check, X, Share2, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import type { QuizQuestion } from "@/lib/types/database"
 
 interface QuizInterfaceProps {
   categoryId: string
   difficulty: "facile" | "moyen" | "difficile"
   onRestart: () => void
 }
-
-interface Question {
-  id: number
-  question: string
-  options: string[]
-  correctAnswer: number
-  explanation: string
-}
-
-const MOCK_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: "Quelle est la durée de validité d'une carte nationale d'identité pour un adulte au Cameroun ?",
-    options: ["5 ans", "10 ans", "15 ans", "20 ans"],
-    correctAnswer: 1,
-    explanation:
-      "La carte nationale d'identité camerounaise est valable 10 ans pour les adultes et 5 ans pour les mineurs.",
-  },
-  {
-    id: 2,
-    question: "Quel est le coût officiel d'établissement d'une CNI au Cameroun ?",
-    options: ["3 000 FCFA", "6 000 FCFA", "10 000 FCFA", "15 000 FCFA"],
-    correctAnswer: 1,
-    explanation: "Le coût officiel d'établissement d'une carte nationale d'identité est de 6 000 FCFA.",
-  },
-  {
-    id: 3,
-    question: "Combien de temps faut-il généralement pour obtenir une CNI après l'enrôlement ?",
-    options: ["1 semaine", "2-4 semaines", "2 mois", "6 mois"],
-    correctAnswer: 1,
-    explanation:
-      "Le délai moyen pour obtenir une CNI après l'enrôlement est de 2 à 4 semaines, bien que cela puisse varier selon les périodes.",
-  },
-]
 
 export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfaceProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
@@ -54,22 +21,82 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
   const [score, setScore] = useState(0)
   const [answers, setAnswers] = useState<boolean[]>([])
   const [quizCompleted, setQuizCompleted] = useState(false)
+  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const questions = MOCK_QUESTIONS
-  const progress = ((currentQuestion + 1) / questions.length) * 100
+  useEffect(() => {
+    async function fetchQuestions() {
+      setLoading(true)
+      const params = new URLSearchParams()
+      params.append("category", categoryId)
+      params.append("difficulty", difficulty.toUpperCase())
+
+      try {
+        const res = await fetch(`/api/quiz?${params}`)
+        const result = await res.json()
+        setQuestions(result.data || [])
+      } catch (error) {
+        console.error("Error fetching quiz questions:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchQuestions()
+  }, [categoryId, difficulty])
+
+  const progress = questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (selectedAnswer !== null) return
+    if (selectedAnswer !== null || questions.length === 0) return
 
     setSelectedAnswer(answerIndex)
     setShowExplanation(true)
 
-    const isCorrect = answerIndex === questions[currentQuestion].correctAnswer
+    const isCorrect = answerIndex === questions[currentQuestion].correctAnswerIndex
     setAnswers([...answers, isCorrect])
 
     if (isCorrect) {
       setScore(score + 1)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="animate-pulse">
+            <div className="h-2 bg-muted rounded mb-8"></div>
+            <Card className="p-8">
+              <div className="h-6 bg-muted rounded w-3/4 mb-8"></div>
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-12 bg-muted rounded"></div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+          <Card className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-card-foreground">Aucune question disponible</h2>
+            <p className="mt-2 text-muted-foreground">
+              Il n'y a pas encore de questions pour cette catégorie et difficulté.
+            </p>
+            <Button onClick={onRestart} className="mt-6">
+              Retour
+            </Button>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   const handleNextQuestion = () => {
@@ -185,7 +212,7 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
           <div className="mt-8 space-y-3">
             {question.options.map((option, index) => {
               const isSelected = selectedAnswer === index
-              const isCorrect = index === question.correctAnswer
+              const isCorrect = index === question.correctAnswerIndex
               const showResult = showExplanation
 
               let buttonClass = "w-full justify-start text-left p-4 h-auto border-2 transition-all"

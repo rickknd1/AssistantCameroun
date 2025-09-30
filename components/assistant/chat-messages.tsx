@@ -13,12 +13,15 @@ interface ChatMessagesProps {
 }
 
 export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    scrollToBottom()
   }, [messages, isTyping])
 
   const handleCopy = (content: string) => {
@@ -26,30 +29,30 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   }
 
   return (
-    <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-      <div className="mx-auto max-w-4xl space-y-6">
+    <div className="h-full overflow-y-auto p-3 sm:p-4" ref={containerRef}>
+      <div className="mx-auto max-w-4xl space-y-4 sm:space-y-6 pb-4">
         {messages.map((message) => (
-          <div key={message.id} className={`flex gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={message.id} className={`flex gap-2 sm:gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             {message.role === "assistant" && (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent">
-                <Bot className="h-5 w-5 text-white" />
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent">
+                <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
             )}
 
-            <div className={`flex max-w-[80%] flex-col gap-2 ${message.role === "user" ? "items-end" : "items-start"}`}>
+            <div className={`flex max-w-[85%] sm:max-w-[80%] flex-col gap-1.5 sm:gap-2 ${message.role === "user" ? "items-end" : "items-start"}`}>
               <div
-                className={`rounded-2xl px-4 py-3 ${
+                className={`rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "border border-border bg-card text-card-foreground"
                 }`}
               >
                 {message.role === "assistant" ? (
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <div className="prose prose-sm max-w-none dark:prose-invert text-sm sm:text-base">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className="text-sm sm:text-base leading-relaxed">{message.content}</p>
                 )}
               </div>
 
@@ -104,8 +107,8 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
             </div>
 
             {message.role === "user" && (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
-                <User className="h-5 w-5 text-muted-foreground" />
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -127,7 +130,10 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
             </div>
           </div>
         )}
+
+        {/* Scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
-    </ScrollArea>
+    </div>
   )
 }

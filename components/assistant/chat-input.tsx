@@ -45,15 +45,15 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-border bg-background">
-      <div className="mx-auto max-w-4xl p-4">
+    <div className="w-full bg-background">
+      <div className="mx-auto max-w-4xl p-3 sm:p-4">
         {/* Contextual Suggestions */}
-        <div className="mb-3 flex flex-wrap gap-2">
+        <div className="mb-2 sm:mb-3 flex flex-wrap gap-1.5 sm:gap-2">
           {CONTEXTUAL_SUGGESTIONS.map((suggestion) => (
             <button
               key={suggestion}
               onClick={() => handleSuggestionClick(suggestion)}
-              className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+              className="rounded-full border border-border bg-background px-2.5 sm:px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
               disabled={isTyping}
             >
               {suggestion}
@@ -68,7 +68,7 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value.slice(0, maxLength))}
             placeholder="Posez votre question ici..."
-            className="min-h-[60px] max-h-[200px] resize-none pr-24"
+            className="min-h-[56px] sm:min-h-[60px] max-h-[150px] sm:max-h-[200px] resize-none pr-20 sm:pr-24 text-sm sm:text-base"
             disabled={isTyping}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -78,18 +78,18 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
             }}
           />
 
-          <div className="absolute bottom-2 right-2 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
+          <div className="absolute bottom-2 right-2 flex items-center gap-1.5 sm:gap-2">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
               {message.length}/{maxLength}
             </span>
-            <Button type="submit" size="icon" disabled={!message.trim() || isTyping} className="h-9 w-9">
-              <Send className="h-4 w-4" />
+            <Button type="submit" size="icon" disabled={!message.trim() || isTyping} className="h-8 w-8 sm:h-9 sm:w-9">
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="sr-only">Envoyer</span>
             </Button>
           </div>
         </form>
 
-        <p className="mt-2 text-center text-xs text-muted-foreground">
+        <p className="mt-1.5 sm:mt-2 text-center text-xs text-muted-foreground hidden sm:block">
           Appuyez sur Entrée pour envoyer, Shift + Entrée pour une nouvelle ligne
         </p>
       </div>

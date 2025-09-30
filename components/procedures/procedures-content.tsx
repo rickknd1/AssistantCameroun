@@ -2,124 +2,17 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Clock, Coins, TrendingUp, FileText, Building2, Home, Car, GraduationCap, Scale } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import type { Procedure } from "@/lib/types/database"
 
-interface Procedure {
-  id: string
-  name: string
-  category: string
-  duration: string
-  cost: string
-  difficulty: "Facile" | "Moyen" | "Difficile"
+interface ProcedureWithIcon extends Procedure {
   icon: React.ElementType
 }
-
-const PROCEDURES: Procedure[] = [
-  {
-    id: "cni",
-    name: "Carte Nationale d'Identité (CNI)",
-    category: "identite",
-    duration: "2-4 semaines",
-    cost: "6 000 FCFA",
-    difficulty: "Facile",
-    icon: FileText,
-  },
-  {
-    id: "passeport",
-    name: "Passeport ordinaire",
-    category: "identite",
-    duration: "3-6 semaines",
-    cost: "75 000 FCFA",
-    difficulty: "Moyen",
-    icon: FileText,
-  },
-  {
-    id: "acte-naissance",
-    name: "Acte de naissance",
-    category: "identite",
-    duration: "1-2 jours",
-    cost: "1 000 FCFA",
-    difficulty: "Facile",
-    icon: FileText,
-  },
-  {
-    id: "creation-entreprise",
-    name: "Création d'entreprise",
-    category: "entreprise",
-    duration: "2-4 semaines",
-    cost: "50 000 - 200 000 FCFA",
-    difficulty: "Difficile",
-    icon: Building2,
-  },
-  {
-    id: "registre-commerce",
-    name: "Inscription au registre du commerce",
-    category: "entreprise",
-    duration: "1-2 semaines",
-    cost: "25 000 FCFA",
-    difficulty: "Moyen",
-    icon: Building2,
-  },
-  {
-    id: "titre-foncier",
-    name: "Demande de titre foncier",
-    category: "foncier",
-    duration: "6-12 mois",
-    cost: "Variable",
-    difficulty: "Difficile",
-    icon: Home,
-  },
-  {
-    id: "permis-construire",
-    name: "Permis de construire",
-    category: "foncier",
-    duration: "2-3 mois",
-    cost: "50 000 - 150 000 FCFA",
-    difficulty: "Moyen",
-    icon: Home,
-  },
-  {
-    id: "permis-conduire",
-    name: "Permis de conduire",
-    category: "transport",
-    duration: "3-6 mois",
-    cost: "150 000 - 250 000 FCFA",
-    difficulty: "Moyen",
-    icon: Car,
-  },
-  {
-    id: "carte-grise",
-    name: "Carte grise (certificat d'immatriculation)",
-    category: "transport",
-    duration: "1-2 semaines",
-    cost: "25 000 FCFA",
-    difficulty: "Facile",
-    icon: Car,
-  },
-  {
-    id: "inscription-universite",
-    name: "Inscription à l'université",
-    category: "education",
-    duration: "Variable",
-    cost: "50 000 - 500 000 FCFA",
-    difficulty: "Moyen",
-    icon: GraduationCap,
-  },
-  {
-    id: "plainte-commissariat",
-    name: "Dépôt de plainte au commissariat",
-    category: "justice",
-    duration: "1 jour",
-    cost: "Gratuit",
-    difficulty: "Facile",
-    icon: Scale,
-  },
-]
 
 const CATEGORIES = [
   { id: "all", label: "Toutes", icon: FileText },
@@ -131,15 +24,63 @@ const CATEGORIES = [
   { id: "justice", label: "Justice", icon: Scale },
 ]
 
+const getCategoryIcon = (category: string): React.ElementType => {
+  switch (category) {
+    case "identite":
+      return FileText
+    case "entreprise":
+      return Building2
+    case "foncier":
+      return Home
+    case "transport":
+      return Car
+    case "education":
+      return GraduationCap
+    case "justice":
+      return Scale
+    default:
+      return FileText
+  }
+}
+
 export function ProceduresContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
+  const [procedures, setProcedures] = useState<Procedure[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredProcedures = PROCEDURES.filter((proc) => {
-    const matchesSearch = proc.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = activeCategory === "all" || proc.category === activeCategory
-    return matchesSearch && matchesCategory
-  })
+  useEffect(() => {
+    async function fetchProcedures() {
+      setLoading(true)
+      const params = new URLSearchParams()
+
+      if (activeCategory !== "all") {
+        params.append("category", activeCategory)
+      }
+      if (searchQuery) {
+        params.append("search", searchQuery)
+      }
+
+      try {
+        const res = await fetch(`/api/procedures?${params}`)
+        const result = await res.json()
+        setProcedures(result.data || [])
+      } catch (error) {
+        console.error("Error fetching procedures:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProcedures()
+  }, [activeCategory, searchQuery])
+
+  const proceduresWithIcons: ProcedureWithIcon[] = procedures.map((proc) => ({
+    ...proc,
+    icon: getCategoryIcon(proc.category),
+  }))
+
+  const filteredProcedures = proceduresWithIcons
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -202,40 +143,58 @@ export function ProceduresContent() {
               {filteredProcedures.length > 1 ? "s" : ""}
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProcedures.map((procedure) => (
-                <Link
-                  key={procedure.id}
-                  href={`/procedures/${procedure.id}`}
-                  className="group rounded-lg border border-border bg-card p-6 transition-all hover:shadow-lg"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <procedure.icon className="h-6 w-6 text-primary" />
+            {loading ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="animate-pulse rounded-lg border border-border bg-card p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="h-12 w-12 bg-muted rounded-lg"></div>
+                      <div className="h-6 w-16 bg-muted rounded"></div>
                     </div>
-                    <Badge className={getDifficultyColor(procedure.difficulty)}>{procedure.difficulty}</Badge>
-                  </div>
-
-                  <h3 className="mt-4 font-semibold text-card-foreground group-hover:text-primary">{procedure.name}</h3>
-
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      <span>{procedure.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Coins className="h-4 w-4" />
-                      <span>{procedure.cost}</span>
+                    <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-muted rounded w-1/2"></div>
+                      <div className="h-3 bg-muted rounded w-1/2"></div>
                     </div>
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredProcedures.map((procedure) => (
+                  <Link
+                    key={procedure.id}
+                    href={`/procedures/${procedure.slug}`}
+                    className="group rounded-lg border border-border bg-card p-6 transition-all hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <procedure.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <Badge className={getDifficultyColor(procedure.difficulty)}>{procedure.difficulty}</Badge>
+                    </div>
 
-                  <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">
-                    Voir les détails
-                    <TrendingUp className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    <h3 className="mt-4 font-semibold text-card-foreground group-hover:text-primary">{procedure.name}</h3>
+
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{procedure.duration}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Coins className="h-4 w-4" />
+                        <span>{procedure.costs[0]?.amount || "Variable"}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">
+                      Voir les détails
+                      <TrendingUp className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

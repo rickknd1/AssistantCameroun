@@ -59,31 +59,50 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Appel à l'API réelle
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: content,
+          conversationHistory: messages.map(m => ({
+            role: m.role,
+            content: m.content
+          }))
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la communication avec l\'assistant')
+      }
+
+      const data = await response.json()
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `Pour répondre à votre question sur "${content.slice(0, 50)}...", voici les informations officielles :\n\n**Procédure à suivre :**\n\n1. Rendez-vous au centre d'enrôlement le plus proche de votre domicile\n2. Présentez les documents requis (acte de naissance, photos d'identité)\n3. Effectuez l'enrôlement biométrique\n4. Payez les frais administratifs\n5. Récupérez votre récépissé\n\nLe délai de traitement est généralement de **2 à 4 semaines**. Vous serez notifié par SMS lorsque votre document sera prêt.\n\n**Important :** Assurez-vous que tous vos documents sont conformes aux exigences pour éviter tout retard.`,
+        content: data.response,
         timestamp: new Date(),
-        sources: [
-          {
-            title: "Loi N° 2016/007 du 12 juillet 2016 portant Code Pénal",
-            reference: "Art. 152-156",
-            url: "/bibliotheque/code-penal",
-          },
-          {
-            title: "Décret N° 2011/408 du 09 décembre 2011",
-            reference: "Chapitre III",
-            url: "/bibliotheque/decret-2011-408",
-          },
-        ],
-        confidence: 95,
+        sources: data.sources || [],
+        confidence: data.confidence || 70,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('Error sending message:', error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
       setIsTyping(false)
-    }, 2000)
+    }
   }
 
   const handleNewConversation = () => {
@@ -91,7 +110,7 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex h-full w-full overflow-hidden">
       <ChatSidebar
         conversations={conversations}
         isOpen={sidebarOpen}
@@ -99,14 +118,18 @@ export function ChatInterface() {
         onNewConversation={handleNewConversation}
       />
 
-      <div className="flex flex-1 flex-col">
-        {messages.length === 0 ? (
-          <WelcomeScreen onQuestionClick={handleSendMessage} />
-        ) : (
-          <ChatMessages messages={messages} isTyping={isTyping} />
-        )}
+      <div className="flex flex-1 flex-col min-h-0 h-full">
+        <div className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <WelcomeScreen onQuestionClick={handleSendMessage} />
+          ) : (
+            <ChatMessages messages={messages} isTyping={isTyping} />
+          )}
+        </div>
 
-        <ChatInput onSendMessage={handleSendMessage} isTyping={isTyping} />
+        <div className="flex-shrink-0 border-t border-border bg-background">
+          <ChatInput onSendMessage={handleSendMessage} isTyping={isTyping} />
+        </div>
       </div>
     </div>
   )

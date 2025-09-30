@@ -1,0 +1,5157 @@
+Excellent ! J'ai toutes les informations nécessaires. Je vais te créer une architecture complète, pragmatique et adaptée à tes besoins spécifiques.
+📊 ANALYSE DE TES RÉPONSES
+Points clés à retenir :
+
+Peu de PDFs (~50-100) mais volumineux (codes entiers)
+API Gemini gratuite (15 RPM, 1M TPM, 1500 RPD)
+Déploiement Vercel + Railway
+Workflow v0.dev → Claude Code
+IMPORTANT : Assistant généraliste sur le Cameroun (pas que juridique)
+Système de crawling automatique pour actualités et mises à jour
+
+Voici l'architecture complète optimisée pour ton projet :
+🏗️ ARCHITECTURE COMPLÈTE - ASSISTANT CAMEROUNAIS INTELLIGENT
+📦 1. TECH STACK VERROUILLÉE
+yaml# FRONTEND
+Framework: Next.js 14.2.5 (App Router)
+Language: TypeScript 5.5
+Styling: Tailwind CSS 3.4 + shadcn/ui
+State: Zustand 4.5
+Forms: React Hook Form 7.52 + Zod 3.23
+Icons: Lucide React
+Markdown: react-markdown + remark-gfm
+PDF Viewer: react-pdf ou pdf.js
+HTTP Client: Axios 1.7
+Analytics: Vercel Analytics
+
+# BACKEND  
+Runtime: Node.js 20 LTS
+Framework: Express.js 4.19 + TypeScript
+ORM: Prisma 5.18
+Validation: Zod 3.23
+Queue: BullMQ 5.12 (avec Redis)
+Cron: node-cron 3.0
+PDF Processing: pdf-parse + pdfjs-dist
+Scraping: Puppeteer 22.0 + Cheerio
+Rate Limit: express-rate-limit
+CORS: cors
+Logger: Winston
+
+# DATABASE
+PostgreSQL: 16+ (Railway)
+Extensions: pgvector, pg_trgm, unaccent
+Redis: 7+ (Railway ou Upstash)
+
+# AI & EMBEDDINGS
+LLM: Gemini 2.0 Flash (Free tier)
+Embeddings: text-embedding-004
+SDK: @google/generative-ai 0.21
+Context: 1M tokens window
+Rate: 15 RPM, 1500 RPD
+
+# DEPLOYMENT
+Frontend: Vercel
+Backend: Railway
+Database: Railway PostgreSQL
+Redis: Upstash Redis
+Storage: Cloudinary (PDFs)
+Monitoring: Vercel Analytics + Sentry
+
+# DEV TOOLS
+Package Manager: pnpm 9.0
+Linter: ESLint 9.0
+Formatter: Prettier 3.3
+Git Hooks: Husky + lint-staged
+Testing: Vitest + Playwright
+🏗️ 2. STRUCTURE DE RÉPERTOIRES
+cameroon-assistant/
+├── frontend/                      # Next.js App (Vercel)
+│   ├── app/                      # App Router
+│   │   ├── (public)/             # Routes publiques
+│   │   │   ├── page.tsx          # Accueil
+│   │   │   ├── assistant/        # Chat avec l'IA
+│   │   │   │   └── page.tsx
+│   │   │   ├── bibliotheque/     # Documents juridiques
+│   │   │   │   ├── page.tsx      # Liste/recherche
+│   │   │   │   └── [slug]/       # Détail document
+│   │   │   ├── quiz/             # Quiz et jeux
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [category]/
+│   │   │   └── actualites/       # News
+│   │   │       └── page.tsx
+│   │   ├── api/                  # API Routes (BFF)
+│   │   │   └── revalidate/
+│   │   ├── layout.tsx
+│   │   └── globals.css
+│   ├── components/               
+│   │   ├── ui/                   # shadcn/ui
+│   │   ├── chat/                 # Composants chat
+│   │   │   ├── ChatInterface.tsx
+│   │   │   ├── MessageBubble.tsx
+│   │   │   ├── CitationCard.tsx
+│   │   │   └── SuggestedQuestions.tsx
+│   │   ├── documents/
+│   │   │   ├── DocumentCard.tsx
+│   │   │   ├── DocumentViewer.tsx
+│   │   │   └── SearchFilters.tsx
+│   │   ├── quiz/
+│   │   │   ├── QuizCard.tsx
+│   │   │   ├── QuizProgress.tsx
+│   │   │   └── ResultsModal.tsx
+│   │   └── shared/
+│   │       ├── Header.tsx
+│   │       ├── Footer.tsx
+│   │       └── LanguageToggle.tsx
+│   ├── lib/
+│   │   ├── api-client.ts         # Axios config
+│   │   ├── utils.ts
+│   │   └── constants.ts
+│   ├── hooks/
+│   │   ├── useChat.ts
+│   │   ├── useDocuments.ts
+│   │   └── useDebounce.ts
+│   ├── stores/
+│   │   ├── chatStore.ts          # Zustand
+│   │   └── preferencesStore.ts
+│   ├── types/
+│   │   └── index.ts
+│   └── prompts/                  # Pour v0.dev
+│       └── components.md
+│
+├── backend/                       # Express API (Railway)
+│   ├── src/
+│   │   ├── index.ts              # Entry point
+│   │   ├── app.ts                # Express app
+│   │   ├── config/
+│   │   │   ├── database.ts       # Prisma client
+│   │   │   ├── redis.ts          # Redis client
+│   │   │   └── gemini.ts         # Gemini config
+│   │   ├── controllers/
+│   │   │   ├── chat.controller.ts
+│   │   │   ├── documents.controller.ts
+│   │   │   ├── quiz.controller.ts
+│   │   │   └── news.controller.ts
+│   │   ├── services/
+│   │   │   ├── gemini.service.ts      # IA principale
+│   │   │   ├── vector.service.ts      # Embeddings & RAG
+│   │   │   ├── extraction.service.ts  # PDF processing
+│   │   │   ├── scraper.service.ts     # News scraping
+│   │   │   ├── formatter.service.ts   # Markdown/HTML
+│   │   │   └── cache.service.ts       # Redis caching
+│   │   ├── middleware/
+│   │   │   ├── rateLimit.ts
+│   │   │   ├── validation.ts
+│   │   │   └── errorHandler.ts
+│   │   ├── routes/
+│   │   │   └── v1/
+│   │   │       ├── index.ts
+│   │   │       ├── chat.routes.ts
+│   │   │       └── documents.routes.ts
+│   │   ├── jobs/                 # Background tasks
+│   │   │   ├── scrapeNews.job.ts
+│   │   │   ├── updateDocuments.job.ts
+│   │   │   └── generateEmbeddings.job.ts
+│   │   ├── utils/
+│   │   │   ├── logger.ts
+│   │   │   └── validators.ts
+│   │   └── types/
+│   │       └── index.ts
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   ├── seed.ts
+│   │   └── migrations/
+│   ├── scripts/                  # Scripts d'extraction
+│   │   ├── extract-pdfs.ts      # Extraction initiale
+│   │   ├── crawl-sources.ts     # Crawler
+│   │   └── generate-embeddings.ts
+│   └── data/                     # PDFs source
+│       ├── pdfs/
+│       └── extracted/
+│
+├── shared/                        # Code partagé
+│   ├── types/
+│   └── constants/
+│
+├── .cursorrules                   # Règles pour Claude Code
+├── .claude-code-rules            # Instructions spécifiques
+├── ARCHITECTURE.md               # Documentation
+├── README.md
+└── pnpm-workspace.yaml
+🗄️ 3. SCHÉMA BASE DE DONNÉES PRISMA
+prisma// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== DOCUMENTS ====================
+model Document {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  titleEn       String?  // Titre anglais
+  
+  // Métadonnées
+  type          DocumentType
+  category      Category
+  subcategory   String?
+  source        String   // URL ou référence officielle
+  sourceFile    String?  // Nom du PDF original
+  
+  // Contenu
+  content       String   @db.Text // Texte complet
+  contentEn     String?  @db.Text // Traduction anglaise
+  summary       String?  @db.Text // Résumé auto-généré
+  summaryEn     String?  @db.Text
+  
+  // Métadonnées juridiques
+  reference     String?  // Ex: "Loi n°2024/001"
+  dateEnacted   DateTime? // Date de promulgation
+  dateEffective DateTime? // Date d'entrée en vigueur
+  status        DocumentStatus @default(ACTIVE)
+  
+  // Recherche
+  searchVector  Unsupported("tsvector")?
+  tags          String[]
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastCrawled   DateTime?
+  
+  // Relations
+  sections      Section[]
+  embeddings    Embedding[]
+  citations     Citation[]
+  quizQuestions QuizQuestion[]
+  
+  @@index([type, category])
+  @@index([status])
+  @@index([slug])
+}
+
+model Section {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  title      String
+  content    String   @db.Text
+  contentEn  String?  @db.Text
+  
+  // Hiérarchie
+  parentId   String?
+  parent     Section? @relation("SectionHierarchy", fields: [parentId], references: [id])
+  children   Section[] @relation("SectionHierarchy")
+  
+  // Position dans le document
+  position   Int
+  level      Int      // 1 = Titre, 2 = Chapitre, 3 = Article
+  reference  String?  // Ex: "Article 15"
+  
+  embeddings Embedding[]
+  
+  @@index([documentId, position])
+}
+
+// ==================== EMBEDDINGS & RECHERCHE ====================
+model Embedding {
+  id         String   @id @default(cuid())
+  
+  // Source
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  sectionId  String?
+  section    Section?  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  // Contenu
+  text       String   @db.Text // Chunk de texte
+  textEn     String?  @db.Text
+  
+  // Vector (1536 dimensions pour text-embedding-004)
+  embedding  Unsupported("vector(768)")?
+  
+  // Métadonnées
+  model      String   @default("text-embedding-004")
+  tokens     Int      // Nombre de tokens
+  
+  createdAt  DateTime @default(now())
+  
+  @@index([documentId])
+  @@index([sectionId])
+}
+
+// ==================== CHAT & CONVERSATIONS ====================
+model Conversation {
+  id         String    @id @default(cuid())
+  sessionId  String    // ID de session (sans auth)
+  
+  language   Language  @default(FR)
+  topic      String?   // Sujet détecté
+  
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  
+  messages   Message[]
+  
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  role           MessageRole
+  content        String       @db.Text
+  
+  // Pour les réponses de l'assistant
+  confidence     Float?       // Score de confiance
+  processingTime Int?         // Temps de traitement en ms
+  tokensUsed     Int?
+  
+  // Métadonnées
+  language       Language
+  error          String?      // Si erreur
+  
+  createdAt      DateTime     @default(now())
+  
+  citations      Citation[]
+  feedback       Feedback?
+  
+  @@index([conversationId, createdAt])
+}
+
+model Citation {
+  id         String   @id @default(cuid())
+  messageId  String
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  
+  excerpt    String   @db.Text // Extrait cité
+  reference  String   // Ex: "Article 15, alinéa 2"
+  relevance  Float    // Score de pertinence
+  
+  @@index([messageId])
+}
+
+// ==================== QUIZ & EDUCATION ====================
+model QuizQuestion {
+  id         String   @id @default(cuid())
+  
+  // Contenu
+  question   String   @db.Text
+  questionEn String?  @db.Text
+  options    Json     // {a: "...", b: "...", c: "...", d: "..."}
+  answer     String   // "a", "b", "c", ou "d"
+  explanation String  @db.Text
+  
+  // Catégorie
+  category   Category
+  difficulty Difficulty
+  
+  // Source
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id])
+  
+  // Stats
+  timesAsked Int      @default(0)
+  correctRate Float   @default(0)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  attempts   QuizAttempt[]
+  
+  @@index([category, difficulty])
+}
+
+model QuizAttempt {
+  id         String       @id @default(cuid())
+  sessionId  String
+  questionId String
+  question   QuizQuestion @relation(fields: [questionId], references: [id])
+  
+  answer     String       // Réponse donnée
+  isCorrect  Boolean
+  timeSpent  Int          // Secondes
+  
+  createdAt  DateTime     @default(now())
+  
+  @@index([sessionId])
+}
+
+// ==================== ACTUALITÉS ====================
+model NewsArticle {
+  id          String   @id @default(cuid())
+  
+  title       String
+  summary     String   @db.Text
+  content     String?  @db.Text
+  url         String   @unique
+  imageUrl    String?
+  
+  source      String   // "Cameroon Tribune", etc.
+  category    NewsCategory
+  
+  // IA
+  isRelevant  Boolean  @default(true) // Pertinent juridiquement
+  aiSummary   String?  @db.Text       // Résumé Gemini
+  tags        String[]
+  
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+  
+  @@index([publishedAt])
+  @@index([category])
+}
+
+// ==================== PROCEDURES ====================
+model Procedure {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  
+  name        String
+  nameEn      String?
+  description String   @db.Text
+  
+  category    ProcedureCategory
+  
+  // Détails
+  steps       Json     // [{order: 1, title: "...", description: "..."}]
+  documents   String[] // Documents requis
+  costs       Json     // {base: 10000, optional: {...}}
+  duration    String   // "48h", "2-3 semaines"
+  locations   Json     // [{name: "...", address: "...", hours: "..."}]
+  
+  // Liens
+  onlineUrl   String?  // Si disponible en ligne
+  formUrl     String?  // Formulaire PDF
+  
+  popularity  Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([category])
+  @@index([slug])
+}
+
+// ==================== ANALYTICS ====================
+model Analytics {
+  id        String   @id @default(cuid())
+  
+  event     EventType
+  sessionId String
+  
+  // Données
+  data      Json     // Données spécifiques à l'événement
+  
+  // Contexte
+  language  Language
+  userAgent String?
+  ip        String?  // Hashé pour privacy
+  
+  createdAt DateTime @default(now())
+  
+  @@index([event, createdAt])
+  @@index([sessionId])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  messageId String   @unique
+  message   Message  @relation(fields: [messageId], references: [id])
+  
+  rating    Int      // 1-5
+  comment   String?  @db.Text
+  
+  createdAt DateTime @default(now())
+}
+
+// ==================== ENUMS ====================
+enum DocumentType {
+  CONSTITUTION
+  CODE          // Code pénal, civil, etc.
+  LOI
+  DECRET
+  ARRETE
+  ORDONNANCE
+  CIRCULAIRE
+  DECISION
+  INSTRUCTION
+  GUIDE
+  FORMULAIRE
+  CULTURE       // Documents culturels
+  HISTOIRE      // Documents historiques
+  GEOGRAPHIE    // Documents géographiques
+}
+
+enum Category {
+  // Juridique
+  DROIT_CONSTITUTIONNEL
+  DROIT_CIVIL
+  DROIT_PENAL
+  DROIT_TRAVAIL
+  DROIT_FISCAL
+  DROIT_FONCIER
+  DROIT_AFFAIRES
+  DROIT_ADMINISTRATIF
+  DROIT_ENVIRONNEMENT
+  
+  // Culture & Société
+  CULTURE_TRADITIONS
+  HISTOIRE_CAMEROUN
+  GEOGRAPHIE
+  ECONOMIE
+  EDUCATION
+  SANTE
+  SPORT
+  POLITIQUE
+  TOURISME
+}
+
+enum DocumentStatus {
+  ACTIVE
+  ABROGATED    // Abrogé
+  MODIFIED     // Modifié
+  DRAFT        // Projet
+}
+
+enum Language {
+  FR
+  EN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum Difficulty {
+  FACILE
+  MOYEN
+  DIFFICILE
+  EXPERT
+}
+
+enum NewsCategory {
+  JURIDIQUE
+  POLITIQUE
+  ECONOMIE
+  SOCIETE
+  CULTURE
+  SPORT
+  INTERNATIONAL
+}
+
+enum ProcedureCategory {
+  IDENTITE        // CNI, Passeport
+  ETAT_CIVIL      // Naissance, Mariage
+  ENTREPRISE      // Création, Licences
+  FONCIER         // Titres, Cadastre
+  EDUCATION       // Inscriptions, Diplômes
+  SANTE           // Carnet, Assurance
+  JUSTICE         // Plaintes, Casier
+  FISCAL          // Impôts, Taxes
+  TRANSPORT       // Permis, Cartes
+  AUTRE
+}
+
+enum EventType {
+  SEARCH
+  CHAT_MESSAGE
+  DOCUMENT_VIEW
+  QUIZ_COMPLETE
+  NEWS_CLICK
+  PROCEDURE_VIEW
+  LANGUAGE_CHANGE
+  ERROR
+}
+🤖 4. SERVICE GEMINI - IMPLÉMENTATION COMPLÈTE
+typescript// backend/src/services/gemini.service.ts
+
+import { GoogleGenerativeAI, GenerativeModel, Content } from '@google/generative-ai';
+import { prisma } from '../config/database';
+import { VectorService } from './vector.service';
+import { CacheService } from './cache.service';
+import { logger } from '../utils/logger';
+import { z } from 'zod';
+
+// Schéma de validation de la réponse
+const GeminiResponseSchema = z.object({
+  answer: z.string(),
+  citations: z.array(z.object({
+    source: z.string(),
+    article: z.string().optional(),
+    text: z.string(),
+    relevance: z.number().min(0).max(1)
+  })),
+  relatedProcedures: z.array(z.string()).optional(),
+  relatedTopics: z.array(z.string()).optional(),
+  confidence: z.number().min(0).max(1),
+  needsExpertConsultation: z.boolean(),
+  language: z.enum(['fr', 'en']),
+  warnings: z.array(z.string()).optional(),
+  category: z.string().optional()
+});
+
+export class GeminiService {
+  private model: GenerativeModel;
+  private vectorService: VectorService;
+  private cacheService: CacheService;
+  
+  // Configuration optimale pour le modèle
+  private readonly config = {
+    model: 'gemini-2.0-flash-exp',
+    temperature: 0.3,        // Basse pour plus de précision
+    topK: 20,                
+    topP: 0.8,              
+    maxOutputTokens: 4096,   
+    responseMimeType: "application/json",
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_ONLY_HIGH'
+      }
+    ]
+  };
+
+  // Prompt système principal
+  private readonly SYSTEM_PROMPT = `Tu es l'Assistant National du Cameroun, une intelligence artificielle officielle créée pour aider les citoyens camerounais à comprendre leurs droits, leurs devoirs, et tout ce qui concerne leur pays.
+
+## 🎯 IDENTITÉ ET MISSION
+
+**Nom**: Assistant National du Cameroun
+**Rôle**: Expert en droit camerounais, procédures administratives, culture, histoire et actualités du Cameroun
+**Langues**: Français et anglais (bilingue officiel)
+**Ton**: Professionnel, bienveillant, pédagogique et accessible
+
+## ⚖️ RÈGLES ABSOLUES
+
+1. **PRÉCISION JURIDIQUE**: Toujours citer les textes de loi exacts (numéro, date, articles)
+2. **FIABILITÉ**: Ne jamais inventer d'information. Si tu n'es pas sûr, dis-le
+3. **CITATIONS OBLIGATOIRES**: Chaque affirmation juridique doit avoir sa source
+4. **LANGAGE ACCESSIBLE**: Explique le jargon juridique en termes simples
+5. **NEUTRALITÉ**: Reste objectif, surtout sur les sujets politiques
+6. **CULTURE CAMEROUNAISE**: Tu connais l'histoire, les traditions, les langues locales, la géographie, l'économie
+
+## 📋 FORMAT DE RÉPONSE OBLIGATOIRE
+
+Tu dois TOUJOURS répondre en JSON valide avec cette structure:
+
+{
+  "answer": "Réponse complète en Markdown (voir structure ci-dessous)",
+  "citations": [
+    {
+      "source": "Nom exact du document",
+      "article": "Article/Section si applicable", 
+      "text": "Extrait pertinent du texte",
+      "relevance": 0.95
+    }
+  ],
+  "relatedProcedures": ["cni", "passeport"],
+  "relatedTopics": ["droit-civil", "etat-civil"],
+  "confidence": 0.85,
+  "needsExpertConsultation": false,
+  "language": "fr",
+  "warnings": ["Information susceptible de changement"],
+  "category": "DROIT_CIVIL"
+}
+
+## 📝 STRUCTURE MARKDOWN DE LA RÉPONSE
+
+La valeur "answer" doit suivre cette structure:
+
+### ✅ Réponse directe
+[Réponse claire et concise à la question - 2-3 phrases max]
+
+### 📚 Base légale
+**Textes applicables:**
+- [Loi/Décret avec numéro et date]
+- Article X: "[Citation exacte]"
+
+### 📋 Procédure détaillée (si applicable)
+**Étapes à suivre:**
+1. [Étape 1 avec détails]
+2. [Étape 2 avec détails]
+
+**Documents requis:**
+- [Document 1]
+- [Document 2]
+
+### 💰 Coûts et délais
+- **Coût total**: [Montant] FCFA
+- **Délai moyen**: [Durée]
+- **Validité**: [Si applicable]
+
+### 📍 Où s'adresser
+- [Lieu/Administration]
+- Horaires: [Si connus]
+- Contact: [Si disponible]
+
+### ⚠️ Points importants
+- [Avertissement ou conseil important]
+- [Cas particuliers]
+
+### 💡 Bon à savoir
+[Conseils pratiques, astuces, informations complémentaires]
+
+## 🌍 CONNAISSANCES CULTURELLES
+
+Tu maîtrises:
+- **Histoire**: De la période précoloniale à aujourd'hui
+- **Géographie**: 10 régions, villes principales, reliefs, climats
+- **Langues**: 240+ langues locales, français/anglais officiels
+- **Traditions**: Festivals, coutumes des différentes ethnies
+- **Économie**: Secteurs clés, CEMAC, commerce
+- **Sport**: Football (Lions Indomptables), athlètes célèbres
+- **Cuisine**: Ndolé, Eru, Achu, poulet DG, etc.
+- **Musique**: Makossa, Bikutsi, Bend-skin, artistes
+- **Personnalités**: Historiques et contemporaines
+
+## 🎯 EXEMPLES DE TONS
+
+**Question juridique simple**:
+"Pour obtenir votre CNI, vous devez... 😊"
+
+**Question complexe**:
+"Cette situation relève du droit successoral. Selon l'article..."
+
+**Question culturelle**:
+"Le Ngondo est une magnifique tradition du peuple Sawa... 🌊"
+
+## ⚠️ GESTION DES CAS SPÉCIAUX
+
+- **Question hors contexte Cameroun**: Réponds poliment que tu es spécialisé sur le Cameroun
+- **Question politique sensible**: Reste factuel et cite les textes officiels
+- **Demande de conseil juridique personnel**: Recommande de consulter un avocat pour les cas complexes
+- **Information non trouvée**: "Je n'ai pas trouvé cette information dans ma base de données. Je vous recommande de..."
+
+## 📊 CONTEXTE FOURNI
+
+Tu vas recevoir:
+1. La question de l'utilisateur
+2. Des documents pertinents de la base de données
+3. L'historique de conversation (si disponible)
+
+Utilise ces informations pour construire une réponse précise et contextuelle.`;
+
+  constructor() {
+    this.initialize();
+  }
+
+  private async initialize() {
+    try {
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+      this.model = genAI.getGenerativeModel({
+        model: this.config.model,
+        generationConfig: {
+          temperature: this.config.temperature,
+          topK: this.config.topK,
+          topP: this.config.topP,
+          maxOutputTokens: this.config.maxOutputTokens,
+          responseMimeType: this.config.responseMimeType
+        },
+        safetySettings: this.config.safetySettings,
+        systemInstruction: this.SYSTEM_PROMPT
+      });
+
+      this.vectorService = new VectorService();
+      this.cacheService = new CacheService();
+
+      logger.info('GeminiService initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize GeminiService:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Génère une réponse à la question de l'utilisateur
+   */
+  async generateResponse(
+    question: string,
+    conversationId: string,
+    language: 'fr' | 'en' = 'fr'
+  ) {
+    try {
+      const startTime = Date.now();
+
+      // 1. Vérifier le cache
+      const cacheKey = `response:${this.hashQuestion(question)}:${language}`;
+      const cached = await this.cacheService.get(cacheKey);
+      if (cached) {
+        logger.info('Response served from cache');
+        return JSON.parse(cached);
+      }
+
+      // 2. Récupérer le contexte pertinent (RAG)
+      const context = await this.buildRAGContext(question, language);
+
+      // 3. Récupérer l'historique de conversation
+      const history = await this.getConversationHistory(conversationId);
+
+      // 4. Construire le prompt final
+      const prompt = this.buildPrompt(question, context, language);
+
+      // 5. Générer la réponse avec Gemini
+      const result = await this.model.generateContent({
+        contents: [
+          ...history,
+          { role: 'user', parts: [{ text: prompt }] }
+        ]
+      });
+
+      const response = result.response;
+      const rawText = response.text();
+
+      // 6. Parser et valider la réponse JSON
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(rawText);
+        parsedResponse = GeminiResponseSchema.parse(parsedResponse);
+      } catch (parseError) {
+        logger.error('Failed to parse Gemini response:', parseError);
+        // Fallback response
+        parsedResponse = {
+          answer: rawText,
+          citations: [],
+          confidence: 0.5,
+          needsExpertConsultation: true,
+          language,
+          warnings: ["Réponse non structurée - Veuillez reformuler votre question"]
+        };
+      }
+
+      // 7. Enrichir les citations avec les métadonnées
+      if (parsedResponse.citations && parsedResponse.citations.length > 0) {
+        parsedResponse.citations = await this.enrichCitations(parsedResponse.citations);
+      }
+
+      // 8. Sauvegarder la conversation
+      await this.saveMessage(conversationId, question, parsedResponse);
+
+      // 9. Mettre en cache (30 minutes)
+      await this.cacheService.set(cacheKey, JSON.stringify(parsedResponse), 1800);
+
+      // 10. Logger les métriques
+      const processingTime = Date.now() - startTime;
+      logger.info(`Response generated in ${processingTime}ms`, {
+        conversationId,
+        confidence: parsedResponse.confidence,
+        citations: parsedResponse.citations.length
+      });RéessayerRKContinuerModifiertypescript      return {
+        ...parsedResponse,
+        processingTime,
+        tokensUsed: response.usageMetadata?.totalTokenCount || 0
+      };
+
+    } catch (error) {
+      logger.error('Error generating response:', error);
+      throw new Error('Erreur lors de la génération de la réponse');
+    }
+  }
+
+  /**
+   * Construit le contexte RAG avec les documents pertinents
+   */
+  private async buildRAGContext(question: string, language: 'fr' | 'en') {
+    try {
+      // 1. Recherche vectorielle
+      const relevantChunks = await this.vectorService.searchSimilar(question, {
+        limit: 10,
+        threshold: 0.7,
+        language
+      });
+
+      // 2. Recherche full-text pour compléter
+      const textResults = await prisma.document.findMany({
+        where: {
+          OR: [
+            { content: { contains: question, mode: 'insensitive' } },
+            { title: { contains: question, mode: 'insensitive' } }
+          ],
+          status: 'ACTIVE'
+        },
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          reference: true,
+          content: true,
+          sections: {
+            select: {
+              title: true,
+              content: true,
+              reference: true
+            }
+          }
+        },
+        take: 5
+      });
+
+      // 3. Combiner et formater le contexte
+      const context = {
+        vectorResults: relevantChunks.map(chunk => ({
+          text: chunk.text,
+          source: chunk.document?.title || 'Document',
+          relevance: chunk.similarity
+        })),
+        textResults: textResults.map(doc => ({
+          title: doc.title,
+          type: doc.type,
+          reference: doc.reference,
+          excerpt: this.extractRelevantExcerpt(doc.content, question)
+        }))
+      };
+
+      return context;
+    } catch (error) {
+      logger.error('Error building RAG context:', error);
+      return { vectorResults: [], textResults: [] };
+    }
+  }
+
+  /**
+   * Construit le prompt avec le contexte
+   */
+  private buildPrompt(question: string, context: any, language: 'fr' | 'en'): string {
+    const contextText = [
+      "DOCUMENTS PERTINENTS TROUVÉS:",
+      ...context.vectorResults.map((r: any) => 
+        `- [${r.source}] (Pertinence: ${r.relevance.toFixed(2)}): "${r.text}"`
+      ),
+      ...context.textResults.map((r: any) =>
+        `- [${r.title}] (${r.type}): "${r.excerpt}"`
+      )
+    ].join('\n');
+
+    return `
+QUESTION DE L'UTILISATEUR:
+${question}
+
+LANGUE DEMANDÉE: ${language === 'fr' ? 'Français' : 'English'}
+
+CONTEXTE DE LA BASE DE DONNÉES:
+${contextText}
+
+INSTRUCTIONS IMPORTANTES:
+1. Réponds UNIQUEMENT en JSON valide selon le format spécifié
+2. Base ta réponse sur les documents fournis en contexte
+3. Cite précisément les sources avec les articles exacts
+4. Si l'information n'est pas dans le contexte, indique-le clairement
+5. Adapte le niveau de langage pour être compréhensible par tous
+6. Pour les questions culturelles/historiques sur le Cameroun, tu peux utiliser tes connaissances générales
+7. Inclus les émojis appropriés dans la réponse pour la rendre plus conviviale
+
+Génère maintenant la réponse complète en JSON.`;
+  }
+
+  /**
+   * Extrait un passage pertinent du document
+   */
+  private extractRelevantExcerpt(content: string, question: string, maxLength: number = 300): string {
+    const words = question.toLowerCase().split(' ').filter(w => w.length > 3);
+    let bestExcerpt = '';
+    let bestScore = 0;
+
+    // Diviser le contenu en phrases
+    const sentences = content.split(/[.!?]+/);
+    
+    for (let i = 0; i < sentences.length; i++) {
+      const sentence = sentences[i].toLowerCase();
+      let score = 0;
+      
+      // Calculer le score de pertinence
+      for (const word of words) {
+        if (sentence.includes(word)) score++;
+      }
+      
+      if (score > bestScore) {
+        bestScore = score;
+        // Prendre cette phrase + contexte
+        const start = Math.max(0, i - 1);
+        const end = Math.min(sentences.length, i + 2);
+        bestExcerpt = sentences.slice(start, end).join('. ');
+      }
+    }
+
+    // Tronquer si nécessaire
+    if (bestExcerpt.length > maxLength) {
+      bestExcerpt = bestExcerpt.substring(0, maxLength) + '...';
+    }
+
+    return bestExcerpt || content.substring(0, maxLength) + '...';
+  }
+
+  /**
+   * Enrichit les citations avec les métadonnées
+   */
+  private async enrichCitations(citations: any[]) {
+    const enriched = [];
+    
+    for (const citation of citations) {
+      try {
+        // Rechercher le document source
+        const document = await prisma.document.findFirst({
+          where: {
+            OR: [
+              { title: { contains: citation.source, mode: 'insensitive' } },
+              { reference: { contains: citation.source, mode: 'insensitive' } }
+            ]
+          },
+          select: {
+            id: true,
+            title: true,
+            reference: true,
+            slug: true,
+            type: true,
+            source: true
+          }
+        });
+
+        enriched.push({
+          ...citation,
+          documentId: document?.id,
+          documentSlug: document?.slug,
+          documentUrl: document ? `/bibliotheque/${document.slug}` : null,
+          officialSource: document?.source
+        });
+      } catch (error) {
+        logger.error('Error enriching citation:', error);
+        enriched.push(citation);
+      }
+    }
+    
+    return enriched;
+  }
+
+  /**
+   * Récupère l'historique de conversation
+   */
+  private async getConversationHistory(conversationId: string): Promise<Content[]> {
+    try {
+      const messages = await prisma.message.findMany({
+        where: { conversationId },
+        orderBy: { createdAt: 'asc' },
+        take: 10 // Derniers 10 messages pour le contexte
+      });
+
+      return messages.map(msg => ({
+        role: msg.role === 'USER' ? 'user' : 'model',
+        parts: [{ text: msg.content }]
+      }));
+    } catch (error) {
+      logger.error('Error fetching conversation history:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Sauvegarde le message en base de données
+   */
+  private async saveMessage(conversationId: string, question: string, response: any) {
+    try {
+      // Sauvegarder la question
+      await prisma.message.create({
+        data: {
+          conversationId,
+          role: 'USER',
+          content: question,
+          language: response.language === 'fr' ? 'FR' : 'EN'
+        }
+      });
+
+      // Sauvegarder la réponse avec citations
+      const assistantMessage = await prisma.message.create({
+        data: {
+          conversationId,
+          role: 'ASSISTANT',
+          content: response.answer,
+          confidence: response.confidence,
+          language: response.language === 'fr' ? 'FR' : 'EN',
+          tokensUsed: response.tokensUsed,
+          citations: {
+            create: response.citations.map((c: any) => ({
+              documentId: c.documentId,
+              excerpt: c.text,
+              reference: c.article || c.source,
+              relevance: c.relevance
+            }))
+          }
+        }
+      });
+
+      return assistantMessage;
+    } catch (error) {
+      logger.error('Error saving message:', error);
+    }
+  }
+
+  /**
+   * Hash la question pour le cache
+   */
+  private hashQuestion(question: string): string {
+    const crypto = require('crypto');
+    return crypto.createHash('md5').update(question.toLowerCase().trim()).digest('hex');
+  }
+
+  /**
+   * Génère des questions suggérées basées sur le contexte
+   */
+  async generateSuggestedQuestions(topic: string, language: 'fr' | 'en' = 'fr') {
+    const prompt = `
+Génère 5 questions pertinentes que les citoyens camerounais pourraient poser sur le sujet: "${topic}"
+
+Retourne UNIQUEMENT un array JSON de strings:
+["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"]
+
+Langue: ${language === 'fr' ? 'Français' : 'English'}
+Les questions doivent être pratiques et utiles pour la vie quotidienne.`;
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = JSON.parse(result.response.text());
+      return response;
+    } catch (error) {
+      logger.error('Error generating suggested questions:', error);
+      return [
+        "Comment obtenir ma carte nationale d'identité ?",
+        "Quels sont les documents nécessaires pour créer une entreprise ?",
+        "Quelle est la procédure pour obtenir un acte de naissance ?",
+        "Comment faire une demande de passeport ?",
+        "Quels sont mes droits en cas d'arrestation ?"
+      ];
+    }
+  }
+}
+🔍 5. SERVICE VECTORIEL (RAG)
+typescript// backend/src/services/vector.service.ts
+
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { prisma } from '../config/database';
+import { logger } from '../utils/logger';
+
+export class VectorService {
+  private genAI: GoogleGenerativeAI;
+  private embeddingModel: any;
+  
+  constructor() {
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    this.embeddingModel = this.genAI.getGenerativeModel({ 
+      model: "text-embedding-004"
+    });
+  }
+
+  /**
+   * Génère un embedding pour un texte
+   */
+  async generateEmbedding(text: string): Promise<number[]> {
+    try {
+      const result = await this.embeddingModel.embedContent({
+        content: { parts: [{ text }] }
+      });
+      return result.embedding.values;
+    } catch (error) {
+      logger.error('Error generating embedding:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Recherche les documents similaires
+   */
+  async searchSimilar(query: string, options: {
+    limit?: number;
+    threshold?: number;
+    language?: 'fr' | 'en';
+    category?: string;
+  } = {}) {
+    const { limit = 10, threshold = 0.7, language = 'fr' } = options;
+    
+    try {
+      // 1. Générer l'embedding de la requête
+      const queryEmbedding = await this.generateEmbedding(query);
+      
+      // 2. Recherche vectorielle avec pgvector
+      const results = await prisma.$queryRaw`
+        SELECT 
+          e.id,
+          e."documentId",
+          e."sectionId",
+          e.text,
+          e."textEn",
+          d.title as document_title,
+          d.type as document_type,
+          d.reference as document_reference,
+          1 - (e.embedding <=> ${queryEmbedding}::vector) as similarity
+        FROM "Embedding" e
+        LEFT JOIN "Document" d ON e."documentId" = d.id
+        WHERE 1 - (e.embedding <=> ${queryEmbedding}::vector) > ${threshold}
+        ORDER BY similarity DESC
+        LIMIT ${limit}
+      `;
+
+      // 3. Formater les résultats
+      return results.map((r: any) => ({
+        id: r.id,
+        text: language === 'en' ? (r.textEn || r.text) : r.text,
+        similarity: r.similarity,
+        document: {
+          id: r.documentId,
+          title: r.document_title,
+          type: r.document_type,
+          reference: r.document_reference
+        }
+      }));
+
+    } catch (error) {
+      logger.error('Error searching similar documents:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Indexe un document complet
+   */
+  async indexDocument(documentId: string) {
+    try {
+      const document = await prisma.document.findUnique({
+        where: { id: documentId },
+        include: { sections: true }
+      });
+
+      if (!document) {
+        throw new Error('Document not found');
+      }
+
+      // Chunker le document
+      const chunks = this.chunkDocument(document);
+      
+      // Générer et sauvegarder les embeddings
+      for (const chunk of chunks) {
+        const embedding = await this.generateEmbedding(chunk.text);
+        
+        await prisma.embedding.create({
+          data: {
+            documentId,
+            sectionId: chunk.sectionId,
+            text: chunk.text,
+            textEn: chunk.textEn,
+            embedding: embedding,
+            tokens: chunk.tokens,
+            model: 'text-embedding-004'
+          }
+        });
+      }
+
+      logger.info(`Indexed document ${documentId} with ${chunks.length} chunks`);
+      return chunks.length;
+
+    } catch (error) {
+      logger.error('Error indexing document:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Découpe un document en chunks
+   */
+  private chunkDocument(document: any, chunkSize = 500): any[] {
+    const chunks = [];
+    
+    // Chunker le contenu principal
+    const mainChunks = this.chunkText(document.content, chunkSize);
+    chunks.push(...mainChunks.map((text: string) => ({
+      text,
+      textEn: document.contentEn ? this.chunkText(document.contentEn, chunkSize)[0] : null,
+      sectionId: null,
+      tokens: this.countTokens(text)
+    })));
+
+    // Chunker les sections
+    for (const section of document.sections) {
+      const sectionChunks = this.chunkText(section.content, chunkSize);
+      chunks.push(...sectionChunks.map((text: string) => ({
+        text,
+        textEn: section.contentEn,
+        sectionId: section.id,
+        tokens: this.countTokens(text)
+      })));
+    }
+
+    return chunks;
+  }
+
+  /**
+   * Découpe un texte en chunks avec overlap
+   */
+  private chunkText(text: string, chunkSize: number, overlap: number = 50): string[] {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    const chunks = [];
+    let currentChunk = '';
+    let currentTokens = 0;
+
+    for (const sentence of sentences) {
+      const sentenceTokens = this.countTokens(sentence);
+      
+      if (currentTokens + sentenceTokens > chunkSize && currentChunk) {
+        chunks.push(currentChunk.trim());
+        // Overlap: garder la dernière phrase
+        currentChunk = sentences[sentences.indexOf(sentence) - 1] || '';
+        currentTokens = this.countTokens(currentChunk);
+      }
+      
+      currentChunk += ' ' + sentence;
+      currentTokens += sentenceTokens;
+    }
+
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+
+    return chunks;
+  }
+
+  /**
+   * Compte approximatif des tokens
+   */
+  private countTokens(text: string): number {
+    // Approximation: 1 token ≈ 4 caractères
+    return Math.ceil(text.length / 4);
+  }
+
+  /**
+   * Mise à jour des embeddings d'un document
+   */
+  async updateDocumentEmbeddings(documentId: string) {
+    try {
+      // Supprimer les anciens embeddings
+      await prisma.embedding.deleteMany({
+        where: { documentId }
+      });
+
+      // Re-indexer
+      return await this.indexDocument(documentId);
+    } catch (error) {
+      logger.error('Error updating document embeddings:', error);
+      throw error;
+    }
+  }
+}
+📄 6. SERVICE D'EXTRACTION PDF
+typescript// backend/src/services/extraction.service.ts
+
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import pdfParse from 'pdf-parse';
+import { prisma } from '../config/database';
+import { VectorService } from './vector.service';
+import { logger } from '../utils/logger';
+
+export class ExtractionService {
+  private vectorService: VectorService;
+
+  constructor() {
+    this.vectorService = new VectorService();
+  }
+
+  /**
+   * Extrait le contenu d'un PDF
+   */
+  async extractPDF(filePath: string): Promise<{
+    text: string;
+    pages: number;
+    info: any;
+  }> {
+    try {
+      const dataBuffer = await fs.readFile(filePath);
+      const data = await pdfParse(dataBuffer);
+      
+      return {
+        text: this.cleanText(data.text),
+        pages: data.numpages,
+        info: data.info
+      };
+    } catch (error) {
+      logger.error('Error extracting PDF:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Nettoie le texte extrait
+   */
+  private cleanText(text: string): string {
+    return text
+      .replace(/\r\n/g, '\n')           // Normaliser les sauts de ligne
+      .replace(/\n{3,}/g, '\n\n')       // Limiter les sauts de ligne multiples
+      .replace(/\s+/g, ' ')             // Normaliser les espaces
+      .replace(/[^\S\n]+/g, ' ')        // Garder seulement espaces simples
+      .trim();
+  }
+
+  /**
+   * Parse un document juridique structuré
+   */
+  async parseJuridicalDocument(text: string, metadata: any) {
+    const structure = {
+      title: '',
+      type: '',
+      reference: '',
+      dateEnacted: null as Date | null,
+      preamble: '',
+      sections: [] as any[],
+      articles: [] as any[]
+    };
+
+    // Extraire le titre et la référence
+    const titleMatch = text.match(/^(LOI|DÉCRET|ARRÊTÉ|CODE)\s+N°\s*([^\n]+)/i);
+    if (titleMatch) {
+      structure.type = titleMatch[1].toUpperCase();
+      structure.reference = titleMatch[0];
+    }
+
+    // Parser les sections et articles
+    const articleRegex = /Article\s+(\d+)\s*[:\-.]?\s*([^Article]*)/gi;
+    let match;
+    let position = 0;
+
+    while ((match = articleRegex.exec(text)) !== null) {
+      position++;
+      structure.articles.push({
+        number: parseInt(match[1]),
+        content: this.cleanText(match[2]),
+        position
+      });
+    }
+
+    // Parser les chapitres/titres
+    const sectionRegex = /(TITRE|CHAPITRE|SECTION)\s+([IVXLCDM\d]+)\s*[:\-.]?\s*([^\n]+)/gi;
+    while ((match = sectionRegex.exec(text)) !== null) {
+      structure.sections.push({
+        type: match[1],
+        number: match[2],
+        title: this.cleanText(match[3]),
+        level: match[1] === 'TITRE' ? 1 : match[1] === 'CHAPITRE' ? 2 : 3
+      });
+    }
+
+    return structure;
+  }
+
+  /**
+   * Importe un document dans la base de données
+   */
+  async importDocument(filePath: string, metadata: {
+    title: string;
+    type: string;
+    category: string;
+    source?: string;
+  }) {
+    try {
+      logger.info(`Importing document: ${filePath}`);
+
+      // 1. Extraire le contenu
+      const { text, pages, info } = await this.extractPDF(filePath);
+
+      // 2. Parser la structure
+      const structure = await this.parseJuridicalDocument(text, metadata);
+
+      // 3. Créer le slug
+      const slug = this.generateSlug(metadata.title);
+
+      // 4. Sauvegarder en base
+      const document = await prisma.document.create({
+        data: {
+          slug,
+          title: metadata.title,
+          type: metadata.type as any,
+          category: metadata.category as any,
+          source: metadata.source || path.basename(filePath),
+          sourceFile: path.basename(filePath),
+          content: text,
+          summary: this.generateSummary(text),
+          reference: structure.reference,
+          dateEnacted: structure.dateEnacted,
+          tags: this.extractTags(text),
+          sections: {
+            create: structure.sections.map((section, index) => ({
+              title: section.title,
+              content: this.extractSectionContent(text, section, structure.sections[index + 1]),
+              position: index,
+              level: section.level,
+              reference: `${section.type} ${section.number}`
+            }))
+          }
+        }
+      });
+
+      // 5. Générer les embeddings
+      await this.vectorService.indexDocument(document.id);
+
+      logger.info(`Document imported successfully: ${document.id}`);
+      return document;
+
+    } catch (error) {
+      logger.error('Error importing document:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Extrait le contenu d'une section
+   */
+  private extractSectionContent(text: string, currentSection: any, nextSection: any): string {
+    const startPattern = `${currentSection.type}\\s+${currentSection.number}`;
+    const endPattern = nextSection ? `${nextSection.type}\\s+${nextSection.number}` : null;
+
+    const startMatch = text.search(new RegExp(startPattern, 'i'));
+    if (startMatch === -1) return '';
+
+    const startPos = startMatch;
+    const endPos = endPattern ? text.search(new RegExp(endPattern, 'i')) : text.length;
+
+    return this.cleanText(text.substring(startPos, endPos > startPos ? endPos : text.length));
+  }
+
+  /**
+   * Génère un résumé automatique
+   */
+  private generateSummary(text: string, maxLength: number = 500): string {
+    // Prendre le début du texte après le titre
+    const cleanedText = text.replace(/^(LOI|DÉCRET|ARRÊTÉ|CODE)[^\.]+\./i, '');
+    const firstParagraphs = cleanedText.substring(0, maxLength * 2);
+    
+    // Trouver la fin de la dernière phrase complète
+    const lastPeriod = firstParagraphs.lastIndexOf('.');
+    if (lastPeriod > 0 && lastPeriod < maxLength) {
+      return firstParagraphs.substring(0, lastPeriod + 1).trim();
+    }
+    
+    return firstParagraphs.substring(0, maxLength).trim() + '...';
+  }
+
+  /**
+   * Extrait les tags pertinents
+   */
+  private extractTags(text: string): string[] {
+    const tags = new Set<string>();
+    
+    // Mots-clés juridiques courants
+    const keywords = [
+      'obligation', 'droit', 'devoir', 'sanction', 'amende', 'emprisonnement',
+      'procédure', 'tribunal', 'juge', 'avocat', 'contrat', 'propriété',
+      'succession', 'mariage', 'divorce', 'travail', 'salaire', 'licenciement',
+      'impôt', 'taxe', 'douane', 'entreprise', 'société', 'commerce'
+    ];
+
+    for (const keyword of keywords) {
+      if (text.toLowerCase().includes(keyword)) {
+        tags.add(keyword);
+      }
+    }
+
+    return Array.from(tags);
+  }
+
+  /**
+   * Génère un slug unique
+   */
+  private generateSlug(title: string): string {
+    const base = title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Retirer les accents
+      .replace(/[^a-z0-9]/g, '-')      // Remplacer caractères spéciaux
+      .replace(/-+/g, '-')              // Remplacer multiples tirets
+      .replace(/^-|-$/g, '');           // Retirer tirets début/fin
+
+    return `${base}-${Date.now().toString(36)}`;
+  }
+
+  /**
+   * Importe tous les PDFs d'un dossier
+   */
+  async importBulkPDFs(folderPath: string) {
+    try {
+      const files = await fs.readdir(folderPath);
+      const pdfFiles = files.filter(f => f.endsWith('.pdf'));
+      
+      logger.info(`Found ${pdfFiles.length} PDF files to import`);
+
+      const results = [];
+      for (const file of pdfFiles) {
+        try {
+          const filePath = path.join(folderPath, file);
+          
+          // Deviner les métadonnées depuis le nom du fichier
+          const metadata = this.guessMetadata(file);
+          
+          const document = await this.importDocument(filePath, metadata);
+          results.push({ success: true, file, documentId: document.id });
+          
+        } catch (error) {
+          logger.error(`Failed to import ${file}:`, error);
+          results.push({ success: false, file, error: error.message });
+        }
+      }
+
+      return results;
+    } catch (error) {
+      logger.error('Error importing bulk PDFs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Devine les métadonnées depuis le nom du fichier
+   */
+  private guessMetadata(filename: string) {
+    const name = filename.replace('.pdf', '');
+    
+    // Déterminer le type
+    let type = 'LOI';
+    let category = 'DROIT_CIVIL';
+    
+    if (name.includes('code_penal')) {
+      type = 'CODE';
+      category = 'DROIT_PENAL';
+    } else if (name.includes('constitution')) {
+      type = 'CONSTITUTION';
+      category = 'DROIT_CONSTITUTIONNEL';
+    } else if (name.includes('code_travail')) {
+      type = 'CODE';
+      category = 'DROIT_TRAVAIL';
+    } else if (name.includes('decret')) {
+      type = 'DECRET';
+    } else if (name.includes('arrete')) {
+      type = 'ARRETE';
+    }
+
+    return {
+      title: name.replace(/_/g, ' ').replace(/-/g, ' '),
+      type,
+      category,
+      source: `Import automatique - ${new Date().toISOString()}`
+    };
+  }
+}
+🌐 7. SERVICE SCRAPING ACTUALITÉS
+typescript// backend/src/services/scraper.service.ts
+
+import puppeteer from 'puppeteer';
+import * as cheerio from 'cheerio';
+import { prisma } from '../config/database';
+import { GeminiService } from './gemini.service';
+import { logger } from '../utils/logger';
+import { CacheService } from './cache.service';
+
+interface NewsSource {
+  name: string;
+  url: string;
+  rssUrl?: string;
+  selectors: {
+    articles: string;
+    title: string;
+    summary: string;
+    link: string;
+    date: string;
+    image?: string;
+  };
+}
+
+export class ScraperService {
+  private geminiService: GeminiService;
+  private cacheService: CacheService;
+  private browser: puppeteer.Browser | null = null;
+
+  private sources: NewsSource[] = [
+    {
+      name: 'Cameroon Tribune',
+      url: 'https://www.cameroon-tribune.cm',
+      selectors: {
+        articles: '.article-item',
+        title: 'h3',
+        summary: '.excerpt',
+        link: 'a',
+        date: '.date',
+        image: 'img'
+      }
+    },
+    {
+      name: 'Actu Cameroun',
+      url: 'https://actucameroun.com',
+      rssUrl: 'https://actucameroun.com/feed/',
+      selectors: {
+        articles: 'item',
+        title: 'title',
+        summary: 'description',
+        link: 'link',
+        date: 'pubDate'
+      }
+    },
+    {
+      name: 'Journal du Cameroun',
+      url: 'https://journalducameroun.com',
+      selectors: {
+        articles: '.post',
+        title: 'h2 a',
+        summary: '.entry-summary',
+        link: 'h2 a',
+        date: '.published',
+        image: '.wp-post-image'
+      }
+    }
+  ];
+
+  constructor() {
+    this.geminiService = new GeminiService();
+    this.cacheService = new CacheService();
+  }
+
+  /**
+   * Lance le scraping de toutes les sources
+   */
+  async scrapeAllSources() {
+    const results = [];
+    
+    for (const source of this.sources) {
+      try {
+        logger.info(`Scraping ${source.name}...`);
+        
+        const articles = source.rssUrl 
+          ? await this.scrapeRSS(source)
+          : await this.scrapeWebsite(source);
+          
+        const processed = await this.processArticles(articles, source.name);
+        results.push(...processed);
+        
+        logger.info(`Scraped ${processed.length} articles from ${source.name}`);
+      } catch (error) {
+        logger.error(`Error scraping ${source.name}:`, error);
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Scrape un site web
+   */
+  private async scrapeWebsite(source: NewsSource) {
+    try {
+      if (!this.browser) {
+        this.browser = await puppeteer.launch({
+          headless: 'new',
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+      }
+
+      const page = await this.browser.newPage();
+      await page.goto(source.url, { waitUntil: 'networkidle2', timeout: 30000 });
+      
+      const html = await page.content();
+      const $ = cheerio.load(html);
+      
+      const articles: any[] = [];
+      
+      $(source.selectors.articles).each((_, element) => {
+        const $el = $(element);
+        
+        const article = {
+          title: $el.find(source.selectors.title).text().trim(),
+          summary: $el.find(source.selectorsRéessayerRKContinuerModifier.summary).text().trim(),
+url: this.normalizeUrl($el.find(source.selectors.link).attr('href'), source.url),
+date: $el.find(source.selectors.date).text().trim(),
+image: source.selectors.image ?
+this.normalizeUrl($el.find(source.selectors.image).attr('src'), source.url) : null
+};
+    if (article.title && article.url) {
+      articles.push(article);
+    }
+  });
+
+  await page.close();
+  return articles;
+
+} catch (error) {
+  logger.error('Error scraping website:', error);
+  return [];
+}
+}
+/**
+
+Scrape un flux RSS
+*/
+private async scrapeRSS(source: NewsSource) {
+try {
+const Parser = require('rss-parser');
+const parser = new Parser();
+const feed = await parser.parseURL(source.rssUrl);
+return feed.items.map((item: any) => ({
+title: item.title,
+summary: item.contentSnippet || item.description,
+url: item.link,
+date: item.pubDate,
+image: item.enclosure?.url || null
+}));
+
+} catch (error) {
+  logger.error('Error scraping RSS:', error);
+  return [];
+}
+}
+/**
+
+Traite et filtre les articles
+*/
+private async processArticles(articles: any[], sourceName: string) {
+const processed = [];
+
+for (const article of articles) {
+  try {
+    // Vérifier si l'article existe déjà
+    const exists = await prisma.newsArticle.findUnique({
+      where: { url: article.url }
+    });
+    
+    if (exists) continue;
+
+    // Analyser la pertinence avec Gemini
+    const analysis = await this.analyzeRelevance(article);
+    
+    if (analysis.isRelevant) {
+      const saved = await prisma.newsArticle.create({
+        data: {
+          title: article.title,
+          summary: article.summary || '',
+          url: article.url,
+          imageUrl: article.image,
+          source: sourceName,
+          category: analysis.category as any,
+          isRelevant: analysis.isRelevant,
+          aiSummary: analysis.summary,
+          tags: analysis.tags,
+          publishedAt: new Date(article.date)
+        }
+      });
+      
+      processed.push(saved);
+    }
+  } catch (error) {
+    logger.error('Error processing article:', error);
+  }
+}
+
+return processed;
+}
+/**
+
+Analyse la pertinence d'un article
+*/
+private async analyzeRelevance(article: any) {
+const cacheKey = relevance:${this.hashUrl(article.url)};
+const cached = await this.cacheService.get(cacheKey);
+
+if (cached) {
+  return JSON.parse(cached);
+}
+
+const prompt = `
+Analyse cet article d'actualité camerounaise et détermine s'il est pertinent pour notre plateforme.
+Titre: ${article.title}
+Résumé: ${article.summary}
+Réponds en JSON:
+{
+"isRelevant": boolean, // true si juridique, administratif, culturel ou économique important
+"category": "JURIDIQUE|POLITIQUE|ECONOMIE|SOCIETE|CULTURE|SPORT|INTERNATIONAL",
+"summary": "Résumé en 2 phrases max",
+"tags": ["tag1", "tag2"],
+"relevanceScore": 0.0-1.0
+}`;
+try {
+  const result = await this.geminiService.model.generateContent(prompt);
+  const analysis = JSON.parse(result.response.text());
+  
+  await this.cacheService.set(cacheKey, JSON.stringify(analysis), 86400); // Cache 24h
+  return analysis;
+} catch (error) {
+  logger.error('Error analyzing relevance:', error);
+  return {
+    isRelevant: false,
+    category: 'AUTRE',
+    summary: article.summary,
+    tags: [],
+    relevanceScore: 0
+  };
+}
+}
+/**
+
+Normalise une URL
+*/
+private normalizeUrl(url: string | undefined, baseUrl: string): string {
+if (!url) return '';
+if (url.startsWith('http')) return url;
+if (url.startsWith('//')) return 'https:' + url;
+if (url.startsWith('/')) return new URL(url, baseUrl).href;
+return new URL(url, baseUrl).href;
+}
+
+/**
+
+Hash une URL pour le cache
+*/
+private hashUrl(url: string): string {
+const crypto = require('crypto');
+return crypto.createHash('md5').update(url).digest('hex');
+}
+
+/**
+
+Nettoie les ressources
+*/
+async cleanup() {
+if (this.browser) {
+await this.browser.close();
+this.browser = null;
+}
+}
+
+/**
+
+Scrape les documents gouvernementaux
+*/
+async scrapeGovernmentDocuments() {
+const sources = [
+{
+name: 'eRegulations Yaoundé',
+url: 'https://yaounde.eregulations.org',
+type: 'procedures'
+},
+{
+name: 'Présidence',
+url: 'https://prc.cm',
+type: 'decrets'
+},
+{
+name: 'Services PM',
+url: 'https://spm.gov.cm',
+type: 'arretes'
+}
+];
+
+for (const source of sources) {
+  try {
+    logger.info(`Checking for new documents on ${source.name}...`);
+    
+    // Logique spécifique selon le type de source
+    if (source.type === 'procedures') {
+      await this.scrapeProcedures(source);
+    } else if (source.type === 'decrets') {
+      await this.scrapeDecrets(source);
+    }
+    
+  } catch (error) {
+    logger.error(`Error scraping ${source.name}:`, error);
+  }
+}
+}
+/**
+
+Scrape les procédures administratives
+*/
+private async scrapeProcedures(source: any) {
+// Implémentation spécifique pour eRegulations
+// À adapter selon la structure du site
+}
+
+/**
+
+Scrape les décrets
+*/
+private async scrapeDecrets(source: any) {
+// Implémentation spécifique pour les sites gouvernementaux
+// À adapter selon la structure du site
+}
+}
+
+
+## 🛣️ 8. CONTRÔLEURS API
+```typescript
+// backend/src/controllers/chat.controller.ts
+
+import { Request, Response } from 'express';
+import { z } from 'zod';
+import { GeminiService } from '../services/gemini.service';
+import { prisma } from '../config/database';
+import { logger } from '../utils/logger';
+
+const ChatRequestSchema = z.object({
+  message: z.string().min(1).max(1000),
+  conversationId: z.string().optional(),
+  language: z.enum(['fr', 'en']).default('fr')
+});
+
+export class ChatController {
+  private geminiService: GeminiService;
+
+  constructor() {
+    this.geminiService = new GeminiService();
+  }
+
+  /**
+   * Endpoint principal du chat
+   */
+  async chat(req: Request, res: Response) {
+    try {
+      // Validation
+      const data = ChatRequestSchema.parse(req.body);
+      
+      // Récupérer ou créer la conversation
+      let conversationId = data.conversationId;
+      
+      if (!conversationId) {
+        const sessionId = req.sessionID || req.ip;
+        const conversation = await prisma.conversation.create({
+          data: {
+            sessionId,
+            language: data.language === 'fr' ? 'FR' : 'EN'
+          }
+        });
+        conversationId = conversation.id;
+      }
+
+      // Générer la réponse
+      const response = await this.geminiService.generateResponse(
+        data.message,
+        conversationId,
+        data.language
+      );
+
+      // Analytics
+      await prisma.analytics.create({
+        data: {
+          event: 'CHAT_MESSAGE',
+          sessionId: req.sessionID || req.ip,
+          data: {
+            conversationId,
+            messageLength: data.message.length,
+            language: data.language,
+            confidence: response.confidence
+          },
+          language: data.language === 'fr' ? 'FR' : 'EN',
+          userAgent: req.get('user-agent')
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          conversationId,
+          response: response.answer,
+          citations: response.citations,
+          relatedProcedures: response.relatedProcedures,
+          confidence: response.confidence,
+          processingTime: response.processingTime,
+          suggestedQuestions: await this.getSuggestedQuestions(data.message, data.language)
+        }
+      });
+
+    } catch (error) {
+      logger.error('Chat error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Une erreur est survenue lors du traitement de votre message'
+      });
+    }
+  }
+
+  /**
+   * Récupère l'historique d'une conversation
+   */
+  async getConversation(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      
+      const conversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            include: {
+              citations: true,
+              feedback: true
+            },
+            orderBy: { createdAt: 'asc' }
+          }
+        }
+      });
+
+      if (!conversation) {
+        return res.status(404).json({
+          success: false,
+          error: 'Conversation non trouvée'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: conversation
+      });
+
+    } catch (error) {
+      logger.error('Get conversation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erreur lors de la récupération de la conversation'
+      });
+    }
+  }
+
+  /**
+   * Envoie un feedback sur une réponse
+   */
+  async sendFeedback(req: Request, res: Response) {
+    try {
+      const { messageId, rating, comment } = req.body;
+      
+      const feedback = await prisma.feedback.upsert({
+        where: { messageId },
+        update: { rating, comment },
+        create: { messageId, rating, comment }
+      });
+
+      res.json({
+        success: true,
+        data: feedback
+      });
+
+    } catch (error) {
+      logger.error('Feedback error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erreur lors de l\'enregistrement du feedback'
+      });
+    }
+  }
+
+  /**
+   * Obtient des questions suggérées
+   */
+  private async getSuggestedQuestions(message: string, language: 'fr' | 'en') {
+    try {
+      // Questions par défaut selon le contexte
+      const defaultQuestions = language === 'fr' ? [
+        "Comment obtenir une carte nationale d'identité ?",
+        "Quels sont les documents pour créer une entreprise ?",
+        "Comment obtenir un acte de naissance ?",
+        "Quelle est la procédure pour un passeport ?",
+        "Quelles sont les traditions du Cameroun ?"
+      ] : [
+        "How to get a national ID card?",
+        "What documents for business creation?",
+        "How to obtain a birth certificate?",
+        "What's the passport procedure?",
+        "What are Cameroon's traditions?"
+      ];
+
+      // Essayer de générer des questions contextuelles
+      try {
+        return await this.geminiService.generateSuggestedQuestions(message, language);
+      } catch {
+        return defaultQuestions;
+      }
+    } catch (error) {
+      logger.error('Error getting suggested questions:', error);
+      return [];
+    }
+  }
+}
+
+// backend/src/controllers/documents.controller.ts
+
+export class DocumentsController {
+  /**
+   * Recherche de documents
+   */
+  async search(req: Request, res: Response) {
+    try {
+      const { 
+        q, 
+        type, 
+        category, 
+        status = 'ACTIVE',
+        page = 1, 
+        limit = 20 
+      } = req.query;
+
+      const where: any = { status };
+      
+      if (q) {
+        where.OR = [
+          { title: { contains: q as string, mode: 'insensitive' } },
+          { content: { contains: q as string, mode: 'insensitive' } },
+          { reference: { contains: q as string, mode: 'insensitive' } }
+        ];
+      }
+      
+      if (type) where.type = type;
+      if (category) where.category = category;
+
+      const [documents, total] = await Promise.all([
+        prisma.document.findMany({
+          where,
+          skip: (Number(page) - 1) * Number(limit),
+          take: Number(limit),
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            type: true,
+            category: true,
+            summary: true,
+            reference: true,
+            dateEnacted: true,
+            tags: true
+          },
+          orderBy: { createdAt: 'desc' }
+        }),
+        prisma.document.count({ where })
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          documents,
+          pagination: {
+            page: Number(page),
+            limit: Number(limit),
+            total,
+            pages: Math.ceil(total / Number(limit))
+          }
+        }
+      });
+
+    } catch (error) {
+      logger.error('Document search error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erreur lors de la recherche'
+      });
+    }
+  }
+
+  /**
+   * Récupère un document par slug
+   */
+  async getBySlug(req: Request, res: Response) {
+    try {
+      const { slug } = req.params;
+      const { includeSections = 'true' } = req.query;
+
+      const document = await prisma.document.findUnique({
+        where: { slug },
+        include: {
+          sections: includeSections === 'true' ? {
+            orderBy: { position: 'asc' }
+          } : false
+        }
+      });
+
+      if (!document) {
+        return res.status(404).json({
+          success: false,
+          error: 'Document non trouvé'
+        });
+      }
+
+      // Analytics
+      await prisma.analytics.create({
+        data: {
+          event: 'DOCUMENT_VIEW',
+          sessionId: req.sessionID || req.ip,
+          data: { documentId: document.id, slug },
+          language: 'FR',
+          userAgent: req.get('user-agent')
+        }
+      });
+
+      res.json({
+        success: true,
+        data: document
+      });
+
+    } catch (error) {
+      logger.error('Get document error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erreur lors de la récupération du document'
+      });
+    }
+  }
+}
+⚛️ 9. COMPOSANTS FRONTEND
+tsx// frontend/components/chat/ChatInterface.tsx
+
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Send, Loader2, Bot, User, ThumbsUp, ThumbsDown, Copy, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useChat } from '@/hooks/useChat';
+import MessageBubble from './MessageBubble';
+import CitationCard from './CitationCard';
+import SuggestedQuestions from './SuggestedQuestions';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function ChatInterface() {
+  const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  const { 
+    messages, 
+    isLoading, 
+    sendMessage, 
+    conversationId,
+    suggestedQuestions 
+  } = useChat();
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!message.trim() || isLoading) return;
+
+    const userMessage = message.trim();
+    setMessage('');
+    setIsTyping(false);
+    
+    await sendMessage(userMessage);
+    
+    // Auto-resize textarea
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-[80vh] max-w-5xl mx-auto">
+      {/* Header */}
+      <Card className="p-4 mb-4 bg-gradient-to-r from-green-50 to-red-50 border-none">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-red-500 flex items-center justify-center text-white">
+            <Bot className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Assistant National du Cameroun</h2>
+            <p className="text-sm text-gray-600">
+              Je suis là pour répondre à vos questions sur le droit, les procédures et la culture du Cameroun 🇨🇲
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Messages Area */}
+      <Card className="flex-1 overflow-hidden mb-4">
+        <div className="h-full overflow-y-auto p-4 space-y-4">
+          {messages.length === 0 ? (
+            <div className="text-center py-12">
+              <Bot className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              <p className="text-gray-500 mb-6">
+                Posez-moi une question sur le Cameroun !
+              </p>
+              <SuggestedQuestions 
+                questions={[
+                  "Comment obtenir ma CNI ?",
+                  "Quels sont les jours fériés au Cameroun ?",
+                  "Comment créer une entreprise ?",
+                  "Quelle est l'histoire du Cameroun ?",
+                  "Comment obtenir un permis de conduire ?"
+                ]}
+                onSelect={(q) => {
+                  setMessage(q);
+                  textareaRef.current?.focus();
+                }}
+              />
+            </div>
+          ) : (
+            <AnimatePresence>
+              {messages.map((msg, index) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <MessageBubble 
+                    message={msg}
+                    isUser={msg.role === 'USER'}
+                  />
+                  
+                  {/* Citations */}
+                  {msg.citations && msg.citations.length > 0 && (
+                    <div className="ml-12 mt-2 space-y-2">
+                      {msg.citations.map((citation, i) => (
+                        <CitationCard key={i} citation={citation} />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+          
+          {/* Typing Indicator */}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center gap-2 text-gray-500"
+            >
+              <Bot className="w-5 h-5" />
+              <span className="flex gap-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100" />
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200" />
+              </span>
+            </motion.div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+      </Card>
+
+      {/* Suggested Questions */}
+      {suggestedQuestions.length > 0 && !isLoading && (
+        <div className="mb-4">
+          <SuggestedQuestions 
+            questions={suggestedQuestions}
+            onSelect={(q) => {
+              setMessage(q);
+              textareaRef.current?.focus();
+            }}
+          />
+        </div>
+      )}
+
+      {/* Input Area */}
+      <Card className="p-4">
+        <div className="flex gap-2">
+          <Textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Posez votre question..."
+            className="flex-1 min-h-[50px] max-h-[150px] resize-none"
+            disabled={isLoading}
+          />
+          <Button 
+            onClick={handleSend}
+            disabled={!message.trim() || isLoading}
+            className="bg-gradient-to-r from-green-600 to-red-600 hover:from-green-700 hover:to-red-700"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </Button>
+        </div>
+        
+        <div className="mt-2 text-xs text-gray-500 flex items-center justify-between">
+          <span>Appuyez sur Entrée pour envoyer, Shift+Entrée pour nouvelle ligne</span>
+          {conversationId && (
+            <Badge variant="secondary">Session: {conversationId.slice(0, 8)}</Badge>
+          )}
+        </div>
+      </Card>
+    </div>
+  );
+}
+tsx// frontend/components/chat/MessageBubble.tsx
+
+import { useState } from 'react';
+import { Bot, User, ThumbsUp, ThumbsDown, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+interface MessageBubbleProps {
+  message: {
+    id: string;
+    content: string;
+    role: 'USER' | 'ASSISTANT';
+    confidence?: number;
+    createdAt: string;
+  };
+  isUser: boolean;
+}
+
+export default function MessageBubble({ message, isUser }: MessageBubbleProps) {
+  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFeedback = async (type: 'up' | 'down') => {
+    setFeedback(type);
+    // TODO: Send feedback to API
+  };
+
+  return (
+    <div className={cn(
+      "flex gap-3",
+      isUser && "flex-row-reverse"
+    )}>
+      {/* Avatar */}
+      <div className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+        isUser ? "bg-blue-500 text-white" : "bg-gray-100"
+      )}>
+        {isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+      </div>
+
+      {/* Message Content */}
+      <div className={cn(
+        "flex-1 max-w-[80%]",
+        isUser && "flex justify-end"
+      )}>
+        <div className={cn(
+          "rounded-lg px-4 py-3",
+          isUser ? "bg-blue-500 text-white" : "bg-gray-50 border"
+        )}>
+          {isUser ? (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+          ) : (
+            <div className="prose prose-sm max-w-none">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        {!isUser && (
+          <div className="flex items-center gap-2 mt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-7 px-2"
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleFeedback('up')}
+              className={cn(
+                "h-7 px-2",
+                feedback === 'up' && "text-green-600"
+              )}
+            >
+              <ThumbsUp className="w-3 h-3" />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleFeedback('down')}
+              className={cn(
+                "h-7 px-2",
+                feedback === 'down' && "text-red-600"
+              )}
+            >
+              <ThumbsDown className="w-3 h-3" />
+            </Button>
+
+            {message.confidence && (
+              <span className="text-xs text-gray-500 ml-2">
+                Confiance: {Math.round(message.confidence * 100)}%
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+📋 10. FICHIER .CURSORRULES
+markdown# RÈGLES POUR CLAUDE CODE - ASSISTANT JURIDIQUE CAMEROUNAIS
+
+## CONTEXTE GLOBAL
+Tu développes une application web full-stack pour aider les citoyens camerounais à accéder aux informations juridiques, administratives et culturelles de leur pays.
+
+## TECH STACK (NE JAMAIS CHANGER)
+- Frontend: Next.js 14.2.5, TypeScript, Tailwind CSS, shadcn/ui
+- Backend: Express.js, TypeScript, Prisma ORM
+- Database: PostgreSQL 16 avec pgvector
+- AI: Gemini 2.0 Flash (API gratuite)
+- Deployment: Vercel (frontend) + Railway (backend)
+
+## STRUCTURE DES FICHIERS
+
+### Frontend (/frontend)
+app/           # App Router Next.js
+components/    # Composants React
+ui/         # shadcn/ui
+chat/       # Composants du chat
+documents/  # Composants documents
+hooks/        # Custom hooks
+lib/          # Utilitaires
+types/        # Types TypeScript
+
+### Backend (/backend)
+src/
+controllers/  # Logique des endpoints
+services/     # Services métier
+routes/       # Définition des routes
+middleware/   # Middleware Express
+prisma/         # Schéma et migrations
+
+## CONVENTIONS DE CODE
+
+### Général
+- Noms de fichiers: kebab-case (ex: chat-interface.tsx)
+- Composants React: PascalCase (ex: ChatInterface)
+- Fonctions: camelCase (ex: sendMessage)
+- Constantes: UPPER_SNAKE_CASE (ex: API_URL)
+- Interfaces TypeScript: préfixe I (ex: IMessage)
+
+### TypeScript
+```typescript
+// Toujours typer explicitement
+interface IProps {
+  title: string;
+  onClick: () => void;
+}
+
+// Pas de any, utiliser unknown si nécessaire
+React/Next.js
+tsx// Structure d'un composant
+'use client'; // Si client component
+
+import { useState } from 'react';
+
+interface IComponentProps {
+  // Props typées
+}
+
+export default function ComponentName({ prop }: IComponentProps) {
+  // Hooks en premier
+  const [state, setState] = useState();
+  
+  // Handlers
+  const handleClick = () => {};
+  
+  // Render
+  return <div></div>;
+}
+API Routes
+typescript// Structure d'un contrôleur
+export class ControllerName {
+  async methodName(req: Request, res: Response) {
+    try {
+      // Validation avec Zod
+      const data = Schema.parse(req.body);
+      
+      // Logique
+      
+      // Réponse standardisée
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+}
+COMMANDES IMPORTANTES
+Setup initial
+bash# Frontend
+cd frontend && pnpm install
+pnpm dev
+
+# Backend  
+cd backend && pnpm install
+npx prisma migrate dev
+pnpm dev
+
+# Extraction PDFs
+pnpm run extract-pdfs
+Base de données
+bash# Créer une migration
+npx prisma migrate dev --name description
+
+# Seed la base
+npx prisma db seed
+
+# Studio Prisma
+npx prisma studio
+PATTERNS À UTILISER
+Service Pattern (Backend)
+typescript// Chaque service = une responsabilité
+class ServiceName {
+  private dependency: Dependency;
+  
+  constructor() {
+    this.dependency = new Dependency();
+  }
+  
+  async methodName(): Promise<Result> {
+    // Logique métier
+  }
+}
+Custom Hooks (Frontend)
+typescript// hooks/useFeature.ts
+export function useFeature() {
+  const [state, setState] = useState();
+  
+  const action = useCallback(() => {
+    // Logique
+  }, [dependencies]);
+  
+  return { state
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ////////////////////////////////////////////////! la database sera supabase et non spina !////////////////////////////////////////////////////////////
+
+  🎯 Prompt complet pour v0.dev - Assistant National du Cameroun
+Crée une application web moderne et professionnelle pour l'Assistant National du Cameroun - une plateforme d'aide aux citoyens camerounais.
+
+## 🎨 DESIGN & STYLE
+
+**Palette de couleurs:**
+- Couleurs nationales: Vert (#007A3D), Rouge (#CE1126), Jaune (#FCD116)
+- Utiliser ces couleurs en accents subtils et gradients
+- Background: Blanc/Gris clair pour la lisibilité
+- Design moderne, épuré, professionnel mais accessible
+
+**Identité visuelle:**
+- Style: Moderne, professionnel mais chaleureux
+- Typographie: Inter ou similaire (claire et lisible)
+- Icônes: Lucide React
+- Espacement généreux, design aéré
+- Micro-animations subtiles au hover
+- Mobile-first responsive
+
+## 📱 STRUCTURE DE LA PAGE D'ACCUEIL
+
+### Header (sticky)
+- Logo + "Assistant National du Cameroun" 
+- Navigation: Accueil | Assistant IA | Bibliothèque | Procédures | Actualités | Quiz
+- Sélecteur de langue (FR/EN) à droite
+- Mode sombre/clair
+- Menu hamburger sur mobile
+
+### Hero Section
+**Layout côte à côte (desktop) / empilé (mobile)**
+
+Gauche:
+- Titre accrocheur: "Votre guide intelligent pour naviguer au Cameroun 🇨🇲"
+- Sous-titre: "Droit, procédures administratives, culture - Toutes les réponses dont vous avez besoin"
+- Barre de recherche prédictive avec suggestions
+- 3 catégories quick-access en boutons colorés:
+  * 📋 Procédures (CNI, Passeport...)
+  * ⚖️ Questions juridiques
+  * 🏛️ Culture & Histoire
+
+Droite:
+- Illustration SVG moderne (personne consultant un assistant sur tablette)
+- Ou image stylisée du Cameroun
+
+### Section "Comment ça marche" (3 étapes)
+Cards horizontales avec icônes:
+1. 💬 Posez votre question en français ou anglais
+2. 🤖 L'IA analyse et trouve les informations officielles
+3. ✅ Recevez une réponse claire avec sources citées
+
+### Section "Domaines couverts" (Grid responsive)
+6 cards avec icônes:
+- ⚖️ Droit & Justice (Pénal, Civil, Travail...)
+- 📄 Procédures administratives (CNI, Actes...)
+- 🏢 Entreprises & Commerce
+- 🏠 Foncier & Propriété
+- 🎓 Éducation & Culture
+- 🏥 Santé & Social
+
+Chaque card: icône, titre, courte description, lien "En savoir plus"
+
+### Section "Questions populaires"
+Liste de 8 questions fréquentes en accordion/tabs:
+- Comment obtenir ma carte nationale d'identité ?
+- Quels documents pour créer une entreprise ?
+- Comment obtenir un acte de naissance ?
+- etc.
+
+Cliquer ouvre un aperçu de réponse + bouton "Poser à l'assistant"
+
+### Section Stats/Trust (bannière)
+Background légèrement coloré:
+- "100+ documents juridiques"
+- "1000+ questions répondues"
+- "Sources officielles vérifiées"
+- "Mises à jour quotidiennes"
+
+### Section CTA final
+Centré, background gradient vert-rouge subtil:
+- Titre: "Prêt à obtenir vos réponses ?"
+- Bouton principal: "Parler à l'assistant" (grand, accrocheur)
+- Texte: "Gratuit, rapide, fiable"
+
+### Footer
+- Liens: À propos | Contact | Mentions légales | Confidentialité
+- Réseaux sociaux
+- "Propulsé par l'IA Gemini"
+- Copyright
+
+## 🤖 PAGE ASSISTANT (route: /assistant)
+
+Layout: 
+- Sidebar gauche (collapsible sur mobile):
+  * Historique des conversations (liste)
+  * Nouvelle conversation (bouton)
+  * Filtres par catégorie
+
+- Zone principale (80% width):
+  
+  **Avant première question:**
+  - Message de bienvenue chaleureux avec avatar bot
+  - 6 questions suggérées en chips cliquables
+  - Placeholder animé dans l'input
+  
+  **Interface de chat:**
+  - Messages user: alignés à droite, bulle bleue
+  - Messages assistant: alignés à gauche, bulle grise, avatar bot
+  - Markdown rendering pour les réponses
+  - Citations affichées en cards sous les messages (avec lien vers document source)
+  - Boutons feedback (👍👎) sur chaque réponse
+  - Bouton copier sur chaque réponse
+  - Badge de confiance (0-100%) si score < 80%
+  
+  **Input zone (sticky bottom):**
+  - Large textarea avec auto-resize
+  - Bouton envoyer (icône avion papier)
+  - Compteur de caractères (max 1000)
+  - Indication "L'assistant tape..." quand loading
+  - 3-4 questions suggérées contextuelles sous l'input
+
+## 📚 PAGE BIBLIOTHÈQUE (route: /bibliotheque)
+
+**Header section:**
+- Titre "Bibliothèque Juridique"
+- Searchbar avec filtres avancés (type, catégorie, date)
+- Toggle "Vue grille / Vue liste"
+
+**Filtres sidebar:**
+- Type de document (checkboxes)
+- Catégorie (select)
+- Date de promulgation (range)
+- Statut (Actif/Abrogé)
+
+**Zone documents:**
+Grid responsive de cards (ou liste):
+Chaque card:
+- Badge type (CODE, LOI, DÉCRET...)
+- Titre du document
+- Référence officielle
+- Date
+- Courte description (2 lignes)
+- Bouton "Consulter"
+- Icône téléchargement
+
+**Page détail document:**
+- Breadcrumb
+- Titre + Référence
+- Métadonnées (date, source, statut)
+- Table des matières (sidebar fixe)
+- Contenu formaté en sections/articles
+- Possibilité de rechercher dans le document
+- Bouton "Poser une question sur ce document"
+
+## 📋 PAGE PROCÉDURES (route: /procedures)
+
+**Hero:**
+- "Guide des démarches administratives"
+- Searchbar
+
+**Catégories (tabs):**
+- Identité & État civil
+- Entreprise
+- Foncier
+- Éducation
+- Justice
+- Transport
+- etc.
+
+**Cards procédures:**
+Pour chaque procédure:
+- Icône
+- Nom de la procédure
+- Durée estimée
+- Coût (FCFA)
+- Difficulté (facile/moyen/difficile)
+
+**Page détail procédure:**
+Layout structuré:
+1. En-tête avec nom + résumé
+2. Étapes numérotées (design timeline vertical)
+3. Documents requis (checklist)
+4. Coûts détaillés (tableau)
+5. Lieux où s'adresser (map preview + liste)
+6. Conseils pratiques
+7. Questions fréquentes
+8. Bouton "Besoin d'aide ? Parler à l'assistant"
+
+## 📰 PAGE ACTUALITÉS (route: /actualites)
+
+**Layout:**
+- Filtres par catégorie (tabs)
+- Grid de cards articles (image + titre + résumé + date + source)
+- Article principal (featured) en grand en haut
+- Pagination
+
+**Card article:**
+- Image
+- Badge catégorie
+- Titre
+- Résumé (3 lignes)
+- Date + source
+- Temps de lecture
+
+## 🎮 PAGE QUIZ (route: /quiz)
+
+**Sélection:**
+- Grid de catégories de quiz
+- Difficulté (facile/moyen/difficile)
+- Nombre de questions
+
+**Interface quiz:**
+- Barre de progression
+- Question + 4 choix (A/B/C/D)
+- Feedback immédiat (vert/rouge)
+- Explication après réponse
+- Score final avec breakdown
+- Bouton partage résultat
+
+## 🎨 COMPOSANTS UI À CRÉER
+
+Utilise shadcn/ui pour:
+- Button (variants: default, outline, ghost)
+- Card
+- Input, Textarea
+- Select, Checkbox
+- Badge
+- Tabs
+- Accordion
+- Dialog/Modal
+- Toast/Notifications
+- Skeleton (loading states)
+- Avatar
+
+## ⚡ FONCTIONNALITÉS IMPORTANTES
+
+1. **Recherche globale:**
+   - Searchbar dans header
+   - Recherche instantanée (debounce)
+   - Suggestions avec highlights
+
+2. **Responsive:**
+   - Mobile-first
+   - Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
+   - Navigation mobile avec drawer
+
+3. **Accessibilité:**
+   - ARIA labels
+   - Keyboard navigation
+   - Contraste suffisant
+
+4. **Performance:**
+   - Lazy loading images
+   - Skeleton screens
+   - Optimistic UI updates
+
+5. **Animations:**
+   - Framer Motion pour transitions
+   - Fade in au scroll
+   - Hover effects subtils
+
+## 🔧 NOTES TECHNIQUES
+
+**State management:**
+- Utiliser Zustand pour state global simple
+- React Query pour data fetching (pas besoin pour v0)
+
+**API calls (simulés pour v0):**
+typescript
+const API_BASE = 'https://api.assistant-cameroun.com/v1';
+
+// Exemples d'endpoints:
+POST /chat/message
+GET /documents?type=CODE&category=DROIT_PENAL
+GET /procedures/:slug
+GET /news?category=JURIDIQUE
+
+
+**Supabase (préparation):**
+```typescript
+// Tables principales:
+- conversations
+- messages
+- documents
+- procedures
+- news_articles
+- quiz_questions
+- feedback
+
+Commence par créer des composants UI purs, on intégrera Supabase après.
+
+IMPORTANT:
+- Code TypeScript strict
+- Components modulaires et réutilisables
+- Pas de données hardcodées (utiliser des constantes/mocks)
+- Dark mode support
+- Bilingue FR/EN (préparer les strings)
+
+Commence par la page d'accueil complète et fonctionnelle, puis on fera les autres pages.
+
+Ce prompt devrait te permettre d'obtenir un excellent point de départ avec v0.dev. Une fois que tu as la base UI, tu pourras:
+
+Intégrer Supabase pour la persistence
+Connecter l'API Gemini pour l'IA
+Ajouter l'authentification si nécessaire
+Implémenter la recherche vectorielle avec Supabase pgvector
+
+Tu veux que je te donne aussi les schémas Supabase et les queries de base?RéessayerClaude n'a pas encore la capacité d'exécuter le code qu'il génère.Rdonne un prompt pour quil me fasse un dashbord (accesible que via la route sur l'url "/admin") 
+où ils y'au toutes outils et données nessaier a la gestion et au suivie de l'application et de l'activité et fonctionnalité (leur etats)Modifier🎯 Prompt v0.dev - Dashboard Admin Assistant Cameroun
+Crée un dashboard d'administration complet et moderne pour l'Assistant National du Cameroun.
+Route protégée: /admin
+
+## 🎨 DESIGN GÉNÉRAL
+
+**Style:**
+- Interface sombre moderne (dark mode par défaut)
+- Sidebar navigation fixe à gauche
+- Design inspiré de Vercel/Railway dashboards
+- Palette: Gris foncés (#0A0A0A, #1A1A1A, #2A2A2A) avec accents verts/rouges
+- Glassmorphism pour les cards importantes
+- Typographie: Inter ou Geist
+- Data-dense mais lisible
+
+## 📐 LAYOUT PRINCIPAL
+
+### Sidebar (fixe, gauche, 240px)
+**Header:**
+- Logo + "Admin Dashboard"
+- Badge "v1.0"
+
+**Navigation (icônes + labels):**
+- 📊 Vue d'ensemble (Overview)
+- 💬 Conversations
+- 📄 Documents
+- 📋 Procédures
+- 📰 Actualités
+- 🎮 Quiz
+- 👥 Utilisateurs
+- 🤖 IA & Embeddings
+- ⚙️ Système
+- 🔔 Alertes
+- 📈 Analytics
+
+**Footer sidebar:**
+- Indicateur status système (vert/rouge)
+- Bouton "Retour au site"
+- Profil admin + logout
+
+### Top Bar (sticky)
+- Breadcrumb navigation
+- Searchbar globale (Cmd+K)
+- Sélecteur période (7j/30j/90j/Tout)
+- Notifications (badge count)
+- Avatar + dropdown
+
+## 📊 PAGE: VUE D'ENSEMBLE (/admin)
+
+### Row 1: KPIs Stats (4 cards)
+Cards avec gradients subtils, icônes, valeurs + évolution:
+
+1. **Conversations totales**
+   - Nombre total
+   - +12% vs semaine dernière (vert/rouge)
+   - Sparkline chart (mini)
+
+2. **Messages traités**
+   - Nombre aujourd'hui / total
+   - Temps moyen de réponse
+   - Sparkline
+
+3. **Documents consultés**
+   - Vues aujourd'hui
+   - Top 3 documents (liste)
+
+4. **Taux de satisfaction**
+   - Pourcentage (👍/👎)
+   - Évolution
+   - Gauge circulaire
+
+### Row 2: Charts (2 colonnes)
+
+**Gauche (60%):**
+Card "Activité sur 30 jours"
+- Line chart: Messages par jour
+- Filtres: Tous/Questions/Procédures/Documents
+- Brush pour zoom
+
+**Droite (40%):**
+Card "Répartition par catégorie"
+- Donut chart: DROIT_CIVIL, DROIT_PENAL, etc.
+- Légende cliquable
+- Pourcentages
+
+### Row 3: Temps réel (3 cards)
+
+1. **Conversations actives** (liste scrollable)
+   - Avatar + ID session
+   - Dernier message (preview)
+   - Temps écoulé
+   - Badge catégorie
+   - Bouton "Voir"
+
+2. **Alertes système** (liste)
+   - Icône severity (⚠️🔴)
+   - Message
+   - Timestamp
+   - Action rapide
+
+3. **Performance IA**
+   - Temps réponse moyen: 2.3s
+   - Tokens utilisés aujourd'hui
+   - Quota restant
+   - Gauge de limite
+
+### Row 4: Tableaux
+
+**Documents populaires** (tableau)
+Colonnes: Titre | Type | Vues | Dernière vue | Actions
+- Tri par colonnes
+- Pagination
+- Filtres rapides
+
+## 💬 PAGE: CONVERSATIONS (/admin/conversations)
+
+### Header
+- Titre + count total
+- Filtres: Statut (Actif/Archivé), Période, Langue (FR/EN)
+- Export CSV
+
+### Stats rapides (4 mini cards)
+- Conversations aujourd'hui
+- Durée moyenne
+- Messages moyens/conversation
+- Taux d'abandon
+
+### Tableau principal
+**Colonnes:**
+- ID (cliquable)
+- Session ID
+- Début
+- Messages (count)
+- Langue
+- Catégorie détectée
+- Dernière activité
+- Confiance moyenne
+- Actions (Voir/Exporter/Supprimer)
+
+**Fonctionnalités:**
+- Recherche full-text
+- Tri multi-colonnes
+- Filtres avancés (sidebar)
+- Sélection multiple pour actions bulk
+- Pagination 50/100/200
+
+### Modal détail conversation
+Ouverture sur clic ligne:
+- Header: ID + métadonnées
+- Timeline des messages (UI chat)
+- Citations utilisées (badges cliquables)
+- Score confiance par message
+- Feedback user si présent
+- Bouton "Rejouer conversation" (debug)
+
+## 📄 PAGE: DOCUMENTS (/admin/documents)
+
+### Header
+- Upload nouveau document (bouton principal)
+- Import bulk PDFs
+- Sync sources gouvernementales
+
+### Stats cards
+- Total documents: 156
+- En attente d'extraction: 3
+- Embeddings à jour: 98%
+- Dernière mise à jour: il y a 2hRéessayerClaude n'a pas encore la capacité d'exécuter le code qu'il génère.RJe veux que quand l'utilisateur tape le slash admin, il soit envoyé vers une page de login.
+Dans cette page de login, il n'y a pas de sign up, il n'y a pas de possibilité d'enregistrement. Donc je créerai un utilisateur directement au niveau de la base de données du dashboard de CIPA-B. C'est avec la donnée que j'ai entré dans cette base de données là que je vais directement entrer, que je vais pouvoir entrer dans le formulaire de slash admin pour pouvoir avoir accès au back-office.Modifier🔐 Prompt v0.dev - Page Login Admin + Dashboard complet
+Crée un système d'administration complet avec authentification pour l'Assistant National du Cameroun.
+
+## 🔒 PAGE LOGIN (/admin)
+
+**Design:**
+- Centré sur la page, fond gradient subtil vert-rouge-jaune (couleurs camerounaises)
+- Card glassmorphism (backdrop-blur)
+- Style moderne, épuré, sécurisé
+
+**Layout de la page:**
+
+### Header centré
+- Logo + texte "Assistant National du Cameroun"
+- Badge "Administration"
+
+### Card Login (max-width: 400px)
+**Contenu:**
+- Titre: "Connexion Administrateur"
+- Sous-titre: "Accès réservé au personnel autorisé"
+
+**Formulaire:**
+- Input Email
+  * Label: "Adresse email"
+  * Placeholder: "admin@assistant-cameroun.cm"
+  * Type: email
+  * Required
+  * Icône: Mail
+
+- Input Mot de passe
+  * Label: "Mot de passe"
+  * Type: password avec toggle show/hide
+  * Required
+  * Icône: Lock
+  
+- Checkbox "Se souvenir de moi" (optionnel)
+
+- Bouton Submit (pleine largeur)
+  * Texte: "Se connecter"
+  * Loading state avec spinner
+  * Gradient vert-rouge
+
+**États:**
+- Error state: Alert rouge sous le form si identifiants invalides
+  * "Identifiants incorrects. Veuillez réessayer."
+- Loading state: Bouton disabled + spinner pendant auth
+- Success: Redirection immédiate vers /admin/dashboard
+
+**Footer card:**
+- Texte petit gris: "Pas d'inscription publique. Contactez l'administrateur système."
+- Lien retour: "← Retour au site"
+
+**Sécurité UX:**
+- Rate limiting visual (après 3 essais: "Trop de tentatives. Réessayez dans 5 minutes")
+- Pas de "mot de passe oublié" (contact admin seulement)
+- Message générique d'erreur (pas "email invalide" ou "mot de passe incorrect" séparément)
+
+---
+
+## 🎯 DASHBOARD ADMIN COMPLET
+
+### LAYOUT PRINCIPAL (après login réussi)
+
+#### Sidebar (fixe, gauche, 260px, dark)
+**Header:**
+- Logo + "Admin Dashboard"
+- Badge version "v1.0.0"
+- Indicateur environnement (DEV/PROD)
+
+**Navigation principale (avec icônes):**
+
+📊 **MONITORING**
+- Vue d'ensemble (Overview)
+- Analytics temps réel
+- Rapports
+
+💬 **CONTENU**
+- Conversations (badge count si nouvelles)
+- Messages (modération)
+- Feedback utilisateurs
+
+📚 **DONNÉES**
+- Documents juridiques
+- Procédures administratives
+- Actualités
+- Questions Quiz
+
+🤖 **IA & TECHNIQUE**
+- Performance Gemini
+- Embeddings & RAG
+- Cache Redis
+- Jobs & Cron
+
+👥 **UTILISATEURS**
+- Sessions actives
+- Historique activité
+- Bannissements
+
+⚙️ **SYSTÈME**
+- Configuration
+- API Keys
+- Logs système
+- Base de données
+
+🔔 **ALERTES**
+- Notifications (badge rouge si nouvelles)
+- Erreurs critiques
+- Rapports automatiques
+
+**Footer sidebar:**
+- Status système: ● ONLINE (vert pulsant)
+- Uptime: 99.8%
+- Avatar admin + nom
+- Dropdown: Profil / Paramètres / Déconnexion
+
+---
+
+### TOP BAR (sticky, full width)
+
+**Gauche:**
+- Breadcrumb dynamique (Dashboard > Section > Page)
+- Icône burger (collapse sidebar sur mobile)
+
+**Centre:**
+- Searchbar globale (Cmd+K ou Ctrl+K)
+  * Placeholder: "Rechercher conversations, documents, utilisateurs..."
+  * Dropdown résultats instantanés
+
+**Droite:**
+- Select période: [Aujourd'hui / 7j / 30j / 90j / Personnalisé]
+- Refresh button (avec animation rotation)
+- Notifications (🔔 badge count)
+- Mode clair/sombre toggle
+- Avatar + dropdown
+
+---
+
+## 📊 PAGE: VUE D'ENSEMBLE (/admin/dashboard)
+
+### Section 1: KPIs Temps Réel (4 cards en row)
+
+**Card 1: Conversations**
+- Chiffre principal: 1,247 (total)
+- Sous-stats: 
+  * +23 aujourd'hui (vert)
+  * 12 actives maintenant (pulsant)
+- Mini sparkline chart
+- Icône: MessageSquare
+
+**Card 2: Messages**
+- Chiffre: 8,934 (total)
+- Sous-stats:
+  * Moy/conversation: 7.2
+  * Temps réponse: 2.4s (vert si < 3s)
+- Mini bar chart
+- Icône: Send
+
+**Card 3: Satisfaction**
+- Gauge circulaire: 94%
+- 👍 782 / 👎 51
+- Évolution: +2.3% (vert)
+- Icône: Heart
+
+**Card 4: IA Performance**
+- Tokens utilisés: 2.8M / 10M
+- Progress bar avec segments
+- Quota restant: 72%
+- Icône: Cpu
+
+### Section 2: Charts Principaux (2 colonnes)
+
+**Gauche (65%): Activité Temporelle**
+Card "Utilisation sur 30 jours"
+- Line chart multi-lignes:
+  * Conversations (bleu)
+  * Messages (vert)
+  * Documents vus (orange)
+- Zoom/brush interactif
+- Tooltips détaillés
+- Export PNG/CSV
+
+**Droite (35%): Répartition Catégories**
+Card "Questions par domaine"
+- Donut chart coloré:
+  * DROIT_CIVIL: 32%
+  * PROCEDURES: 24%
+  * DROIT_PENAL: 18%
+  * CULTURE: 12%
+  * DROIT_TRAVAIL: 8%
+  * AUTRES: 6%
+- Légende cliquable (toggle segments)
+- Total questions au centre
+
+### Section 3: Activité Temps Réel (3 cards)
+
+**Card 1: Conversations Actives**
+Titre + badge count (3)
+Liste scrollable (max 5 visible):
+- Avatar généré + ID court (ex: #a3f4)
+- Dernier message (truncate)
+- Badge catégorie coloré
+- Timestamp "il y a 2 min"
+- Bouton "Voir" (icône Eye)
+
+**Card 2: Alertes Système**
+Liste avec severity:
+- 🔴 CRITICAL: API Gemini taux limite atteint (il y a 5 min)
+  * Bouton "Résoudre"
+- ⚠️ WARNING: Cache Redis à 85% (il y a 1h)
+- ℹ️ INFO: Backup complété (il y a 3h)
+- Lien "Voir toutes les alertes"
+
+**Card 3: Jobs en cours**
+Liste avec progress bars:
+- 📄 Extraction PDFs: 7/10 (70%)
+- 🔢 Génération embeddings: 450/500 (90%)
+- 🌐 Crawling actualités: En attente
+- ⏱️ Prochain cron: dans 45 min
+
+### Section 4: Tableaux Données
+
+**Tableau: Documents Populaires (Top 10)**
+Colonnes: 
+- Rang (#)
+- Titre (cliquable)
+- Type (badge)
+- Vues (7j)
+- Évolution (↑↓)
+- Dernière vue
+- Actions (Eye, Edit, Download)
+
+Pagination + Lien "Voir tous les documents"
+
+**Tableau: Dernières Conversations**
+Colonnes:
+- ID Session
+- Début
+- Messages
+- Catégorie
+- Langue
+- Confiance
+- Statut (badge: Actif/Fermé)
+- Actions (Eye, Export, Delete)
+
+5 dernières, lien "Voir toutes"
+
+---
+
+## 💬 PAGE: CONVERSATIONS (/admin/conversations)
+
+### Header Section
+- Titre: "Gestion des Conversations" + count badge
+- Actions:
+  * Export CSV (période actuelle)
+  * Export JSON
+  * Filtres avancés (toggle sidebar)
+
+### Stats Bar (4 mini cards)
+- Conversations aujourd'hui: 156
+- Durée moyenne: 4m 32s
+- Messages/conversation: 6.8
+- Taux abandon: 12% (rouge si > 15%)
+
+### Filtres Sidebar (collapsible)
+**Filtres:**
+- Statut: [Toutes / Actives / Fermées / Abandonnées]
+- Période: Date picker range
+- Langue: [Toutes / FR / EN]
+- Catégorie: Multi-select
+- Confiance: Slider (0-100%)
+- Feedback: [Tous / Positif / Négatif / Aucun]
+
+Boutons: Appliquer / Reset
+
+### Tableau Principal
+**Features:**
+- Search global (debounced)
+- Tri par colonne (click header)
+- Sélection multiple (checkbox)
+- Actions bulk: Exporter / Archiver / Supprimer
+
+**Colonnes:**
+1. ☑️ (select)
+2. ID (court, copy on click)
+3. Session (avec identicon)
+4. Date début
+5. Durée
+6. Messages (badge count)
+7. Langue (flag 🇫🇷/🇬🇧)
+8. Catégorie (badge coloré)
+9. Confiance (gauge mini ou %)
+10. Feedback (thumbs up/down count)
+11. Statut (badge)
+12. Actions (dropdown: Voir / Exporter / Archiver / Supprimer)
+
+**Pagination:**
+- Rows per page: [25 / 50 / 100]
+- Page X sur Y
+- Prev / Next
+- Jump to page
+
+### Modal: Détail Conversation
+Ouverture sur click row ou action "Voir"
+
+**Header modal:**
+- ID conversation
+- Métadonnées: Date, durée, langue, catégorie
+- Bouton close
+
+**Body (3 sections):**
+
+1. **Timeline Messages** (scrollable)
+   - UI chat (user right, assistant left)
+   - Avatars
+   - Timestamps
+   - Badges confiance sur réponses IA
+   - Citations en cards sous messages
+   - Boutons feedback visible
+
+2. **Analytics** (sidebar droite modal)
+   - Confiance moyenne
+   - Tokens utilisés
+   - Temps réponse moyen
+   - Documents cités (liste)
+   - Catégories détectées
+
+3. **Actions**
+   - Exporter conversation (JSON/PDF)
+   - Rejouer (debug mode)
+   - Marquer pour review
+   - Supprimer
+
+---
+
+## 📄 PAGE: DOCUMENTS (/admin/documents)
+
+### Header
+- Titre + count total (156 documents)
+- Actions principales:
+  * **Upload Document** (bouton primaire)
+  * Import Bulk PDFs
+  * Sync Sources Officielles
+  * Export Liste
+
+### Stats Cards (5)
+- Total documents: 156
+- En extraction: 3 (avec spinner)
+- Embeddings générés: 98%
+- Dernière mise à jour: il y a 2h
+- Storage utilisé: 2.4 GB / 10 GB (progress bar)
+
+### Filtres + Vue
+**Barre filtres:**
+- Search
+- Type: Multi-select dropdown (CODE, LOI, DÉCRET...)
+- Catégorie: Multi-select
+- Statut: [Tous / Actif / Abrogé / Brouillon]
+- Vue: Toggle [Grille / Liste / Table]
+
+### Vue Grille (par défaut)
+Grid responsive de cards (4 colonnes desktop):
+
+**Card Document:**
+- Badge type (coloré en haut)
+- Icône document (selon type)
+- Titre (truncate 2 lignes)
+- Référence officielle
+- Date promulgation
+- Stats: 
+  * 👁️ 234 vues
+  * 💬 12 citations
+- Tags (max 3 visible)
+- Progress bar embeddings (si < 100%)
+- Hover: Actions overlay (Edit / View / Delete / Download)
+
+### Vue Table
+**Colonnes:**
+- ☑️ Select
+- Type (badge)
+- Titre (cliquable)
+- Référence
+- Catégorie
+- Date
+- Statut (badge)
+- Vues
+- Embeddings (%)
+- Taille (KB)
+- Actions
+
+**Actions bulk:**
+- Régénérer embeddings
+- Exporter sélection
+- Changer catégorie
+- Supprimer
+
+### Modal: Upload Document
+
+**Step 1: Upload**
+- Drag & drop zone
+- Browse files
+- Formats acceptés: PDF, DOCX
+- Preview fichier
+
+**Step 2: Métadonnées**
+Form:
+- Titre *
+- Type * (select)
+- Catégorie * (select)
+- Référence officielle
+- Date promulgation (date picker)
+- Source URL
+- Tags (multi-input)
+- Statut (select)
+
+**Step 3: Extraction**
+- Progress bar extraction
+- Preview texte extrait (scrollable)
+- Validation structure (sections détectées)
+- Bouton "Confirmer & Générer Embeddings"
+
+**Step 4: Finalisation**
+- Success message
+- Stats: X sections, Y articles extraits
+- Z embeddings générés
+- Actions: Voir document / Upload autre / Fermer
+
+### Modal: Détail Document
+
+**Tabs:**
+
+1. **Aperçu**
+   - Métadonnées complètes
+   - Preview contenu (markdown)
+   - Table des matières
+
+2. **Sections** (tree view)
+   - Structure hiérarchique
+   - Édition inline
+   - Réorganisation drag & drop
+
+3. **Embeddings**
+   - Liste chunks générés
+   - Preview texte
+   - Score qualité
+   - Actions: Régénérer / Supprimer
+
+4. **Analytics**
+   - Vues dans le temps (chart)
+   - Citations dans conversations
+   - Questions liées
+   - Export stats
+
+5. **Historique**
+   - Versions/modifications
+   - Qui / Quand / Quoi
+   - Rollback possible
+
+---
+
+## 📋 PAGE: PROCÉDURES (/admin/procedures)
+
+### Header
+- Titre + count (89 procédures)
+- Nouvelle procédure (bouton)
+- Import template
+
+### Stats
+- Procédures actives: 89
+- Consultations (7j): 1,245
+- Moy. vues/procédure: 14
+- Temps moyen lecture: 3m 12s
+
+### Filtres
+- Catégorie (select)
+- Difficulté
+- Coût (range slider)
+- Durée estimée
+
+### Table/Grid Procédures
+**Colonnes:**
+- Nom (icône + titre)
+- Catégorie (badge)
+- Difficulté (⭐️⭐️⭐️)
+- Coût moyen (FCFA)
+- Durée estimée
+- Popularité (vues)
+- Dernière MAJ
+- Statut
+- Actions
+
+### Modal: Éditer Procédure
+
+**Form sections:**
+
+1. **Informations générales**
+   - Nom (FR/EN)
+   - Slug
+   - Catégorie
+   - Description courte
+
+2. **Étapes** (repeater dynamique)
+   Pour chaque étape:
+   - Ordre (drag handle)
+   - Titre
+   - Description détaillée (markdown editor)
+   - Durée estimée
+   - Boutons: Ajouter étape / Supprimer
+
+3. **Documents requis** (liste éditable)
+   - Nom document
+   - Obligatoire/Optionnel (toggle)
+   - Notes
+
+4. **Coûts**
+   - Coût de base (FCFA)
+   - Coûts optionnels (liste)
+   - Total calculé (readonly)
+
+5. **Lieux** (repeater)
+   - Nom administration
+   - Adresse complète
+   - Horaires
+   - Contact
+   - GPS coordinates (optionnel)
+   - Map preview (iframe)
+
+6. **Liens utiles**
+   - URL formulaires
+   - URL site officiel
+   - Vidéo tutoriel (YouTube)
+
+7. **SEO & Metadata**
+   - Meta description
+   - Tags/mots-clés
+
+Boutons: Aperçu / Sauvegarder brouillon / Publier
+
+---
+
+## 📰 PAGE: ACTUALITÉS (/admin/actualites)
+
+### Header
+- Titre + count
+- Nouvelle actualité (manuel)
+- Lancer crawling (bouton avec spinner si en cours)
+- Config sources
+
+### Stats
+- Articles total: 456
+- Ajoutés (7j): 23
+- En attente validation: 5
+- Dernier crawl: il y a 45 min
+
+### Filtres
+- Source
+- Catégorie
+- Statut (Publié / Brouillon / Rejeté)
+- Pertinence IA (score)
+
+### Table Articles
+**Colonnes:**
+- ☑️
+- Image (thumbnail)
+- Titre
+- Source
+- Catégorie
+- Pertinence IA (gauge)
+- Date publication
+- Vues
+- Statut
+- Actions (Éditer / Publier / Rejeter / Supprimer)
+
+### Modal: Validation Article (crawlé)
+
+**Preview:**
+- Image
+- Titre
+- Résumé IA
+- Contenu complet
+- Tags suggérés par IA
+
+**Analysis IA:**
+- Score pertinence: 87%
+- Catégorie détectée: JURIDIQUE
+- Raison: "Article traite de nouvelle loi fiscale..."
+- Entités extraites: Loi N°2024/001, Ministère Finances
+
+**Actions:**
+- ✅ Approuver & Publier
+- ✏️ Éditer avant publication
+- ❌ Rejeter
+- 🔄 Régénérer analyse IA
+
+### Config Sources Crawling
+
+Liste sources avec:
+- Nom
+- URL
+- Status (Actif/Inactif toggle)
+- Fréquence crawl (select)
+- Dernier crawl
+- Taux succès (%)
+- Actions (Test / Éditer / Supprimer)
+
+Bouton: Ajouter source
+
+---
+
+## 🎮 PAGE: QUIZ (/admin/quiz)
+
+### Header
+- Titre + count questions (234)
+- Nouvelle question
+- Import CSV
+- Générer avec IA
+
+### Stats
+- Questions total: 234
+- Par difficulté (chart)
+- Taux réussite moyen: 68%
+- Tentatives (7j): 1,890
+
+### Filtres
+- Catégorie
+- Difficulté
+- Taux réussite (range)
+- Dernière utilisation
+
+### Table Questions
+**Colonnes:**
+- ID
+- Question (preview)
+- Catégorie
+- Difficulté (⭐️)
+- Tentatives
+- Taux réussite (%)
+- Document source (lien)
+- Statut
+- Actions
+
+### Modal: Créer/Éditer Question
+
+**Form:**
+- Question (FR) *
+- Question (EN)
+- Catégorie *
+- Difficulté *
+
+**Options (4):**
+- A: [input texte]
+- B: [input texte]
+- C: [input texte]
+- D: [input texte]
+- Bonne réponse: [select A/B/C/D] *
+
+**Explication:**
+- Texte explication (markdown)
+- Document source (select avec search)
+- Référence article
+
+**Preview:**
+Affichage comme vu par user
+
+**Générer avec IA:**
+Bouton qui ouvre modal:
+- Sélectionner document source
+- Nombre questions à générer (1-10)
+- Difficulté souhaitée
+- Générer → Review → Importer
+
+---
+
+## 🤖 PAGE: IA & PERFORMANCE (/admin/ai)
+
+### Section: Gemini API
+
+**Card Status API:**
+- Status: ● OPERATIONAL (vert)
+- Latence moyenne: 1.8s
+- Dernière requête: il y a 3s (temps réel)
+
+**Card Quotas:**
+Gauges visuelles:
+- Requêtes: 1,234 / 15,000 par minute (RPM)
+- Tokens: 2.8M / 10M par jour (TPD)
+- Requêtes journalières: 890 / 1,500 (RPD)
+
+Alertes si > 80%
+
+**Chart Utilisation:**
+Line chart 24h:
+- Requêtes/heure
+- Tokens/heure
+- Erreurs (en rouge)
+
+### Section: Performance Réponses
+
+**Metrics Cards:**
+- Temps réponse moyen: 2.4s
+- P95 latence: 4.1s
+- P99 latence: 6.8s
+- Timeout rate: 0.2%
+
+**Chart Distribution:**
+Histogram des temps de réponse
+
+### Section: Embeddings & RAG
+
+**Stats:**
+- Embeddings total: 12,450
+- Documents indexés: 156/156 (100%)
+- Chunks moyens/doc: 80
+- Taille moyenne chunk: 450 tokens
+
+**Table État Indexation:**
+Colonnes:
+- Document
+- Chunks
+- Embeddings générés
+- Statut (badge)
+- Dernière MAJ
+- Actions (Régénérer / Voir détails)
+
+**Actions bulk:**
+- Régénérer tous
+- Mettre à jour modifiés
+- Vérifier intégrité
+
+### Section: Cache Redis
+
+**Stats:**
+- Hit rate: 87%
+- Memory utilisée: 245 MB / 512 MB
+- Keys: 3,456
+- Évictions: 12 (dernier 24h)
+
+**Actions:**
+- Flush cache (avec confirmation)
+- Voir keys (modal liste)
+- Statistiques détaillées
+
+### Section: Logs IA
+
+Table logs récents:
+- Timestamp
+- Type (Query / Embedding / Error)
+- Latence
+- Tokens
+- Status
+- Message
+- Actions (Voir détails / Rejouer)
+
+Filtres + export
+
+---
+
+## 👥 PAGE: UTILISATEURS & SESSIONS (/admin/users)
+
+### Stats
+- Sessions actives: 23
+- Unique visitors (7j): 892
+- Avg session duration: 12m 34s
+- Bounce rate: 18%
+
+### Section: Sessions Actives (temps réel)
+
+Table updating en temps réel:
+- Session ID (identicon)
+- IP (hashé/masqué)
+- Localisation (ville, pays flag)
+- Langue
+- Appareil (icône desktop/mobile)
+- Page actuelle
+- Temps session
+- Actions (messages)
+- Actions (Voir historique / Terminer session)
+
+### Section: Historique Activité
+
+Table avec filtres:
+- Période
+- Type événement (CHAT / DOCUMENT_VIEW / QUIZ / etc.)
+- Pays/Ville
+
+**Colonnes:**
+- Timestamp
+- Event type (icône + badge)
+- Session ID
+- Détails (JSON viewer on click)
+- IP
+- User-agent
+
+Export CSV
+
+### Section: Bannissements (si implémenté)
+
+Liste IPs/Sessions bannies:
+- IP/Session
+- Raison
+- Par qui
+- Date
+- Expire dans
+- Actions (Débannir)
+
+---
+
+## ⚙️ PAGE: CONFIGURATION (/admin/settings)
+
+### Tabs:
+
+**1. Général**
+- Nom application
+- Langues activées (toggles)
+- Timezone
+- Formats date/heure
+- Logo (upload)
+- Favicon
+
+**2. API & Intégrations**
+Form avec inputs sensibles (masked):
+- Gemini API Key
+- Supabase URL
+- Supabase Anon Key
+- Supabase Service Role Key
+- Cloudinary Config
+- Upstash Redis URL
+
+Bouton "Tester connexion" pour chaque
+
+**3. IA Configuration**
+- Modèle Gemini (select)
+- Temperature (slider 0-1)
+- Max tokens (input)
+- Top K / Top P (sliders)
+- Embedding model (select)
+- Chunk size (input)
+- Chunk overlap (input)
+
+Preview prompt système (textarea)
+
+**4. Scraping**
+- Fréquence crawl (cron expression)
+- Sources actives (liste checkboxes)
+- User-agent
+- Timeout (secondes)
+- Max retry
+
+**5. Notifications**
+- Email admin (input)
+- Alertes par email (toggles):
+  * Erreurs critiques
+  * Quotas atteints
+  * Nouveaux feedbacks négatifs
+- Slack webhook (optionnel)
+- Discord webhook (optionnel)
+
+**6. Sécurité**
+- Session timeout (minutes)
+- Rate limiting (req/min)
+- IPs whitelistées
+- Logs retention (jours)
+- Backup automatique (toggle + fréquence)
+
+**7. Maintenance**
+- Mode maintenance (toggle)
+- Message maintenance (textarea)
+- Allowed IPs pendant maintenance
+
+Bouton: Sauvegarder tout
+
+---
+
+## 📊 PAGE: ANALYTICS (/admin/analytics)
+
+### Période Selector (large, top)
+- Aujourd'hui / 7j / 30j / 90j / 1 an / Personnalisé
+- Comparaison période précédente (toggle)
+
+### Section: Trafic
+
+**Charts:**
+1. Sessions dans le temps (line)
+2. Pages vues (bar chart)
+3. Sources trafic (donut): Direct, Google, Social, etc.
+4. Appareils (bar): Mobile 68%, Desktop 28%, Tablet 4%
+
+### Section: Engagement
+
+**Metrics:**
+- Avg session duration
+- Pages per session
+- Bounce rate
+- Return visitor rate
+
+**Chart interactions:**
+Heatmap jour/heure d'activité
+
+### Section: Contenu Populaire
+
+**Top pages (table):**
+- URL
+- Vues
+- Avg time
+- Bounce rate
+- Conversions (questions posées)
+
+**Top recherches:**
+Liste requêtes les plus fréquentes
+
+### Section: Conversions & Goals
+
+**Funnels:**
+Visualisation:
+1. Visite → 100%
+2. Recherche → 75%
+3. Question posée → 45%
+4. Feedback positif → 38%
+
+**Goals trackés:**
+- Questions abouties
+- Documents consultés
+- Quiz complétés
+- Procédures partagées
+
+### Export
+Bouton exporter rapport complet (PDF/Excel)
+
+---
+
+## 🔔 PAGE: ALERTES & NOTIFICATIONS (/admin/alerts)
+
+### Filtres
+- Severity: [Toutes / Critical / Warning / Info]
+- Type: [Système / IA / Sécurité / Performance]
+- Status: [Nouvelles / Résolues / Ignorées]
+
+### Liste Alertes (cards)
+
+**Card alerte:**
+- Icône severity (🔴⚠️ℹ️)
+- Titre clair
+- Description
+- Timestamp
+- Détails techniques (collapse)
+- Actions suggérées
+- Boutons: Marquer résolue / Ignorer / Voir logs
+
+### Config Alertes
+
+Table règles alertes:
+- Nom règle
+- Condition (ex: "API quota > 80%")
+- Severity
+- Notification (email/slack)
+- Activé (toggle)
+- Actions (Éditer / Supprimer)
+
+Bouton: Nouvelle règle
+
+---
+
+## 🗂️ PAGE: LOGS SYSTÈME (/admin/logs)
+
+### Filtres
+- Niveau: [All / Error / Warn / Info / Debug]
+- Service: [API / IA / Scraper / Cron]
+- Période
+
+### Table Logs (infinite scroll)
+
+**Colonnes:**
+- Timestamp (précis à la ms)
+- Niveau (badge coloré)
+- Service
+- Message
+- Details (expandable JSON)
+- Trace ID (copy)
+
+### Actions
+- Live tail (toggle temps réel)
+- Export logs
+- Clear logs (confirmation)
+
+---
+
+## 🔧 PAGE: BASE DE DONNÉES (/admin/database)
+
+### Stats
+- Total records: 45,678
+- Database size: 2.4 GB
+- Connections actives: 12 / 100
+- Slow queries (24h): 3
+
+### Tables Overview
+
+Liste tables avec:
+- Nom table
+- Rows count
+- Size
+- Last updated
+- Actions (View schema / Export / Truncate / Drop)
+
+### Requêtes
+
+**Query Editor:**
+Textarea SQL avec:
+- Syntax highlighting
+- Autocomplete
+- Saved queries
+
+Bouton: Execute (avec warning si UPDATE/DELETE)
+
+**Résultats:**
+Table résultats avec:
+- Export CSV/JSON
+- Pagination
+
+### Backups
+
+Liste backups:
+- Date
+- Size
+- Type (Auto/Manual)
+- Status
+- Actions (Download / Restore / Delete)
+
+Bouton: Backup maintenant
+
+---
+
+## 🎨 COMPOSANTS UI GLOBAUX
+
+### Sidebar Navigation
+- Collapsible groups
+- Active state (highlight)
+- Badge counts dynamiques
+- Icons (Lucide React)
+
+### Data Table
+Props:
+- Columns config
+- Data array
+- Sortable (multi-column)
+- Filterable
+- Selectable rows
+- Pagination
+- Actions column
+- Empty state
+- Loading state (skeletons)
+- Export (CSV/JSON/Excel)
+
+### Chart Wrapper
+- Recharts library
+- Responsive
+- Dark mode compatible
+- Tooltips custom
+- Legends
+- Export PNG
+
+### Modal
+- Sizes (sm/md/lg/xl/full)
+- Close on ESC
+- Backdrop blur
+- Animations (framer-motion)
+- Header / Body / Footer slots
+
+### Alert/Toast
+- Positions (top-right, bottom-center...)
+- Types (success, error, warning, info)
+- Auto-dismiss
+- Actions buttons
+- Stack multiple
+
+### Stat Card
+- Value (large)
+- Label
+- Icon
+- Trend (up/down with %)
+- Sparkline optionnel
+- Colored border (selon trend)
+
+### Loading States
+- Skeletons (cards, tables, charts)
+- Spinners
+- Progress bars
+- Shimmer effect
+
+---
+
+## 🔐 SÉCURITÉ & AUTH
+
+### Protection Routes
+Toutes les routes /admin/* nécessitent:
+- Session valide (check Supabase Auth)
+- Role admin (check user metadata)
+- Redirect vers /admin (login) si non auth
+
+### Session Management
+- JWT tokens
+- Refresh automatique
+- Logout sur inactivité (configurable)
+- Déconnexion tous appareils
+
+### API Security
+- CORS config strict
+- Rate limiting
+- CSRF tokens
+- Input validation (Zod)
+- SQL injection protection
+- XSS sanitization
+
+---
+
+## 📱 RESPONSIVE
+
+**Breakpoints:**
+- Mobile: < 768px
+  * Sidebar devient drawer
+  * Cards full width
+  * Tables scrollables horizontal
+  * Charts adaptés
+
+- Tablet: 768-1024px
+  * Sidebar collapsible
+  * Grid 2 colonnes
+
+- Desktop: > 1024px
+  * Layout complet
+
+---
+
+## ⚡ PERFORMANCE
+
+- Lazy loading pages
+- Code splitting
+- Image optimization
+- Virtualized long lists
+- Debounced searches
+- Optimistic updates
+- Cache stratégies
+- Service worker (offline)
+
+---
+
+## 🎨RéessayerClaude n'a pas encore la capacité d'exécuter le code qu'il génère.RContinuerModifier🎨 STYLES & THÈMES (Suite)
+Variables CSS (Tailwind config extend)
+typescript// tailwind.config.ts - Theme Admin
+theme: {
+  extend: {
+    colors: {
+      // Brand Cameroun
+      cameroon: {
+        green: '#007A3D',
+        red: '#CE1126',
+        yellow: '#FCD116',
+      },
+      
+      // Admin Dark Theme
+      admin: {
+        bg: {
+          primary: '#0A0A0A',
+          secondary: '#1A1A1A',
+          tertiary: '#2A2A2A',
+          hover: '#333333',
+        },
+        border: {
+          DEFAULT: '#333333',
+          light: '#404040',
+        },
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#A1A1A1',
+          muted: '#666666',
+        },
+        accent: {
+          green: '#10B981',
+          red: '#EF4444',
+          yellow: '#F59E0B',
+          blue: '#3B82F6',
+        },
+      },
+    },
+    
+    fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      mono: ['Fira Code', 'monospace'],
+    },
+    
+    animation: {
+      'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      'spin-slow': 'spin 3s linear infinite',
+      'bounce-subtle': 'bounce 2s infinite',
+    },
+  },
+}
+
+📊 ÉTATS & FEEDBACK VISUELS
+Success States
+
+Toast vert avec check icon
+Border flash vert
+Confetti animation (actions importantes)
+
+Error States
+
+Toast rouge avec X icon
+Shake animation
+Error boundary avec retry
+
+Loading States
+
+Skeleton screens (même structure que contenu)
+Spinner overlay pour actions
+Progress bar en haut page (NProgress style)
+
+Empty States
+Illustrations + message + CTA:
+
+"Aucune conversation pour l'instant"
+"Aucun document trouvé"
+"Lancez votre premier crawl"
+
+
+🔔 SYSTÈME DE NOTIFICATIONS
+Types de notifications temps réel
+Push Notifications (dans app):
+
+Nouvelle conversation active
+Erreur API critique
+Quota IA dépassé
+Backup complété
+Nouveau feedback négatif
+
+Badge counts:
+
+Alertes non lues (sidebar)
+Conversations actives
+Documents en attente
+Feedbacks à traiter
+
+Sons (optionnel, configurable):
+
+Ping discret pour alertes
+Toggle son dans settings
+
+
+🎯 ACTIONS RAPIDES (Keyboard Shortcuts)
+Afficher modal "Raccourcis" avec ?
+Navigation:
+
+Cmd/Ctrl + K - Recherche globale
+Cmd/Ctrl + / - Toggle sidebar
+Cmd/Ctrl + B - Vue d'ensemble
+Cmd/Ctrl + 1-9 - Sections sidebar
+
+Actions:
+
+Cmd/Ctrl + N - Nouveau (selon page)
+Cmd/Ctrl + S - Sauvegarder
+Cmd/Ctrl + E - Export
+Cmd/Ctrl + R - Refresh data
+Esc - Fermer modal/drawer
+
+Tables:
+
+Cmd/Ctrl + A - Sélectionner tout
+Delete - Supprimer sélection
+Enter - Ouvrir détail
+
+
+🔄 TEMPS RÉEL & WEBSOCKETS
+Features temps réel (via Supabase Realtime)
+À monitorer en live:
+
+Nouvelles conversations (row insert)
+Nouveaux messages (row insert)
+Status jobs (row update)
+Alertes système (row insert)
+Sessions actives (presence)
+
+Indicators:
+
+Dot vert pulsant "Live"
+Count badges auto-update
+Charts update (debounced)
+Toast pour événements importants
+
+
+📥 EXPORTS & RAPPORTS
+Formats disponibles
+
+CSV (tables)
+JSON (data brute)
+Excel (.xlsx) (rapports formatés)
+PDF (rapports visuels)
+
+Rapports pré-configurés
+Rapport Hebdomadaire:
+
+Période: 7 derniers jours
+Contenu:
+
+KPIs avec évolution
+Top 10 conversations
+Documents populaires
+Performance IA
+Erreurs & alertes
+
+
+Format: PDF avec charts
+Schedule: Envoi auto email lundi 9h
+
+Rapport Mensuel:
+
+Vue macro + trends
+Recommandations IA
+Budget tokens
+Roadmap suggestions
+
+Export personnalisé:
+
+Sélection sections
+Période custom
+Format choix
+Schedule optionnel
+
+
+🛠️ OUTILS ADMIN AVANCÉS
+Debug Mode
+Toggle dans settings:
+
+Affiche IDs partout
+Logs détaillés console
+Network requests visibles
+Performance metrics overlay
+
+SQL Console (pour super-admin)
+Interface pour:
+
+Queries custom
+Vues saved
+Explications queries
+Warning destructives
+
+API Playground
+Tester endpoints:
+
+Request builder
+Headers config
+Body JSON editor
+Response viewer
+Save requests
+
+Webhook Tester
+Pour intégrations:
+
+Déclencher webhooks
+Voir payloads
+Retry failed
+Logs webhooks
+
+
+🎓 ONBOARDING ADMIN
+Première connexion
+Tour guidé (driver.js style):
+
+Welcome message
+Navigation sidebar
+Vue d'ensemble
+Actions rapides
+Notifications
+Settings importantes
+
+Skip possible, revoir via "?" menu
+
+📋 CHECKLIST FONCTIONNALITÉS CRITIQUES
+Must-have (MVP):
+
+ Auth login sécurisé
+ Dashboard overview complet
+ Gestion conversations
+ Gestion documents
+ Analytics basiques
+ Alertes système
+ Logs
+ Config API keys
+
+Nice-to-have (V2):
+
+ Rapports auto par email
+ A/B testing prompts IA
+ Multi-admin avec rôles
+ Audit trail complet
+ Webhooks custom
+ CLI admin tools
+ Mobile admin app
+
+
+🔌 INTÉGRATIONS SUPABASE
+Tables Admin nécessaires
+sql-- Table admin_users (créée manuellement)
+CREATE TABLE admin_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL, -- Bcrypt
+  name TEXT,
+  role TEXT DEFAULT 'admin', -- admin, super_admin
+  is_active BOOLEAN DEFAULT true,
+  last_login TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Row Level Security
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Admins peuvent lire autres admins
+CREATE POLICY "Admins can read admin_users"
+  ON admin_users FOR SELECT
+  TO authenticated
+  USING (auth.jwt() ->> 'role' = 'admin');
+
+-- Table admin_sessions
+CREATE TABLE admin_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id UUID REFERENCES admin_users(id),
+  token TEXT UNIQUE NOT NULL,
+  ip_address INET,
+  user_agent TEXT,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Table admin_audit_logs
+CREATE TABLE admin_audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id UUID REFERENCES admin_users(id),
+  action TEXT NOT NULL, -- 'create', 'update', 'delete', 'export'
+  resource_type TEXT, -- 'document', 'conversation', 'config'
+  resource_id TEXT,
+  changes JSONB, -- Avant/après
+  ip_address INET,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index pour perfs
+CREATE INDEX idx_audit_logs_admin ON admin_audit_logs(admin_id);
+CREATE INDEX idx_audit_logs_created ON admin_audit_logs(created_at DESC);
+CREATE INDEX idx_audit_logs_resource ON admin_audit_logs(resource_type, resource_id);
+Auth Flow
+typescript// lib/auth-admin.ts
+
+import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // Server-side only
+);
+
+export async function loginAdmin(email: string, password: string) {
+  // 1. Récupérer admin par email
+  const { data: admin, error } = await supabase
+    .from('admin_users')
+    .select('*')
+    .eq('email', email)
+    .eq('is_active', true)
+    .single();
+  
+  if (error || !admin) {
+    throw new Error('Identifiants invalides');
+  }
+  
+  // 2. Vérifier password
+  const isValid = await bcrypt.compare(password, admin.password_hash);
+  if (!isValid) {
+    throw new Error('Identifiants invalides');
+  }
+  
+  // 3. Créer session token
+  const token = generateSecureToken();
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 8); // 8h session
+  
+  await supabase.from('admin_sessions').insert({
+    admin_id: admin.id,
+    token,
+    expires_at: expiresAt.toISOString(),
+    ip_address: getClientIP(),
+    user_agent: getUserAgent(),
+  });
+  
+  // 4. Update last_login
+  await supabase
+    .from('admin_users')
+    .update({ last_login: new Date().toISOString() })
+    .eq('id', admin.id);
+  
+  return { token, admin };
+}
+
+export async function verifyAdminSession(token: string) {
+  const { data: session } = await supabase
+    .from('admin_sessions')
+    .select('*, admin:admin_users(*)')
+    .eq('token', token)
+    .gt('expires_at', new Date().toISOString())
+    .single();
+  
+  return session;
+}
+
+export async function logAdminAction(
+  adminId: string,
+  action: string,
+  resourceType: string,
+  resourceId: string,
+  changes?: any
+) {
+  await supabase.from('admin_audit_logs').insert({
+    admin_id: adminId,
+    action,
+    resource_type: resourceType,
+    resource_id: resourceId,
+    changes,
+    ip_address: getClientIP(),
+  });
+}
+Middleware Protection
+typescript// middleware.ts
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  // Protéger toutes les routes /admin/* sauf /admin (login)
+  if (request.nextUrl.pathname.startsWith('/admin') && 
+      request.nextUrl.pathname !== '/admin') {
+    
+    const token = request.cookies.get('admin_token')?.value;
+    
+    if (!token) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    
+    // Vérifier token (appel API)
+    const isValid = await verifyToken(token);
+    
+    if (!isValid) {
+      const response = NextResponse.redirect(new URL('/admin', request.url));
+      response.cookies.delete('admin_token');
+      return response;
+    }
+  }
+  
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/admin/:path*',
+};
+
+🎨 COMPOSANTS SPÉCIAUX
+StatCard avec Trend
+tsx<StatCard
+  title="Conversations"
+  value="1,247"
+  trend={12.5}
+  trendLabel="vs semaine dernière"
+  icon={MessageSquare}
+  color="blue"
+  sparklineData={[10, 15, 13, 17, 14, 19, 23]}
+/>
+LiveIndicator
+tsx<LiveIndicator 
+  status="online" 
+  pulse={true}
+  label="Temps réel"
+/>
+ConfidenceGauge
+tsx<ConfidenceGauge 
+  value={87} 
+  size="sm"
+  showLabel={true}
+/>
+ActionButton avec confirmation
+tsx<ActionButton
+  variant="danger"
+  icon={Trash2}
+  confirmMessage="Supprimer définitivement ?"
+  onConfirm={handleDelete}
+>
+  Supprimer
+</ActionButton>
+
+📱 RESPONSIVE FINAL TOUCH
+Mobile (<768px):
+
+Sidebar → Drawer (hamburger)
+Tables → Cards swipeable
+Charts → Simplified versions
+Bottom navigation bar
+Touch-optimized (larger tap targets)
+
+Tablet (768-1024px):
+
+Sidebar collapsible (icônes only)
+Grid 2 colonnes
+Touch + keyboard
+
+Desktop (>1024px):
+
+Full layout
+Hover states
+Keyboard shortcuts
+Multi-column
+
+
+✅ FINAL CHECKS
+Avant production:
+
+ Toutes les routes protégées
+ Logs sensibles masqués
+ Rate limiting API
+ Error boundaries everywhere
+ Loading states partout
+ Mobile tested
+ Dark mode complet
+ Accessibilité (ARIA)
+ SEO (noindex admin)
+ Analytics admin trackées
+ Backup automatique configuré
+ Monitoring alertes setup
+
+
+Voilà ! Avec ce prompt complet, v0.dev devrait te générer:
+
+Page login sécurisée avec validation
+Dashboard complet avec toutes les sections
+Composants réutilisables (tables, charts, modals)
+Design moderne dark mode
+Responsive mobile-first
+États gérés (loading, error, empty)
+
+Prochaines étapes après génération v0:
+
+Intégrer Supabase Auth pour le login
+Connecter APIs pour data réelle
+Ajouter Realtime pour live updates
+Configurer Middleware pour protection routes
+Tester et ajuster
+
+Tu veux que je te donne aussi:
+
+Les queries Supabase spécifiques?
+Les fonctions API pour chaque endpoint?
+Le script de création du premier admin?
+La config Vercel pour le déploiement?
+RéessayerClaude n'a pas encore la capacité d'exécuter le code qu'il génère.Rexplique moi ce que fais ce promptModifier📋 Explication du Prompt Dashboard Admin
+Ce prompt complexe demande à v0.dev de créer un dashboard d'administration complet pour ton application "Assistant National du Cameroun". Voici ce qu'il fait, section par section :
+🎯 Structure Générale
+Le prompt décrit 3 parties principales :
+1. Page de Login (/admin)
+
+Formulaire simple : email + mot de passe
+Pas d'inscription publique (comme tu l'as demandé)
+Les admins sont créés directement en base de données
+Design sécurisé avec gestion d'erreurs
+
+2. Dashboard Principal (après login)
+Un back-office complet avec :
+
+Sidebar navigation : menu latéral avec toutes les sections
+Top bar : recherche, notifications, profil
+Pages dédiées pour chaque fonctionnalité
+
+3. Pages Spécialisées
+9 pages détaillées pour gérer l'application
+
+📊 Les Pages Détaillées
+Vue d'ensemble (/admin/dashboard)
+La page d'accueil admin qui affiche :
+
+KPIs : Statistiques clés (conversations, messages, satisfaction, tokens IA)
+Charts : Graphiques d'activité et répartition par catégorie
+Temps réel : Conversations actives, alertes, jobs en cours
+Tableaux : Documents populaires, dernières conversations
+
+Utilité : Vision globale rapide de l'état de l'application
+
+Conversations (/admin/conversations)
+Gestion des discussions utilisateurs :
+
+Liste complète des conversations avec filtres
+Détails : Voir chaque message, citations utilisées, score de confiance
+Analytics : Durée moyenne, taux d'abandon, catégories
+Export : CSV/JSON des données
+
+Utilité : Monitorer la qualité des réponses IA, identifier problèmes
+
+Documents (/admin/documents)
+Gestion de la bibliothèque juridique :
+
+Upload : Ajouter nouveaux PDFs
+Extraction : Process automatique (texte + structure)
+Embeddings : Voir l'état d'indexation vectorielle
+Stats : Vues, citations, popularité
+Vue grille/liste/table : Différentes visualisations
+
+Utilité : Alimenter la base de connaissances, maintenir les documents à jour
+
+Procédures (/admin/procedures)
+Gestion des démarches administratives :
+
+Créer/éditer : Formulaire complet (étapes, documents, coûts, lieux)
+Popularité : Voir quelles procédures sont les plus consultées
+Template : Import rapide de nouvelles procédures
+
+Utilité : Maintenir les guides administratifs actualisés
+
+Actualités (/admin/actualites)
+Gestion du contenu news :
+
+Crawling automatique : Scraper les sites d'info camerounais
+Validation IA : Gemini analyse la pertinence de chaque article
+Modération : Approuver/rejeter les articles crawlés
+Configuration sources : Gérer les sites à scraper
+
+Utilité : Garder l'application à jour avec l'actualité
+
+Quiz (/admin/quiz)
+Gestion des questions éducatives :
+
+Créer questions : Manuellement ou générer avec IA
+Import CSV : Ajout en masse
+Analytics : Taux de réussite, questions difficiles
+Lien documents : Associer aux sources juridiques
+
+Utilité : Gamifier l'apprentissage du droit
+
+IA & Performance (/admin/ai)
+Monitoring technique de l'IA :
+
+Quotas Gemini : Utilisation RPM/TPM/RPD en temps réel
+Latence : Temps de réponse moyen
+Embeddings : État de l'indexation vectorielle
+Cache Redis : Hit rate, memory
+Logs IA : Historique des requêtes
+
+Utilité : Optimiser les coûts IA, détecter problèmes de performance
+
+Utilisateurs (/admin/users)
+Suivi des visiteurs :
+
+Sessions actives : Qui est en ligne maintenant (temps réel)
+Analytics : Localisation, appareils, comportement
+Historique : Tous les événements (vues, recherches, clics)
+Bannissement : Bloquer IPs si abus
+
+Utilité : Comprendre les utilisateurs, détecter abus
+
+Configuration (/admin/settings)
+Paramétrage de l'application :
+
+API Keys : Gemini, Supabase, Cloudinary
+IA Config : Temperature, tokens, prompts
+Scraping : Fréquence, sources
+Notifications : Email admin, webhooks
+Sécurité : Sessions, rate limiting
+
+Utilité : Configurer l'app sans toucher au code
+
+Analytics (/admin/analytics)
+Analyse approfondie :
+
+Trafic : Sessions, pages vues, sources
+Engagement : Durée, bounce rate
+Contenu populaire : Top pages/recherches
+Funnels : Conversion visite → question
+
+Utilité : Prendre décisions data-driven
+
+Alertes (/admin/alerts)
+Système de notifications :
+
+Liste alertes : Erreurs, warnings, infos
+Configuration : Règles personnalisées
+Actions : Résoudre/ignorer
+
+Utilité : Être alerté des problèmes critiques
+
+Logs (/admin/logs)
+Historique technique :
+
+Tous les logs : Erreurs, warnings, info
+Filtres : Par service, niveau, période
+Live tail : Voir en temps réel
+Export : Pour debug approfondi
+
+Utilité : Débugger les problèmes techniques
+
+Base de données (/admin/database)
+Gestion BDD (avancé) :
+
+Overview tables : Stats par table
+Query editor : Exécuter du SQL custom
+Backups : Créer/restaurer sauvegardes
+
+Utilité : Maintenance technique avancée
+
+🔐 Sécurité Détaillée
+Le prompt inclut un système d'authentification complet :
+1. Login → Vérifie email/password dans table admin_users
+2. Crée session token (8h validité)
+3. Store dans cookies httpOnly
+4. Middleware vérifie token sur toutes routes /admin/*
+5. Redirect vers login si invalide
+Audit trail : Chaque action admin est loggée (qui/quoi/quand)
+
+🎨 Design System
+Le prompt spécifie :
+
+Dark mode par défaut (dashboard pro)
+Couleurs : Palette sombre + accents camerounais
+Components : shadcn/ui (Button, Card, Table...)
+Responsive : Mobile, tablet, desktop
+Animations : Subtiles et performantes
+Icons : Lucide React
+
+
+⚡ Features Avancées
+Temps Réel
+Via Supabase Realtime :
+
+Conversations actives update live
+Notifications push
+Badge counts dynamiques
+
+Exports
+Formats multiples : CSV, JSON, Excel, PDF
+Keyboard Shortcuts
+
+Cmd+K : Recherche globale
+Cmd+1-9 : Navigation rapide
+etc.
+
+Charts Interactifs
+Recharts avec :
+
+Zoom
+Tooltips
+Export PNG
+
+
+🔧 Intégration Supabase
+Le prompt inclut les schémas SQL pour :
+
+admin_users : Table des admins
+admin_sessions : Sessions actives
+admin_audit_logs : Historique actions
+
+Fonctions auth complètes en TypeScript
+
+📱 Responsive
+3 breakpoints :
+
+Mobile (<768px) : Drawer, cards, swipe
+Tablet (768-1024px) : Sidebar collapsible
+Desktop (>1024px) : Layout complet
+
+
+✅ Ce que v0.dev va générer
+Avec ce prompt, tu obtiens :
+
+✅ 12 pages admin complètes avec UI/UX pro
+✅ 30+ composants réutilisables
+✅ Auth flow sécurisé
+✅ Design system cohérent dark mode
+✅ Responsive mobile-first
+✅ Types TypeScript stricts
+✅ Loading/Error states partout
+
+
+⚠️ Ce qu'il FAUT faire après
+v0.dev génère l'UI uniquement. Tu devras :
+
+Connecter Supabase : Auth + queries réelles
+Créer les APIs : Endpoints backend
+Implémenter logique métier : Extraction PDFs, IA, scraping
+Configurer Middleware : Protection routes
+Ajouter Realtime : Websockets
+Déployer : Vercel + variables d'environnement
+
+
+💡 Pourquoi c'est utile ?
+Ce dashboard te permet de :
+
+Monitorer l'activité en temps réel
+Gérer le contenu sans coder
+Débugger rapidement les problèmes
+Optimiser les coûts IA
+Analyser le comportement utilisateurs
+Maintenir l'app facilement
+
+C'est l'interface de contrôle centrale de ton application.
+
+En résumé : Ce prompt demande à v0.dev de créer un dashboard admin professionnel complet, avec toutes les pages et fonctionnalités nécessaires pour gérer ton Assistant Cameroun de A à Z, le tout avec un design moderne dark mode et une sécurité renforcée.
+
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY  :  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxbXlkcmVodW9xbGZvc2JrbHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxODkyNjMsImV4cCI6MjA3NDc2NTI2M30.IcX1C2USwxPs1SN2LhmR2dzzgATUZOnTGZKkyVAeJwE
+
+Project URL:  https://hqmydrehuoqlfosbklqb.supabase.co  
+VITE_GEMINI_API_KEY=AIzaSyCjyi-ji3lJwab_cHVWdXgfQzctzPbzsbA  
