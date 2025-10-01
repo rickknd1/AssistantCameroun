@@ -189,7 +189,12 @@ export async function POST(request: Request) {
 5. Fournis des réponses structurées avec listes à puces pour les étapes
 6. Indique les coûts, délais et documents requis (utilise le contexte en priorité, sinon tes connaissances générales)
 7. Mets en **gras** les informations importantes
-8. Si tu utilises le contexte, cite les sources. Sinon, indique les informations générales
+8. **CITATIONS OBLIGATOIRES:** Ajoute des citations inline directement dans le texte entre parenthèses quand tu utilises le contexte
+   - Pour les documents: (Référence: Décret N°2005/104)
+   - Pour les procédures: (Source: Procédure CNI)
+   - Pour les lois: (Loi N°2016/007 du 12 juillet 2016)
+   - Pour le web: (Source: site-web.com)
+9. Place les citations juste après l'information qu'elles soutiennent, pas à la fin
 
 ${context}
 
@@ -243,8 +248,34 @@ ${context}
       })
     }
 
-    // 8. Calculer le niveau de confiance (basique)
-    const confidence = sources.length > 0 ? 90 : 70
+    // 8. Calculer le niveau de confiance de manière dynamique
+    let confidence = 50 // Base minimale
+
+    // +10 points par source (max 3 sources = +30)
+    confidence += Math.min(sources.length * 10, 30)
+
+    // +20 points si des documents officiels sont trouvés
+    if (finalDocuments && finalDocuments.length > 0) {
+      confidence += 20
+    }
+
+    // +15 points si des procédures sont trouvées
+    if (finalProcedures && finalProcedures.length > 0) {
+      confidence += 15
+    }
+
+    // +10 points si plusieurs mots-clés matchent
+    if (keywords.length >= 3) {
+      confidence += 10
+    }
+
+    // -15 points si web search a été utilisée (données moins fiables)
+    if (webResults) {
+      confidence -= 15
+    }
+
+    // Limiter entre 50% et 95%
+    confidence = Math.max(50, Math.min(95, confidence))
 
     return NextResponse.json({
       response: responseText,

@@ -1,0 +1,1674 @@
+[
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "Quel est le coût d'une CNI au Cameroun ?",
+    "options": ["6 000 FCFA", "10 000 FCFA", "15 000 FCFA", "20 000 FCFA"],
+    "correctAnswer": "6 000 FCFA",
+    "explanation": "Le coût officiel d'une Carte Nationale d'Identité est de 6 000 FCFA selon la réglementation camerounaise."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "À quel âge peut-on obtenir sa première CNI au Cameroun ?",
+    "options": ["14 ans", "16 ans", "18 ans", "21 ans"],
+    "correctAnswer": "18 ans",
+    "explanation": "La majorité civile au Cameroun est de 18 ans, c'est l'âge minimum pour obtenir une CNI."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "Quelle est la durée de validité d'une CNI au Cameroun ?",
+    "options": ["5 ans", "10 ans", "15 ans", "20 ans"],
+    "correctAnswer": "15 ans",
+    "explanation": "La Carte Nationale d'Identité camerounaise a une durée de validité de 15 ans."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "Quel document est obligatoire pour obtenir un passeport ?",
+    "options": ["CNI", "Acte de naissance", "Certificat de résidence", "Permis de conduire"],
+    "correctAnswer": "CNI",
+    "explanation": "La Carte Nationale d'Identité est le document de base obligatoire pour faire une demande de passeport."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "Où obtient-on un acte de naissance au Cameroun ?",
+    "options": ["Au centre d'état civil", "À la préfecture", "Au ministère", "À la mairie"],
+    "correctAnswer": "Au centre d'état civil",
+    "explanation": "Les actes de naissance sont délivrés par les centres d'état civil des communes ou arrondissements."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Facile",
+    "question": "Combien coûte un passeport ordinaire de 32 pages au Cameroun ?",
+    "options": ["50 000 FCFA", "75 000 FCFA", "110 000 FCFA", "150 000 FCFA"],
+    "correctAnswer": "75 000 FCFA",
+    "explanation": "Le passeport ordinaire de 32 pages coûte 75 000 FCFA au Cameroun."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai normal de délivrance d'une CNI au Cameroun ?",
+    "options": ["1 semaine", "2 semaines", "1 mois", "3 mois"],
+    "correctAnswer": "3 mois",
+    "explanation": "Le délai réglementaire de délivrance d'une CNI est de 3 mois, bien que des retards puissent survenir."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Combien de photos d'identité sont nécessaires pour une demande de CNI ?",
+    "options": ["2 photos", "3 photos", "4 photos", "6 photos"],
+    "correctAnswer": "4 photos",
+    "explanation": "La demande de CNI nécessite 4 photos d'identité récentes et conformes."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Quel est le coût d'un passeport biométrique de 48 pages ?",
+    "options": ["75 000 FCFA", "110 000 FCFA", "150 000 FCFA", "200 000 FCFA"],
+    "correctAnswer": "110 000 FCFA",
+    "explanation": "Le passeport biométrique de 48 pages coûte 110 000 FCFA au Cameroun."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Quelle structure est responsable de la délivrance des CNI ?",
+    "options": ["DGSN", "MINREX", "MINAT", "MINJUSTICE"],
+    "correctAnswer": "DGSN",
+    "explanation": "La Délégation Générale à la Sûreté Nationale (DGSN) est chargée de la production et délivrance des CNI."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Combien coûte la légalisation d'un acte de naissance ?",
+    "options": ["500 FCFA", "1 000 FCFA", "2 000 FCFA", "5 000 FCFA"],
+    "correctAnswer": "1 000 FCFA",
+    "explanation": "La légalisation d'un acte de naissance coûte 1 000 FCFA auprès des autorités compétentes."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée de validité d'un passeport camerounais ?",
+    "options": ["2 ans", "5 ans", "10 ans", "15 ans"],
+    "correctAnswer": "5 ans",
+    "explanation": "Le passeport camerounais a une durée de validité de 5 ans pour les adultes."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Quel décret régit la délivrance des CNI au Cameroun ?",
+    "options": ["Décret n°2016/375", "Décret n°2010/254", "Décret n°2008/196", "Décret n°2005/178"],
+    "correctAnswer": "Décret n°2016/375",
+    "explanation": "Le Décret n°2016/375 du 04 août 2016 fixe les modalités de délivrance de la Carte Nationale d'Identité."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Quel document remplace l'acte de naissance pour les personnes nées avant 1960 ?",
+    "options": ["Certificat de nationalité", "Jugement supplétif", "Attestation d'identité", "Certificat de coutume"],
+    "correctAnswer": "Jugement supplétif",
+    "explanation": "Pour les personnes dont la naissance n'a pas été déclarée, un jugement supplétif tient lieu d'acte de naissance."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Combien de temps faut-il pour obtenir un passeport en procédure d'urgence ?",
+    "options": ["24 heures", "48 heures", "72 heures", "1 semaine"],
+    "correctAnswer": "72 heures",
+    "explanation": "La procédure d'urgence permet d'obtenir un passeport en 72 heures moyennant des frais supplémentaires."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Quel est le coût d'un certificat de nationalité camerounaise ?",
+    "options": ["10 000 FCFA", "25 000 FCFA", "50 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "25 000 FCFA",
+    "explanation": "Le certificat de nationalité camerounaise coûte 25 000 FCFA et est délivré par le tribunal de première instance."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit l'état civil au Cameroun ?",
+    "options": ["Loi n°2011/011", "Loi n°81/02", "Loi n°2006/015", "Loi n°98/015"],
+    "correctAnswer": "Loi n°2011/011",
+    "explanation": "La Loi n°2011/011 du 06 mai 2011 relative à l'état civil au Cameroun est le texte de référence."
+  },
+  {
+    "category": "Identité & Documents",
+    "difficulty": "Difficile",
+    "question": "Dans quel délai doit-on déclarer une naissance au Cameroun ?",
+    "options": ["15 jours", "30 jours", "60 jours", "90 jours"],
+    "correctAnswer": "30 jours",
+    "explanation": "La déclaration de naissance doit être faite dans un délai de 30 jours suivant l'accouchement."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Combien coûte l'immatriculation au RCCM pour une entreprise individuelle ?",
+    "options": ["10 000 FCFA", "25 000 FCFA", "50 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "25 000 FCFA",
+    "explanation": "L'immatriculation d'une entreprise individuelle au Registre du Commerce et du Crédit Mobilier coûte 25 000 FCFA."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Quelle structure gère le RCCM au Cameroun ?",
+    "options": ["MINCOMMERCE", "Greffe du tribunal", "API", "MINFI"],
+    "correctAnswer": "Greffe du tribunal",
+    "explanation": "Le Registre du Commerce et du Crédit Mobilier est géré par le greffe du tribunal de première instance."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Quel est le capital minimum pour créer une SARL au Cameroun ?",
+    "options": ["Aucun minimum", "100 000 FCFA", "500 000 FCFA", "1 000 000 FCFA"],
+    "correctAnswer": "100 000 FCFA",
+    "explanation": "Le capital minimum d'une SARL est de 100 000 FCFA selon l'Acte Uniforme OHADA."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Combien d'associés minimum faut-il pour créer une SARL ?",
+    "options": ["1 associé", "2 associés", "3 associés", "5 associés"],
+    "correctAnswer": "1 associé",
+    "explanation": "Une SARL peut être créée avec un seul associé (SARL unipersonnelle) selon le droit OHADA."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Où s'effectue la déclaration fiscale d'une nouvelle entreprise ?",
+    "options": ["Centre des impôts", "Mairie", "Préfecture", "Chambre de commerce"],
+    "correctAnswer": "Centre des impôts",
+    "explanation": "La déclaration fiscale d'existence se fait au Centre Divisionnaire des Impôts dont relève l'entreprise."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Facile",
+    "question": "Quel document prouve l'existence légale d'une entreprise ?",
+    "options": ["Statuts", "RCCM", "NIF", "Patente"],
+    "correctAnswer": "RCCM",
+    "explanation": "Le numéro RCCM (Registre du Commerce et du Crédit Mobilier) atteste de l'existence légale d'une entreprise."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai pour obtenir un RCCM au Cameroun ?",
+    "options": ["24 heures", "3 jours", "1 semaine", "2 semaines"],
+    "correctAnswer": "3 jours",
+    "explanation": "Le RCCM est généralement délivré dans un délai de 3 jours ouvrables après le dépôt du dossier complet."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'obtention du Numéro d'Identification Fiscale (NIF) ?",
+    "options": ["Gratuit", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "L'obtention du Numéro d'Identification Fiscale (NIF) est gratuite au Cameroun."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de TVA standard au Cameroun ?",
+    "options": ["15,5%", "17,5%", "19,25%", "21%"],
+    "correctAnswer": "19,25%",
+    "explanation": "Le taux normal de TVA au Cameroun est de 19,25% depuis 2019."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "À partir de quel chiffre d'affaires une entreprise doit-elle être assujettie à la TVA ?",
+    "options": ["10 millions FCFA", "30 millions FCFA", "50 millions FCFA", "100 millions FCFA"],
+    "correctAnswer": "50 millions FCFA",
+    "explanation": "Une entreprise dont le CA annuel dépasse 50 millions FCFA doit obligatoirement s'immatriculer à la TVA."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "Combien coûte la patente pour une petite entreprise (Classe 6) ?",
+    "options": ["15 000 FCFA", "25 000 FCFA", "50 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "25 000 FCFA",
+    "explanation": "La patente de classe 6 (petites activités) coûte 25 000 FCFA par an."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Moyen",
+    "question": "Quelle est la date limite de dépôt des déclarations TVA mensuelles ?",
+    "options": ["Le 10 du mois", "Le 15 du mois", "Le 20 du mois", "Le 30 du mois"],
+    "correctAnswer": "Le 15 du mois",
+    "explanation": "Les déclarations de TVA doivent être déposées au plus tard le 15 du mois suivant."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de l'Impôt sur les Sociétés (IS) au Cameroun ?",
+    "options": ["25%", "30%", "33%", "35%"],
+    "correctAnswer": "33%",
+    "explanation": "Le taux normal de l'Impôt sur les Sociétés au Cameroun est de 33% du bénéfice imposable."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Difficile",
+    "question": "Combien coûte la publication au journal des annonces légales (JAL) ?",
+    "options": ["15 000 FCFA", "35 000 FCFA", "75 000 FCFA", "150 000 FCFA"],
+    "correctAnswer": "75 000 FCFA",
+    "explanation": "La publication d'une annonce légale au JAL coûte environ 75 000 FCFA selon la taille de l'annonce."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Difficile",
+    "question": "Quel est le délai de prescription des créances commerciales au Cameroun ?",
+    "options": ["2 ans", "3 ans", "5 ans", "10 ans"],
+    "correctAnswer": "5 ans",
+    "explanation": "Selon l'Acte Uniforme OHADA, les créances commerciales se prescrivent par 5 ans."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de la Taxe Spéciale sur le Revenu (TSR) pour les professions libérales ?",
+    "options": ["5%", "10%", "12,5%", "15%"],
+    "correctAnswer": "12,5%",
+    "explanation": "La TSR applicable aux professions libérales est de 12,5% du chiffre d'affaires."
+  },
+  {
+    "category": "Entreprise & Commerce",
+    "difficulty": "Difficile",
+    "question": "Combien coûte l'enregistrement des statuts d'une SARL ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "75 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "L'enregistrement des statuts d'une SARL aux impôts coûte 50 000 FCFA (droit fixe)."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Quel document atteste de la propriété légale d'un terrain au Cameroun ?",
+    "options": ["Titre foncier", "Acte de vente", "Certificat de propriété", "Bordereau de livraison"],
+    "correctAnswer": "Titre foncier",
+    "explanation": "Le titre foncier est le seul document qui prouve de manière incontestable la propriété d'un terrain."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Où obtient-on un titre foncier au Cameroun ?",
+    "options": ["À la mairie", "Aux Domaines", "À la préfecture", "Au tribunal"],
+    "correctAnswer": "Aux Domaines",
+    "explanation": "Les titres fonciers sont délivrés par les Services des Domaines, du Cadastre et des Affaires Foncières."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Quel document autorise la construction d'un bâtiment ?",
+    "options": ["Permis de construire", "Certificat d'urbanisme", "Attestation de propriété", "Plan cadastral"],
+    "correctAnswer": "Permis de construire",
+    "explanation": "Le permis de construire est l'autorisation administrative obligatoire pour toute construction."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Quelle structure délivre le permis de construire ?",
+    "options": ["La commune", "Les Domaines", "Le MINDUH", "La préfecture"],
+    "correctAnswer": "La commune",
+    "explanation": "Le permis de construire est délivré par le maire de la commune où se situe le terrain."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Combien coûte un certificat d'enregistrement foncier pour un terrain de 300m² ?",
+    "options": ["50 000 FCFA", "100 000 FCFA", "200 000 FCFA", "500 000 FCFA"],
+    "correctAnswer": "100 000 FCFA",
+    "explanation": "Le coût du certificat d'enregistrement varie selon la superficie, environ 100 000 FCFA pour 300m²."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Facile",
+    "question": "Quelle est la première étape pour obtenir un titre foncier ?",
+    "options": ["Immatriculation", "Bornage", "Enquête de commodo", "Publication"],
+    "correctAnswer": "Bornage",
+    "explanation": "Le bornage du terrain par un géomètre agréé est la première étape de la procédure d'immatriculation."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai moyen pour obtenir un titre foncier au Cameroun ?",
+    "options": ["3 mois", "6 mois", "12 mois", "24 mois"],
+    "correctAnswer": "12 mois",
+    "explanation": "La procédure d'obtention d'un titre foncier prend en moyenne 12 mois, parfois plus selon les régions."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Combien coûte approximativement le bornage d'un terrain de 500m² ?",
+    "options": ["100 000 FCFA", "200 000 FCFA", "400 000 FCFA", "800 000 FCFA"],
+    "correctAnswer": "400 000 FCFA",
+    "explanation": "Le bornage par un géomètre agréé coûte environ 400 000 FCFA pour un terrain de 500m²."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux des droits d'enregistrement sur l'achat d'un terrain ?",
+    "options": ["2,5%", "5%", "10%", "15%"],
+    "correctAnswer": "15%",
+    "explanation": "Les droits d'enregistrement sur la vente d'un terrain sont de 15% du prix de vente."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Combien coûte un permis de construire pour une maison individuelle ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "100 000 FCFA", "200 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "Le permis de construire pour une maison d'habitation individuelle coûte environ 50 000 FCFA."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée de validité d'un permis de construire ?",
+    "options": ["6 mois", "1 an", "2 ans", "5 ans"],
+    "correctAnswer": "2 ans",
+    "explanation": "Le permis de construire est valable 2 ans. Les travaux doivent commencer dans ce délai."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Moyen",
+    "question": "Quel document précède le titre foncier dans la procédure ?",
+    "options": ["Certificat administratif", "Mise en valeur", "Attestation de propriété", "Arrêté de concession"],
+    "correctAnswer": "Mise en valeur",
+    "explanation": "La mise en valeur (occupation et aménagement du terrain) est nécessaire avant la délivrance du titre foncier."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit le régime foncier et domanial au Cameroun ?",
+    "options": ["Loi n°74-1", "Loi n°81-02", "Loi n°2011/008", "Loi n°94-01"],
+    "correctAnswer": "Loi n°74-1",
+    "explanation": "La Loi n°74-1 du 6 juillet 1974 fixe le régime foncier et domanial au Cameroun."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Quelle est la superficie minimale pour un lot résidentiel en zone urbaine ?",
+    "options": ["200 m²", "300 m²", "400 m²", "600 m²"],
+    "correctAnswer": "300 m²",
+    "explanation": "La superficie minimale pour un lot d'habitation en zone urbaine est généralement de 300 m²."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Combien coûte la taxe foncière annuelle pour un terrain de 500m² en ville ?",
+    "options": ["10 000 FCFA", "25 000 FCFA", "50 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "La taxe foncière varie selon la localisation et la superficie, environ 50 000 FCFA pour 500m² en zone urbaine."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Quel décret organise les conditions d'obtention du titre foncier ?",
+    "options": ["Décret n°76-165", "Décret n°2005-481", "Décret n°2008-0738", "Décret n°2011-1588"],
+    "correctAnswer": "Décret n°76-165",
+    "explanation": "Le Décret n°76-165 du 27 avril 1976 fixe les conditions d'obtention du titre foncier au Cameroun."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Quelle est la durée de l'enquête de commodo et incommodo ?",
+    "options": ["15 jours", "1 mois", "2 mois", "3 mois"],
+    "correctAnswer": "2 mois",
+    "explanation": "L'enquête de commodo et incommodo dure 2 mois pour permettre aux tiers de formuler d'éventuelles oppositions."
+  },
+  {
+    "category": "Foncier & Immobilier",
+    "difficulty": "Difficile",
+    "question": "Quel est le recul minimum obligatoire par rapport à la voie publique ?",
+    "options": ["2 mètres", "3 mètres", "5 mètres", "10 mètres"],
+    "correctAnswer": "5 mètres",
+    "explanation": "Le recul minimum obligatoire par rapport à la limite de la voie publique est de 5 mètres en zone urbaine."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Quel est le salaire minimum interprofessionnel garanti (SMIG) au Cameroun ?",
+    "options": ["28 216 FCFA", "36 270 FCFA", "41 875 FCFA", "50 000 FCFA"],
+    "correctAnswer": "36 270 FCFA",
+    "explanation": "Le SMIG au Cameroun est de 36 270 FCFA par mois depuis 2014."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Quelle est la durée légale du travail par semaine au Cameroun ?",
+    "options": ["35 heures", "40 heures", "44 heures", "48 heures"],
+    "correctAnswer": "40 heures",
+    "explanation": "La durée légale du travail est de 40 heures par semaine, soit 8 heures par jour."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Combien de jours de congé annuel un salarié a-t-il droit ?",
+    "options": ["15 jours", "18 jours", "21 jours", "30 jours"],
+    "correctAnswer": "18 jours",
+    "explanation": "Le congé annuel est de 18 jours ouvrables par an pour un travailleur ayant accompli une année de service."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Où déclare-t-on un accident de travail au Cameroun ?",
+    "options": ["CNPS", "Ministère du travail", "Police", "Hôpital"],
+    "correctAnswer": "CNPS",
+    "explanation": "Les accidents de travail doivent être déclarés à la Caisse Nationale de Prévoyance Sociale (CNPS)."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Quel est le taux de cotisation employé à la CNPS ?",
+    "options": ["2,8%", "4,2%", "5,6%", "7,0%"],
+    "correctAnswer": "4,2%",
+    "explanation": "Le taux de cotisation du salarié à la CNPS est de 4,2% du salaire brut."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Facile",
+    "question": "Quelle structure règle les conflits de travail au Cameroun ?",
+    "options": ["Tribunal du travail", "Tribunal de première instance", "Inspection du travail", "Ministère du travail"],
+    "correctAnswer": "Tribunal du travail",
+    "explanation": "Les litiges individuels de travail sont de la compétence du tribunal du travail."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai de préavis pour un licenciement (cadre) ?",
+    "options": ["15 jours", "1 mois", "2 mois", "3 mois"],
+    "correctAnswer": "3 mois",
+    "explanation": "Le préavis de licenciement pour un cadre est de 3 mois selon le Code du travail."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de majoration des heures supplémentaires (jours ouvrables) ?",
+    "options": ["20%", "30%", "40%", "50%"],
+    "correctAnswer": "40%",
+    "explanation": "Les heures supplémentaires effectuées les jours ouvrables sont majorées de 40%."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Dans quel délai un accident de travail doit-il être déclaré ?",
+    "options": ["24 heures", "48 heures", "72 heures", "1 semaine"],
+    "correctAnswer": "48 heures",
+    "explanation": "L'employeur doit déclarer l'accident de travail à la CNPS dans les 48 heures."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de cotisation employeur à la CNPS ?",
+    "options": ["7,0%", "11,2%", "14,0%", "16,2%"],
+    "correctAnswer": "16,2%",
+    "explanation": "L'employeur cotise à hauteur de 16,2% du salaire brut à la CNPS (prestations familiales, pensions, accidents)."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Combien de jours de congé de maternité une salariée a-t-elle droit ?",
+    "options": ["10 semaines", "12 semaines", "14 semaines", "16 semaines"],
+    "correctAnswer": "14 semaines",
+    "explanation": "Le congé de maternité est de 14 semaines, dont au moins 6 semaines après l'accouchement."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée maximale d'un CDD au Cameroun ?",
+    "options": ["6 mois", "1 an", "2 ans", "3 ans"],
+    "correctAnswer": "2 ans",
+    "explanation": "Un CDD ne peut excéder 2 ans, renouvellement inclus, sauf exceptions prévues par la loi."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit le Code du travail au Cameroun ?",
+    "options": ["Loi n°92-007", "Loi n°98-004", "Loi n°2010-014", "Loi n°2016-007"],
+    "correctAnswer": "Loi n°92-007",
+    "explanation": "La Loi n°92-007 du 14 août 1992 portant Code du travail est le texte de référence."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Quel est le montant de l'indemnité de licenciement (par année d'ancienneté) ?",
+    "options": ["30% du salaire mensuel", "50% du salaire mensuel", "Un mois de salaire", "Deux mois de salaire"],
+    "correctAnswer": "30% du salaire mensuel",
+    "explanation": "L'indemnité de licenciement est de 30% du salaire mensuel brut par année de service."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de majoration des heures supplémentaires les dimanches ?",
+    "options": ["40%", "60%", "80%", "100%"],
+    "correctAnswer": "60%",
+    "explanation": "Les heures supplémentaires effectuées le dimanche sont majorées de 60%."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Combien de jours fériés légaux existe-t-il au Cameroun ?",
+    "options": ["10 jours", "11 jours", "12 jours", "13 jours"],
+    "correctAnswer": "13 jours",
+    "explanation": "Le Cameroun compte 13 jours fériés légaux par an (civils et religieux)."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Quelle est la durée minimale d'un contrat d'apprentissage ?",
+    "options": ["3 mois", "6 mois", "1 an", "2 ans"],
+    "correctAnswer": "1 an",
+    "explanation": "La durée minimale d'un contrat d'apprentissage est d'un an selon le Code du travail."
+  },
+  {
+    "category": "Droit du Travail",
+    "difficulty": "Difficile",
+    "question": "Quel est le délai de prescription d'une action en justice (litiges de travail) ?",
+    "options": ["1 an", "2 ans", "3 ans", "5 ans"],
+    "correctAnswer": "3 ans",
+    "explanation": "Les actions en justice relatives aux litiges de travail se prescrivent par 3 ans."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Où dépose-t-on une plainte pénale au Cameroun ?",
+    "options": ["Au tribunal", "Au commissariat", "À la gendarmerie", "Toutes ces réponses"],
+    "correctAnswer": "Toutes ces réponses",
+    "explanation": "Une plainte peut être déposée au commissariat, à la gendarmerie ou directement au tribunal."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Quel est le premier degré de juridiction civile au Cameroun ?",
+    "options": ["Tribunal de première instance", "Cour d'appel", "Cour suprême", "Tribunal de grande instance"],
+    "correctAnswer": "Tribunal de première instance",
+    "explanation": "Le tribunal de première instance est la juridiction de premier degré pour les affaires civiles."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Combien coûte le dépôt d'une plainte au commissariat ?",
+    "options": ["Gratuit", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "Le dépôt d'une plainte au commissariat ou à la gendarmerie est gratuit."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Quelle juridiction juge les délits au Cameroun ?",
+    "options": ["Tribunal de première instance", "Tribunal correctionnel", "Cour d'assises", "Tribunal de grande instance"],
+    "correctAnswer": "Tribunal correctionnel",
+    "explanation": "Les délits sont jugés par le tribunal correctionnel (chambre correctionnelle du TPI)."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Où obtient-on un casier judiciaire au Cameroun ?",
+    "options": ["Au tribunal", "Au commissariat", "À la gendarmerie", "Au ministère de la Justice"],
+    "correctAnswer": "Au tribunal",
+    "explanation": "Le casier judiciaire est délivré par le greffe du tribunal de première instance du lieu de naissance."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Facile",
+    "question": "Combien coûte un casier judiciaire ?",
+    "options": ["Gratuit", "2 000 FCFA", "5 000 FCFA", "10 000 FCFA"],
+    "correctAnswer": "2 000 FCFA",
+    "explanation": "Le bulletin n°3 du casier judiciaire coûte 2 000 FCFA."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai d'appel d'un jugement civil ?",
+    "options": ["15 jours", "1 mois", "2 mois", "3 mois"],
+    "correctAnswer": "1 mois",
+    "explanation": "Le délai d'appel d'un jugement civil est d'un mois à compter de la notification."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'assistance judiciaire pour les personnes démunies ?",
+    "options": ["Gratuit", "10 000 FCFA", "25 000 FCFA", "50 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "L'assistance judiciaire permet aux personnes démunies d'avoir un avocat gratuitement."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Quelle juridiction juge les crimes au Cameroun ?",
+    "options": ["Tribunal de première instance", "Tribunal correctionnel", "Cour d'assises", "Cour d'appel"],
+    "correctAnswer": "Cour d'assises",
+    "explanation": "Les crimes (infractions passibles de plus de 10 ans de prison) sont jugés par la Cour d'assises."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai de garde à vue maximum au Cameroun ?",
+    "options": ["24 heures", "48 heures", "72 heures", "8 jours"],
+    "correctAnswer": "48 heures",
+    "explanation": "La garde à vue ne peut excéder 48 heures, renouvelable une fois pour les crimes."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'enregistrement d'un jugement ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "15 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "15 000 FCFA",
+    "explanation": "L'enregistrement d'un jugement au service des impôts coûte 15 000 FCFA (droit fixe)."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Moyen",
+    "question": "Où siège la Cour Suprême du Cameroun ?",
+    "options": ["Douala", "Yaoundé", "Buéa", "Bafoussam"],
+    "correctAnswer": "Yaoundé",
+    "explanation": "La Cour Suprême du Cameroun, plus haute juridiction, siège à Yaoundé."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Difficile",
+    "question": "Combien de Cours d'appel existe-t-il au Cameroun ?",
+    "options": ["5", "7", "10", "13"],
+    "correctAnswer": "10",
+    "explanation": "Le Cameroun compte 10 Cours d'appel réparties sur le territoire national."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Difficile",
+    "question": "Quel est le délai de pourvoi en cassation ?",
+    "options": ["15 jours", "1 mois", "2 mois", "3 mois"],
+    "correctAnswer": "2 mois",
+    "explanation": "Le délai pour former un pourvoi en cassation est de 2 mois à compter de la notification."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Difficile",
+    "question": "Quel est le montant minimum pour saisir le tribunal de première instance ?",
+    "options": ["Aucun minimum", "100 000 FCFA", "500 000 FCFA", "1 000 000 FCFA"],
+    "correctAnswer": "Aucun minimum",
+    "explanation": "Il n'existe pas de montant minimum pour saisir le tribunal de première instance."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit l'organisation judiciaire au Cameroun ?",
+    "options": ["Loi n°2006/015", "Loi n°2006/016", "Loi n°2011/027", "Loi n°2017/014"],
+    "correctAnswer": "Loi n°2006/016",
+    "explanation": "La Loi n°2006/016 du 29 décembre 2006 fixe l'organisation et le fonctionnement de la justice."
+  },
+  {
+    "category": "Justice & Tribunaux",
+    "difficulty": "Difficile",
+    "question": "Combien coûte une signification d'un acte judiciaire par huissier ?",
+    "options": ["15 000 FCFA", "25 000 FCFA", "40 000 FCFA", "75 000 FCFA"],
+    "correctAnswer": "40 000 FCFA",
+    "explanation": "La signification d'un acte par huissier coûte environ 40 000 FCFA selon la distance."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "Quel est le taux normal de la TVA au Cameroun ?",
+    "options": ["15,5%", "17,5%", "19,25%", "21%"],
+    "correctAnswer": "19,25%",
+    "explanation": "Le taux normal de la Taxe sur la Valeur Ajoutée (TVA) est de 19,25% depuis 2019."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "Où paie-t-on ses impôts au Cameroun ?",
+    "options": ["Au centre des impôts", "À la mairie", "À la banque", "À la préfecture"],
+    "correctAnswer": "Au centre des impôts",
+    "explanation": "Les impôts se paient au Centre Divisionnaire des Impôts dont dépend le contribuable."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "Combien coûte la taxe de développement local (TDL) pour une entreprise ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "25 000 FCFA", "Variable"],
+    "correctAnswer": "Variable",
+    "explanation": "La TDL varie selon la catégorie de l'entreprise (de 5 000 à 500 000 FCFA)."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "Quel impôt paie un salarié sur son salaire ?",
+    "options": ["IS", "TVA", "IRPP", "TAF"],
+    "correctAnswer": "IRPP",
+    "explanation": "L'Impôt sur le Revenu des Personnes Physiques (IRPP) est prélevé sur les salaires."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "À partir de quel revenu mensuel paie-t-on l'IRPP ?",
+    "options": ["50 000 FCFA", "62 000 FCFA", "100 000 FCFA", "150 000 FCFA"],
+    "correctAnswer": "62 000 FCFA",
+    "explanation": "L'IRPP est dû pour les revenus mensuels supérieurs à 62 000 FCFA (seuil d'imposition)."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Facile",
+    "question": "Quelle taxe paie-t-on lors de l'achat d'un véhicule neuf ?",
+    "options": ["TVA", "Taxe à l'essieu", "Vignette", "Taxe de circulation"],
+    "correctAnswer": "TVA",
+    "explanation": "Lors de l'achat d'un véhicule neuf, on paie la TVA (19,25%) sur le prix d'achat."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de l'Impôt sur les Sociétés (IS) au Cameroun ?",
+    "options": ["25%", "30%", "33%", "35%"],
+    "correctAnswer": "33%",
+    "explanation": "Le taux normal de l'Impôt sur les Sociétés est de 33% du bénéfice imposable."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Quelle est la date limite de paiement de la patente ?",
+    "options": ["31 janvier", "28 février", "31 mars", "30 avril"],
+    "correctAnswer": "28 février",
+    "explanation": "La patente doit être payée au plus tard le 28 février de chaque année."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de la Taxe Spéciale sur le Revenu (TSR) ?",
+    "options": ["5,5%", "7,5%", "10%", "12,5%"],
+    "correctAnswer": "5,5%",
+    "explanation": "La TSR sur les importations et certaines opérations est de 5,5%."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Combien coûte la taxe sur les véhicules (vignette) pour une voiture de tourisme ?",
+    "options": ["12 500 FCFA", "25 000 FCFA", "50 000 FCFA", "Variable"],
+    "correctAnswer": "Variable",
+    "explanation": "La vignette varie selon la puissance du véhicule (de 12 500 à plus de 100 000 FCFA)."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Quel est le délai de déclaration de la TVA ?",
+    "options": ["Le 10 du mois", "Le 15 du mois", "Le 20 du mois", "Le 30 du mois"],
+    "correctAnswer": "Le 15 du mois",
+    "explanation": "La déclaration et le paiement de la TVA doivent intervenir au plus tard le 15 du mois suivant."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Moyen",
+    "question": "Quelle taxe est prélevée sur les salaires pour financer la formation ?",
+    "options": ["TAF", "FNE", "FEICOM", "CFC"],
+    "correctAnswer": "CFC",
+    "explanation": "La Contribution au Fonds de la Formation Continue (CFC) est de 1,2% de la masse salariale."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de la Taxe à l'Achat (TAF) sur les achats locaux ?",
+    "options": ["1%", "2%", "3%", "5%"],
+    "correctAnswer": "2%",
+    "explanation": "La Taxe à l'Achat sur les achats locaux (TAF) est de 2% du montant HT."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Difficile",
+    "question": "Quelle est la date limite de dépôt de la déclaration annuelle d'IS ?",
+    "options": ["15 mars", "31 mars", "30 avril", "15 mai"],
+    "correctAnswer": "15 mars",
+    "explanation": "La déclaration statistique et fiscale (DSF) doit être déposée au plus tard le 15 mars."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de la centimes additionnels communaux (CAC) ?",
+    "options": ["5%", "10%", "15%", "20%"],
+    "correctAnswer": "10%",
+    "explanation": "Les Centimes Additionnels Communaux représentent 10% des impôts d'État (IS, patente, etc.)."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Difficile",
+    "question": "Combien coûte le timbre fiscal pour une procuration ?",
+    "options": ["1 000 FCFA", "2 000 FCFA", "5 000 FCFA", "10 000 FCFA"],
+    "correctAnswer": "2 000 FCFA",
+    "explanation": "Le timbre fiscal pour légaliser une procuration coûte 2 000 FCFA."
+  },
+  {
+    "category": "Fiscalité & Impôts",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de la Taxe à l'Exportation sur les produits forestiers ?",
+    "options": ["3%", "5%", "10%", "17,5%"],
+    "correctAnswer": "17,5%",
+    "explanation": "La taxe à l'exportation sur les grumes et produits forestiers est de 17,5%."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "À quel âge un enfant entre-t-il à l'école primaire au Cameroun ?",
+    "options": ["4 ans", "5 ans", "6 ans", "7 ans"],
+    "correctAnswer": "6 ans",
+    "explanation": "L'âge officiel d'entrée à l'école primaire (SIL) est de 6 ans au Cameroun."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "Combien coûte l'inscription dans une école publique primaire ?",
+    "options": ["Gratuit", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "L'enseignement primaire public est gratuit au Cameroun depuis 2000."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "Combien d'années dure le cycle primaire au Cameroun ?",
+    "options": ["5 ans", "6 ans", "7 ans", "8 ans"],
+    "correctAnswer": "6 ans",
+    "explanation": "Le cycle primaire dure 6 ans (du SIL à la Classe 6 ou CM2)."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "Quel examen sanctionne la fin du cycle primaire ?",
+    "options": ["BEPC", "CEP", "Probatoire", "Baccalauréat"],
+    "correctAnswer": "CEP",
+    "explanation": "Le Certificat d'Études Primaires (CEP) sanctionne la fin du cycle primaire."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "Où obtient-on une attestation d'équivalence de diplôme ?",
+    "options": ["MINESEC", "MINEDUB", "MINESUP", "Université"],
+    "correctAnswer": "MINESUP",
+    "explanation": "Les attestations d'équivalence de diplômes étrangers sont délivrées par le MINESUP."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Facile",
+    "question": "Combien d'années dure le premier cycle du secondaire ?",
+    "options": ["3 ans", "4 ans", "5 ans", "7 ans"],
+    "correctAnswer": "4 ans",
+    "explanation": "Le premier cycle du secondaire général dure 4 ans (6ème à 3ème)."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'inscription au concours d'entrée en 6ème ?",
+    "options": ["Gratuit", "2 500 FCFA", "5 000 FCFA", "10 000 FCFA"],
+    "correctAnswer": "5 000 FCFA",
+    "explanation": "Les frais d'inscription au concours d'entrée en 6ème sont de 5 000 FCFA."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Quel examen marque la fin du premier cycle du secondaire ?",
+    "options": ["CEP", "BEPC", "Probatoire", "Baccalauréat"],
+    "correctAnswer": "BEPC",
+    "explanation": "Le Brevet d'Études du Premier Cycle (BEPC) sanctionne la classe de 3ème."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'attestation d'équivalence de diplôme ?",
+    "options": ["10 000 FCFA", "25 000 FCFA", "50 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "L'attestation d'équivalence de diplôme étranger coûte environ 50 000 FCFA."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'inscription aux examens officiels (BAC, BEPC) ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "15 000 FCFA", "20 000 FCFA"],
+    "correctAnswer": "15 000 FCFA",
+    "explanation": "Les frais d'inscription aux examens officiels (BEPC, Probatoire, BAC) sont de 15 000 FCFA."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Combien d'universités d'État existe-t-il au Cameroun ?",
+    "options": ["6", "8", "10", "12"],
+    "correctAnswer": "8",
+    "explanation": "Le Cameroun compte 8 universités d'État réparties dans les 10 régions."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Moyen",
+    "question": "Quelle est la moyenne minimale requise pour obtenir le BEPC ?",
+    "options": ["8/20", "10/20", "12/20", "14/20"],
+    "correctAnswer": "10/20",
+    "explanation": "La moyenne minimale pour obtenir le BEPC est de 10/20."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Quel décret organise l'enseignement supérieur au Cameroun ?",
+    "options": ["Décret n°93/026", "Décret n°2001/832", "Décret n°2005/342", "Décret n°2018/190"],
+    "correctAnswer": "Décret n°93/026",
+    "explanation": "Le Décret n°93/026 du 19 janvier 1993 organise les universités au Cameroun."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Combien coûte l'inscription annuelle dans une université d'État ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "75 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "Les frais d'inscription dans les universités d'État sont d'environ 50 000 FCFA par an."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Quelle est la durée du système LMD pour la Licence ?",
+    "options": ["2 ans", "3 ans", "4 ans", "5 ans"],
+    "correctAnswer": "3 ans",
+    "explanation": "Le système LMD (Licence-Master-Doctorat) prévoit 3 ans pour la Licence."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Combien coûte la légalisation d'un diplôme au Cameroun ?",
+    "options": ["2 000 FCFA", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "5 000 FCFA",
+    "explanation": "La légalisation d'un diplôme coûte 5 000 FCFA auprès du ministère compétent."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit l'orientation scolaire et universitaire ?",
+    "options": ["Loi n°98/004", "Loi n°2001/005", "Loi n°2005/006", "Loi n°2010/002"],
+    "correctAnswer": "Loi n°98/004",
+    "explanation": "La Loi n°98/004 du 14 avril 1998 porte orientation de l'éducation au Cameroun."
+  },
+  {
+    "category": "Éducation",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux de réussite minimum pour passer en classe supérieure ?",
+    "options": ["8/20", "9/20", "10/20", "12/20"],
+    "correctAnswer": "10/20",
+    "explanation": "La moyenne annuelle de 10/20 est généralement requise pour passer en classe supérieure."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Combien coûte une consultation dans un hôpital public ?",
+    "options": ["500 FCFA", "1 000 FCFA", "2 500 FCFA", "5 000 FCFA"],
+    "correctAnswer": "1 000 FCFA",
+    "explanation": "Une consultation médicale dans un hôpital public coûte environ 1 000 FCFA."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Quel vaccin est obligatoire pour les voyages internationaux ?",
+    "options": ["COVID-19", "Fièvre jaune", "Hépatite B", "Tuberculose"],
+    "correctAnswer": "Fièvre jaune",
+    "explanation": "Le vaccin contre la fièvre jaune est obligatoire pour entrer au Cameroun et dans plusieurs pays."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Où obtient-on une carte de vaccination au Cameroun ?",
+    "options": ["À l'hôpital", "Au centre de santé", "Dans les deux", "À la pharmacie"],
+    "correctAnswer": "Dans les deux",
+    "explanation": "Les cartes de vaccination sont délivrées dans les hôpitaux et centres de santé."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Combien coûte le vaccin contre la fièvre jaune ?",
+    "options": ["2 000 FCFA", "5 000 FCFA", "10 000 FCFA", "15 000 FCFA"],
+    "correctAnswer": "5 000 FCFA",
+    "explanation": "Le vaccin contre la fièvre jaune coûte environ 5 000 FCFA dans les centres agréés."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Quelle structure gère l'assurance maladie obligatoire ?",
+    "options": ["CNPS", "CNAME", "MINSANTE", "MINFI"],
+    "correctAnswer": "CNPS",
+    "explanation": "La Caisse Nationale de Prévoyance Sociale (CNPS) gère l'assurance maladie obligatoire."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Facile",
+    "question": "Combien coûte une radio dans un hôpital public ?",
+    "options": ["2 500 FCFA", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "5 000 FCFA",
+    "explanation": "Une radiographie standard dans un hôpital public coûte environ 5 000 FCFA."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Quel est le taux de cotisation pour l'assurance maladie obligatoire ?",
+    "options": ["2,8%", "3,6%", "4,2%", "5,0%"],
+    "correctAnswer": "2,8%",
+    "explanation": "Le taux de cotisation pour l'assurance maladie obligatoire est de 2,8% du salaire (employeur)."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Combien coûte une échographie dans un hôpital public ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "15 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "10 000 FCFA",
+    "explanation": "Une échographie abdominale dans un hôpital public coûte environ 10 000 FCFA."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée de validité du certificat de vaccination fièvre jaune ?",
+    "options": ["5 ans", "10 ans", "À vie", "20 ans"],
+    "correctAnswer": "À vie",
+    "explanation": "Depuis 2016, le certificat de vaccination contre la fièvre jaune est valable à vie."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Combien d'hôpitaux généraux existe-t-il au Cameroun ?",
+    "options": ["5", "8", "11", "15"],
+    "correctAnswer": "11",
+    "explanation": "Le Cameroun compte 11 hôpitaux généraux répartis dans les régions."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Combien coûte une analyse de sang (NFS) dans un hôpital public ?",
+    "options": ["2 000 FCFA", "3 500 FCFA", "5 000 FCFA", "10 000 FCFA"],
+    "correctAnswer": "3 500 FCFA",
+    "explanation": "Une Numération Formule Sanguine (NFS) coûte environ 3 500 FCFA dans le public."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Moyen",
+    "question": "Où se trouve le plus grand hôpital du Cameroun ?",
+    "options": ["Yaoundé", "Douala", "Garoua", "Bafoussam"],
+    "correctAnswer": "Yaoundé",
+    "explanation": "L'Hôpital Général de Yaoundé est le plus grand établissement hospitalier du pays."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Difficile",
+    "question": "Combien coûte l'immatriculation à la CNPS pour l'assurance maladie ?",
+    "options": ["Gratuit", "5 000 FCFA", "10 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "L'immatriculation à la CNPS pour l'assurance maladie est gratuite pour les salariés."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Difficile",
+    "question": "Quel est le plafond de remboursement annuel de l'assurance maladie CNPS ?",
+    "options": ["200 000 FCFA", "500 000 FCFA", "1 000 000 FCFA", "2 000 000 FCFA"],
+    "correctAnswer": "500 000 FCFA",
+    "explanation": "Le plafond annuel de remboursement de l'assurance maladie obligatoire est de 500 000 FCFA."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Difficile",
+    "question": "Combien coûte un scanner (TDM) dans un hôpital public ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "75 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "Un scanner (tomodensitométrie) coûte environ 50 000 FCFA dans les hôpitaux publics."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit l'exercice de la médecine au Cameroun ?",
+    "options": ["Loi n°90/35", "Loi n°2001/020", "Loi n°2010/002", "Loi n°2016/007"],
+    "correctAnswer": "Loi n°90/35",
+    "explanation": "La Loi n°90/35 du 10 août 1990 régit l'exercice de la profession médicale au Cameroun."
+  },
+  {
+    "category": "Santé",
+    "difficulty": "Difficile",
+    "question": "Combien de centres hospitaliers universitaires (CHU) existe-t-il au Cameroun ?",
+    "options": ["1", "2", "3", "5"],
+    "correctAnswer": "2",
+    "explanation": "Le Cameroun compte 2 CHU : Yaoundé et Douala."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "À quel âge peut-on passer le permis de conduire au Cameroun ?",
+    "options": ["16 ans", "18 ans", "21 ans", "25 ans"],
+    "correctAnswer": "18 ans",
+    "explanation": "L'âge minimum pour obtenir le permis de conduire de catégorie B est de 18 ans."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "Combien coûte le permis de conduire au Cameroun ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "75 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "Le permis de conduire coûte 50 000 FCFA (frais officiels, hors auto-école)."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "Où obtient-on le permis de conduire au Cameroun ?",
+    "options": ["À la préfecture", "Au ministère des transports", "À la DGSN", "À la mairie"],
+    "correctAnswer": "À la DGSN",
+    "explanation": "Les permis de conduire sont délivrés par les services de la Délégation Générale à la Sûreté Nationale."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "Combien coûte la vignette auto pour une voiture de 5 CV ?",
+    "options": ["12 500 FCFA", "25 000 FCFA", "37 500 FCFA", "50 000 FCFA"],
+    "correctAnswer": "25 000 FCFA",
+    "explanation": "La vignette pour une voiture de tourisme de 5 CV coûte 25 000 FCFA par an."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "Quel document atteste de la propriété d'un véhicule ?",
+    "options": ["Carte grise", "Assurance", "Vignette", "Permis de conduire"],
+    "correctAnswer": "Carte grise",
+    "explanation": "La carte grise (certificat d'immatriculation) atteste de la propriété d'un véhicule."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Facile",
+    "question": "Combien coûte l'assurance responsabilité civile minimum ?",
+    "options": ["25 000 FCFA", "50 000 FCFA", "75 000 FCFA", "100 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "L'assurance responsabilité civile obligatoire coûte environ 50 000 FCFA par an (véhicule léger)."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'immatriculation d'un véhicule neuf ?",
+    "options": ["50 000 FCFA", "100 000 FCFA", "150 000 FCFA", "200 000 FCFA"],
+    "correctAnswer": "100 000 FCFA",
+    "explanation": "L'immatriculation (carte grise) d'un véhicule neuf coûte environ 100 000 FCFA."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée de validité du permis de conduire au Cameroun ?",
+    "options": ["5 ans", "10 ans", "15 ans", "À vie"],
+    "correctAnswer": "À vie",
+    "explanation": "Le permis de conduire camerounais est valable à vie mais peut être suspendu ou retiré."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Combien coûte le contrôle technique annuel ?",
+    "options": ["10 000 FCFA", "15 000 FCFA", "25 000 FCFA", "35 000 FCFA"],
+    "correctAnswer": "25 000 FCFA",
+    "explanation": "Le contrôle technique obligatoire coûte environ 25 000 FCFA par an."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Quel âge maximum a un véhicule d'occasion importé ?",
+    "options": ["5 ans", "8 ans", "10 ans", "15 ans"],
+    "correctAnswer": "10 ans",
+    "explanation": "Les véhicules de tourisme importés ne doivent pas dépasser 10 ans d'âge."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Combien de points comporte le permis à points au Cameroun ?",
+    "options": ["6 points", "12 points", "24 points", "30 points"],
+    "correctAnswer": "24 points",
+    "explanation": "Le permis à points camerounais comporte 24 points au départ."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Moyen",
+    "question": "Combien coûte une visite technique pour l'obtention du permis ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "15 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "10 000 FCFA",
+    "explanation": "La visite médicale obligatoire pour le permis de conduire coûte environ 10 000 FCFA."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Quelle loi régit la circulation routière au Cameroun ?",
+    "options": ["Loi n°98/015", "Loi n°2001/020", "Loi n°2012/011", "Loi n°2016/007"],
+    "correctAnswer": "Loi n°2012/011",
+    "explanation": "La Loi n°2012/011 du 16 juillet 2012 porte code de la route au Cameroun."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Combien coûte l'amende pour défaut de port de ceinture ?",
+    "options": ["5 000 FCFA", "10 000 FCFA", "15 000 FCFA", "25 000 FCFA"],
+    "correctAnswer": "15 000 FCFA",
+    "explanation": "L'amende pour défaut de port de ceinture de sécurité est de 15 000 FCFA."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Combien de points perd-on pour conduite en état d'ivresse ?",
+    "options": ["4 points", "6 points", "10 points", "12 points"],
+    "correctAnswer": "10 points",
+    "explanation": "La conduite en état d'ivresse entraîne un retrait de 10 points du permis."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Combien coûte le changement de propriétaire sur la carte grise ?",
+    "options": ["15 000 FCFA", "25 000 FCFA", "50 000 FCFA", "75 000 FCFA"],
+    "correctAnswer": "50 000 FCFA",
+    "explanation": "Le changement de propriétaire (mutation) sur la carte grise coûte environ 50 000 FCFA."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Quel est le taux d'alcoolémie maximum autorisé au Cameroun ?",
+    "options": ["0,0 g/l", "0,5 g/l", "0,8 g/l", "1,0 g/l"],
+    "correctAnswer": "0,8 g/l",
+    "explanation": "Le taux d'alcoolémie maximum autorisé est de 0,8 gramme par litre de sang."
+  },
+  {
+    "category": "Transport",
+    "difficulty": "Difficile",
+    "question": "Combien coûte la taxe d'entrée (dédouanement) d'un véhicule d'occasion ?",
+    "options": ["Variable selon valeur", "500 000 FCFA", "1 000 000 FCFA", "2 000 000 FCFA"],
+    "correctAnswer": "Variable selon valeur",
+    "explanation": "Les droits de douane varient selon la valeur, l'âge et la cylindrée du véhicule (environ 30-50% de la valeur)."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "Combien de sites UNESCO le Cameroun possède-t-il ?",
+    "options": ["1", "2", "3", "5"],
+    "correctAnswer": "2",
+    "explanation": "Le Cameroun possède 2 sites inscrits au patrimoine mondial de l'UNESCO."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "Quel est le premier site UNESCO du Cameroun ?",
+    "options": ["Réserve de faune du Dja", "Mont Cameroun", "Parc de Waza", "Palais royal de Foumban"],
+    "correctAnswer": "Réserve de faune du Dja",
+    "explanation": "La Réserve de faune du Dja, inscrite en 1987, est le premier site UNESCO du Cameroun."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "En quelle année le Cameroun a-t-il obtenu son indépendance ?",
+    "options": ["1958", "1960", "1961", "1962"],
+    "correctAnswer": "1960",
+    "explanation": "Le Cameroun français a obtenu son indépendance le 1er janvier 1960."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "Qui a été le premier président du Cameroun ?",
+    "options": ["Ahmadou Ahidjo", "Paul Biya", "John Ngu Foncha", "André-Marie Mbida"],
+    "correctAnswer": "Ahmadou Ahidjo",
+    "explanation": "Ahmadou Ahidjo a été le premier président de la République du Cameroun (1960-1982)."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "Quelle est la date de la fête nationale du Cameroun ?",
+    "options": ["1er janvier", "11 février", "20 mai", "20 octobre"],
+    "correctAnswer": "20 mai",
+    "explanation": "La fête nationale du Cameroun est célébrée le 20 mai, jour de l'Unité Nationale."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Facile",
+    "question": "Où se trouve le musée national du Cameroun ?",
+    "options": ["Douala", "Yaoundé", "Foumban", "Bafoussam"],
+    "correctAnswer": "Yaoundé",
+    "explanation": "Le Musée National du Cameroun est situé à Yaoundé, capitale politique."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "Quel est le second site UNESCO du Cameroun ?",
+    "options": ["Mont Cameroun", "Parc de Waza", "Sangha Trinational", "Monts Mandara"],
+    "correctAnswer": "Sangha Trinational",
+    "explanation": "Le Sangha Trinational (Cameroun, RCA, Congo) a été inscrit au patrimoine UNESCO en 2012."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "Combien de langues nationales compte le Cameroun ?",
+    "options": ["Plus de 100", "Plus de 200", "Plus de 280", "Plus de 350"],
+    "correctAnswer": "Plus de 280",
+    "explanation": "Le Cameroun compte plus de 280 langues nationales, reflétant sa grande diversité culturelle."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "En quelle année a eu lieu la réunification du Cameroun ?",
+    "options": ["1960", "1961", "1972", "1984"],
+    "correctAnswer": "1961",
+    "explanation": "La réunification entre le Cameroun oriental et occidental a eu lieu le 1er octobre 1961."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "Où se trouve le palais royal de Foumban ?",
+    "options": ["Région du Littoral", "Région de l'Ouest", "Région du Nord-Ouest", "Région du Centre"],
+    "correctAnswer": "Région de l'Ouest",
+    "explanation": "Le Palais Royal de Foumban, siège du sultanat Bamoun, se trouve dans la région de l'Ouest."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "Combien coûte l'entrée au Musée National de Yaoundé ?",
+    "options": ["500 FCFA", "1 000 FCFA", "2 000 FCFA", "5 000 FCFA"],
+    "correctAnswer": "1 000 FCFA",
+    "explanation": "L'entrée au Musée National du Cameroun coûte environ 1 000 FCFA pour les Camerounais."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Moyen",
+    "question": "Quel festival culturel majeur se tient à Foumban ?",
+    "options": ["Ngondo", "Nguon", "Ngouon", "Medumba"],
+    "correctAnswer": "Nguon",
+    "explanation": "Le Nguon est la grande cérémonie traditionnelle biennale du peuple Bamoun à Foumban."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Difficile",
+    "question": "En quelle année le Cameroun est-il devenu une République unie ?",
+    "options": ["1960", "1961", "1972", "1984"],
+    "correctAnswer": "1972",
+    "explanation": "Le référendum de 1972 a transformé l'État fédéral en République Unie du Cameroun."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Difficile",
+    "question": "Quelle superficie couvre la Réserve du Dja ?",
+    "options": ["326 000 hectares", "526 000 hectares", "726 000 hectares", "926 000 hectares"],
+    "correctAnswer": "526 000 hectares",
+    "explanation": "La Réserve de faune du Dja couvre 526 000 hectares de forêt dense."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Difficile",
+    "question": "Qui a fondé le royaume Bamoun de Foumban ?",
+    "options": ["Ncharé Yen", "Ibrahim Njoya", "Njoya", "Moussa Yaya"],
+    "correctAnswer": "Ncharé Yen",
+    "explanation": "Le royaume Bamoun a été fondé vers 1394 par le roi Ncharé Yen."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Difficile",
+    "question": "Combien de royaumes traditionnels reconnus existe-t-il au Cameroun ?",
+    "options": ["Plus de 50", "Plus de 100", "Plus de 150", "Plus de 200"],
+    "correctAnswer": "Plus de 100",
+    "explanation": "Le Cameroun compte plus de 100 chefferies et royaumes traditionnels reconnus."
+  },
+  {
+    "category": "Culture & Patrimoine",
+    "difficulty": "Difficile",
+    "question": "Quelle langue a été inventée par le sultan Njoya ?",
+    "options": ["Bamileke", "Duala", "Shümom", "Ewondo"],
+    "correctAnswer": "Shümom",
+    "explanation": "Le sultan Ibrahim Njoya a inventé l'écriture Shümom (A-ka-u-ku) pour la langue Bamoun."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Combien de régions administratives compte le Cameroun ?",
+    "options": ["8", "10", "12", "15"],
+    "correctAnswer": "10",
+    "explanation": "Le Cameroun est divisé en 10 régions administratives."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Quelle est la capitale politique du Cameroun ?",
+    "options": ["Douala", "Yaoundé", "Garoua", "Buéa"],
+    "correctAnswer": "Yaoundé",
+    "explanation": "Yaoundé est la capitale politique et administrative du Cameroun."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Combien de ministères compte le gouvernement camerounais (environ) ?",
+    "options": ["20", "30", "40", "50"],
+    "correctAnswer": "30",
+    "explanation": "Le gouvernement camerounais compte environ 30 ministères selon les remaniements."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Qui nomme les ministres au Cameroun ?",
+    "options": ["Le Président de la République", "Le Premier ministre", "L'Assemblée nationale", "Le Sénat"],
+    "correctAnswer": "Le Président de la République",
+    "explanation": "Le Président de la République nomme et révoque les ministres."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Quelle structure représente l'État dans les régions ?",
+    "options": ["Le gouvernorat", "La préfecture", "La mairie", "Le ministère"],
+    "correctAnswer": "Le gouvernorat",
+    "explanation": "Le gouverneur représente l'État dans chaque région administrative."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Facile",
+    "question": "Combien y a-t-il de communes au Cameroun (environ) ?",
+    "options": ["180", "260", "360", "460"],
+    "correctAnswer": "360",
+    "explanation": "Le Cameroun compte environ 360 communes (urbaines et rurales)."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Quelle loi a institué la décentralisation au Cameroun ?",
+    "options": ["Loi n°2004/017", "Loi n°2004/018", "Loi n°2010/002", "Loi n°2019/024"],
+    "correctAnswer": "Loi n°2004/018",
+    "explanation": "La Loi n°2004/018 du 22 juillet 2004 fixe les règles de la décentralisation."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Combien de départements compte le Cameroun ?",
+    "options": ["38", "48", "58", "68"],
+    "correctAnswer": "58",
+    "explanation": "Le Cameroun est divisé en 58 départements répartis dans les 10 régions."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée du mandat présidentiel au Cameroun ?",
+    "options": ["5 ans", "7 ans", "10 ans", "Illimité"],
+    "correctAnswer": "7 ans",
+    "explanation": "Le mandat présidentiel est de 7 ans, renouvelable sans limitation depuis 2008."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Combien de sénateurs compte le Sénat camerounais ?",
+    "options": ["70", "80", "90", "100"],
+    "correctAnswer": "100",
+    "explanation": "Le Sénat camerounais compte 100 sénateurs (70 élus, 30 nommés)."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Combien de députés siègent à l'Assemblée Nationale ?",
+    "options": ["120", "150", "180", "200"],
+    "correctAnswer": "180",
+    "explanation": "L'Assemblée Nationale du Cameroun compte 180 députés."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Moyen",
+    "question": "Quelle est la durée du mandat d'un maire ?",
+    "options": ["3 ans", "5 ans", "7 ans", "10 ans"],
+    "correctAnswer": "5 ans",
+    "explanation": "Le mandat des conseillers municipaux et du maire est de 5 ans."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Difficile",
+    "question": "En quelle année a été créé le Sénat camerounais ?",
+    "options": ["1996", "2008", "2013", "2015"],
+    "correctAnswer": "2013",
+    "explanation": "Le Sénat du Cameroun a été effectivement mis en place en 2013."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Difficile",
+    "question": "Quelle loi a modifié la Constitution pour supprimer la limitation des mandats ?",
+    "options": ["Loi n°96/06", "Loi n°2008/001", "Loi n°2010/001", "Loi n°2016/007"],
+    "correctAnswer": "Loi n°2008/001",
+    "explanation": "La Loi n°2008/001 du 14 avril 2008 a supprimé la limitation du nombre de mandats présidentiels."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Difficile",
+    "question": "Combien d'arrondissements compte le Cameroun (environ) ?",
+    "options": ["260", "300", "360", "400"],
+    "correctAnswer": "360",
+    "explanation": "Le Cameroun compte environ 360 arrondissements."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Difficile",
+    "question": "Quelle est la devise de la République du Cameroun ?",
+    "options": ["Unité, Liberté, Progrès", "Paix, Travail, Patrie", "Unité, Travail, Justice", "Liberté, Égalité, Fraternité"],
+    "correctAnswer": "Paix, Travail, Patrie",
+    "explanation": "La devise du Cameroun est 'Paix - Travail - Patrie'."
+  },
+  {
+    "category": "Gouvernance & Administration",
+    "difficulty": "Difficile",
+    "question": "En quelle année a été adoptée la Constitution actuelle du Cameroun ?",
+    "options": ["1960", "1972", "1984", "1996"],
+    "correctAnswer": "1996",
+    "explanation": "La Constitution actuelle du Cameroun a été adoptée par référendum le 18 janvier 1996."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "À quel âge peut-on voter au Cameroun ?",
+    "options": ["16 ans", "18 ans", "20 ans", "21 ans"],
+    "correctAnswer": "18 ans",
+    "explanation": "Le droit de vote au Cameroun est accordé à partir de 18 ans."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "Quel document est nécessaire pour voter ?",
+    "options": ["CNI", "Carte d'électeur", "Passeport", "Acte de naissance"],
+    "correctAnswer": "Carte d'électeur",
+    "explanation": "Pour voter, il faut être inscrit sur les listes électorales et présenter sa carte d'électeur."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "Où s'inscrit-on sur les listes électorales ?",
+    "options": ["Au centre d'inscription ELECAM", "À la mairie", "À la préfecture", "Au commissariat"],
+    "correctAnswer": "Au centre d'inscription ELECAM",
+    "explanation": "L'inscription sur les listes électorales se fait auprès d'Elections Cameroon (ELECAM)."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "Combien coûte l'inscription sur les listes électorales ?",
+    "options": ["Gratuit", "1 000 FCFA", "5 000 FCFA", "10 000 FCFA"],
+    "correctAnswer": "Gratuit",
+    "explanation": "L'inscription sur les listes électorales est gratuite au Cameroun."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "Quelle structure organise les élections au Cameroun ?",
+    "options": ["MINAT", "ELECAM", "Cour Suprême", "Préfecture"],
+    "correctAnswer": "ELECAM",
+    "explanation": "Elections Cameroon (ELECAM) est l'organe en charge de l'organisation des élections."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Facile",
+    "question": "Peut-on avoir une double nationalité au Cameroun ?",
+    "options": ["Oui", "Non", "Seulement pour les enfants", "Seulement par mariage"],
+    "correctAnswer": "Non",
+    "explanation": "Le Cameroun ne reconnaît pas officiellement la double nationalité."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "À quel âge peut-on se présenter aux élections présidentielles ?",
+    "options": ["21 ans", "25 ans", "35 ans", "40 ans"],
+    "correctAnswer": "35 ans",
+    "explanation": "L'âge minimum pour se présenter à l'élection présidentielle est de 35 ans."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "Combien de signatures faut-il pour une candidature présidentielle ?",
+    "options": ["100", "300", "500", "1 000"],
+    "correctAnswer": "300",
+    "explanation": "Un candidat à la présidentielle doit recueillir au moins 300 signatures d'électeurs."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "Quelle loi régit la nationalité camerounaise ?",
+    "options": ["Loi n°60-14", "Loi n°68-LF-3", "Loi n°2006/015", "Loi n°2016/007"],
+    "correctAnswer": "Loi n°68-LF-3",
+    "explanation": "La Loi n°68-LF-3 du 11 juin 1968 porte Code de la nationalité camerounaise."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "Combien coûte la caution pour une candidature présidentielle ?",
+    "options": ["1 million FCFA", "5 millions FCFA", "10 millions FCFA", "30 millions FCFA"],
+    "correctAnswer": "30 millions FCFA",
+    "explanation": "La caution pour se présenter à l'élection présidentielle est de 30 millions FCFA."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "Combien d'années de résidence faut-il pour demander la nationalité camerounaise ?",
+    "options": ["3 ans", "5 ans", "7 ans", "10 ans"],
+    "correctAnswer": "5 ans",
+    "explanation": "La naturalisation nécessite une résidence habituelle au Cameroun pendant au moins 5 ans."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Moyen",
+    "question": "Quelle juridiction juge les contentieux électoraux ?",
+    "options": ["Tribunal administratif", "Cour d'appel", "Conseil Constitutionnel", "Cour Suprême"],
+    "correctAnswer": "Conseil Constitutionnel",
+    "explanation": "Le Conseil Constitutionnel juge les contentieux des élections présidentielles et législatives."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Difficile",
+    "question": "Combien coûte une demande de naturalisation ?",
+    "options": ["50 000 FCFA", "100 000 FCFA", "250 000 FCFA", "500 000 FCFA"],
+    "correctAnswer": "250 000 FCFA",
+    "explanation": "Les frais de naturalisation s'élèvent à environ 250 000 FCFA."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Difficile",
+    "question": "En quelle année ELECAM a-t-elle été créée ?",
+    "options": ["2000", "2006", "2010", "2012"],
+    "correctAnswer": "2006",
+    "explanation": "Elections Cameroon (ELECAM) a été créée en 2006 pour organiser les élections."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Difficile",
+    "question": "Quel décret fixe les modalités de naturalisation ?",
+    "options": ["Décret n°61-DF-24", "Décret n°68-DF-30", "Décret n°82-408", "Décret n°2011-2266"],
+    "correctAnswer": "Décret n°82-408",
+    "explanation": "Le Décret n°82-408 du 31 août 1982 fixe les conditions d'application du Code de la nationalité."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Difficile",
+    "question": "Combien de membres composent le Conseil Constitutionnel ?",
+    "options": ["7", "9", "11", "15"],
+    "correctAnswer": "11",
+    "explanation": "Le Conseil Constitutionnel camerounais est composé de 11 membres."
+  },
+  {
+    "category": "Droits Civiques",
+    "difficulty": "Difficile",
+    "question": "Quelle est la durée du mandat des membres du Conseil Constitutionnel ?",
+    "options": ["3 ans", "5 ans", "6 ans", "9 ans"],
+    "correctAnswer": "6 ans",
+    "explanation": "Les membres du Conseil Constitutionnel sont nommés pour un mandat de 6 ans renouvelable une fois."
+  }
+]

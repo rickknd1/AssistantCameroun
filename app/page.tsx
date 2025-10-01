@@ -8,6 +8,7 @@ import { DomainsSection } from "@/components/home/domains-section"
 import { PopularQuestionsSection } from "@/components/home/popular-questions-section"
 import { StatsSection } from "@/components/home/stats-section"
 import { CtaSection } from "@/components/home/cta-section"
+import { FeedbackButton } from "@/components/ui/feedback-button"
 
 export default function HomePage() {
   return (
@@ -22,6 +23,7 @@ export default function HomePage() {
         <CtaSection />
       </main>
       <Footer />
+      <FeedbackButton />
     </div>
   )
 }

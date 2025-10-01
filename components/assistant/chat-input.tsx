@@ -109,8 +109,8 @@ export function ChatInput({ onSendMessage, isTyping, lastUserMessage, hasMessage
   }
 
   return (
-    <div className="w-full bg-background border-t border-border">
-      <div className="mx-auto max-w-4xl px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4">
+    <div className="w-full bg-background">
+      <div className="mx-auto max-w-4xl px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4 safe-area-inset-bottom">
         {/* Contextual Suggestions */}
         <div className="mb-2 flex flex-wrap gap-1.5">
           {suggestions.map((suggestion) => (

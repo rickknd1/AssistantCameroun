@@ -47,6 +47,15 @@ export function ChatInterface() {
     const loadedConversations = getConversations()
     setConversations(loadedConversations)
     setSessionId(getSessionId())
+
+    // Clean up corrupted conversations (conversations with error messages without user questions)
+    const cleanConversations = loadedConversations.filter(conv =>
+      conv.lastMessage !== "Désolé, une erreur s'est produite. Veuillez réessayer."
+    )
+    if (cleanConversations.length !== loadedConversations.length) {
+      localStorage.setItem('conversations', JSON.stringify(cleanConversations))
+      setConversations(cleanConversations)
+    }
   }, [])
 
   // Track analytics event
@@ -73,6 +82,12 @@ export function ChatInterface() {
   }
 
   const handleSendMessage = async (content: string) => {
+    // Protection stricte : bloquer si déjà en train de taper
+    if (isTyping) {
+      console.log('Requête bloquée : une réponse est déjà en cours')
+      return
+    }
+
     const isNewConversation = messages.length === 0
     const startTime = Date.now()
 
@@ -86,17 +101,17 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-    // Track conversation start
+    // Track conversation start (sans await car non bloquant)
     if (isNewConversation) {
-      await trackEvent("CONVERSATION_START", {
+      trackEvent("CONVERSATION_START", {
         conversationId,
         firstQuestion: content,
         category: detectCategory(content),
       })
     }
 
-    // Track message sent
-    await trackEvent("MESSAGE_SENT", {
+    // Track message sent (sans await car non bloquant)
+    trackEvent("MESSAGE_SENT", {
       conversationId,
       messageLength: content.length,
       messageNumber: messages.length + 1,
@@ -136,14 +151,6 @@ export function ChatInterface() {
 
       setMessages((prev) => [...prev, assistantMessage])
 
-      // Track message received
-      await trackEvent("MESSAGE_RECEIVED", {
-        conversationId,
-        responseTime,
-        confidence: data.confidence,
-        sourcesCount: data.sources?.length || 0,
-      })
-
       // Save conversation to localStorage
       const updatedMessages = [...messages, userMessage, assistantMessage]
       const title = generateConversationTitle(updatedMessages)
@@ -159,18 +166,22 @@ export function ChatInterface() {
       // Update conversations list
       setConversations(getConversations())
 
+      // Track message received (après le catch pour ne pas déclencher d'erreur)
+      trackEvent("MESSAGE_RECEIVED", {
+        conversationId,
+        responseTime,
+        confidence: data.confidence,
+        sourcesCount: data.sources?.length || 0,
+      })
+
     } catch (error) {
       console.error('Error sending message:', error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "Désolé, une erreur s'est produite. Veuillez réessayer.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
 
-      // Track error
-      await trackEvent("MESSAGE_ERROR", {
+      // NE PAS ajouter de message d'erreur visible à l'utilisateur
+      // Simplement logger l'erreur et arrêter le typing indicator
+
+      // Track error (sans await car non critique)
+      trackEvent("MESSAGE_ERROR", {
         conversationId,
         error: error instanceof Error ? error.message : "Unknown error",
       })
@@ -208,13 +219,14 @@ export function ChatInterface() {
         onQuestionClick={handleSendMessage}
       />
 
-      <div className="flex flex-1 flex-col min-h-0 h-full">
-        {/* Header with sidebar toggle button for mobile */}
-        <div className="flex-shrink-0 border-b border-border bg-background px-3 py-2.5 sm:px-4 sm:py-3 lg:hidden">
+      {/* Main chat area - Fixed height messaging layout */}
+      <div className="flex flex-1 flex-col h-full overflow-hidden">
+        {/* Fixed Header - Mobile only */}
+        <div className="flex-none border-b border-border bg-background px-3 py-2.5 sm:px-4 sm:py-3 lg:hidden">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors touch-manipulation"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors touch-manipulation active:scale-95"
             >
               <svg className="h-5 w-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -224,15 +236,19 @@ export function ChatInterface() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* Scrollable Messages Area - Takes remaining space */}
+        <div className="flex-1 min-h-0 overflow-hidden">
           {messages.length === 0 ? (
-            <WelcomeScreen onQuestionClick={handleSendMessage} />
+            <div className="h-full overflow-y-auto">
+              <WelcomeScreen onQuestionClick={handleSendMessage} />
+            </div>
           ) : (
             <ChatMessages messages={messages} isTyping={isTyping} />
           )}
         </div>
 
-        <div className="flex-shrink-0">
+        {/* Fixed Input Area - Always visible at bottom */}
+        <div className="flex-none border-t border-border bg-background">
           <ChatInput
             onSendMessage={handleSendMessage}
             isTyping={isTyping}

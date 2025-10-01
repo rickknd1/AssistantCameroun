@@ -56,9 +56,15 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
                 )}
               </div>
 
-              {/* Confidence Badge */}
-              {message.role === "assistant" && message.confidence && message.confidence < 80 && (
-                <div className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] sm:text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
+              {/* Confidence Badge - Only for questions with sources (questions related to Cameroon/procedures) */}
+              {message.role === "assistant" && message.confidence && message.sources && message.sources.length > 0 && (
+                <div className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 text-[10px] sm:text-xs ${
+                  message.confidence >= 90
+                    ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100'
+                    : message.confidence >= 75
+                    ? 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100'
+                    : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100'
+                }`}>
                   <AlertCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   <span>Confiance: {message.confidence}%</span>
                 </div>

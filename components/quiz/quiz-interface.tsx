@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Check, X, Share2, RotateCcw } from "lucide-react"
+import { Check, X, Share2, RotateCcw, ArrowLeft, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -13,9 +13,10 @@ interface QuizInterfaceProps {
   categoryId: string
   difficulty: "facile" | "moyen" | "difficile"
   onRestart: () => void
+  onBack?: () => void
 }
 
-export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfaceProps) {
+export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: QuizInterfaceProps) {
   const { language, t } = useLanguage()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -25,6 +26,24 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [loading, setLoading] = useState(true)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
+
+  const handleExit = () => {
+    if (quizCompleted || currentQuestion === 0) {
+      onRestart()
+    } else {
+      setShowExitConfirm(true)
+    }
+  }
+
+  const confirmExit = () => {
+    setShowExitConfirm(false)
+    onRestart()
+  }
+
+  const cancelExit = () => {
+    setShowExitConfirm(false)
+  }
 
   useEffect(() => {
     async function fetchQuestions() {
@@ -198,6 +217,43 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Exit Confirmation Modal */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <Card className="w-full max-w-md p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900">
+                  <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-300" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-card-foreground">Quitter le quiz ?</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Votre progression sera perdue. Voulez-vous vraiment quitter ?
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <Button variant="outline" onClick={cancelExit}>
+                  Annuler
+                </Button>
+                <Button variant="destructive" onClick={confirmExit}>
+                  Quitter
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={handleExit}
+          className="mb-4 -ml-2"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour
+        </Button>
+
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="mb-2 flex items-center justify-between text-sm">
