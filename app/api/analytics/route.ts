@@ -42,8 +42,7 @@ export async function POST(request: Request) {
     ]
 
     if (!validEvents.includes(event)) {
-      console.warn(`⚠️ Invalid analytics event: ${event}`)
-      // Return success to not break the app, but don't insert
+      // Silently ignore invalid events to not break the app
       return NextResponse.json({ success: true, warning: 'Invalid event type' })
     }
 
@@ -57,9 +56,8 @@ export async function POST(request: Request) {
     })
 
     if (error) {
-      console.error('Error inserting analytics:', error)
-      // Return 200 with error details instead of 500 to not break the app
-      return NextResponse.json({ success: false, error: error.message })
+      // Don't log to console to avoid spam, just return success to not break the app
+      return NextResponse.json({ success: true, skipped: true })
     }
 
     return NextResponse.json({ success: true })

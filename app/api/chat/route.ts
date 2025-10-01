@@ -4,6 +4,37 @@ import { NextResponse } from 'next/server'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
+// Function to search the web using Google Custom Search API
+async function searchWeb(query: string): Promise<string> {
+  if (!process.env.GOOGLE_SEARCH_API_KEY || !process.env.GOOGLE_SEARCH_ENGINE_ID) {
+    return ''
+  }
+
+  try {
+    const searchQuery = `${query} Cameroun procédure administrative`
+    const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_SEARCH_API_KEY}&cx=${process.env.GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchQuery)}&num=3`
+
+    const response = await fetch(url)
+    const data = await response.json()
+
+    if (!data.items || data.items.length === 0) {
+      return ''
+    }
+
+    let webContext = '\n\n## Informations trouvées sur le web:\n\n'
+    data.items.slice(0, 3).forEach((item: any, index: number) => {
+      webContext += `${index + 1}. **${item.title}**\n`
+      webContext += `   ${item.snippet}\n`
+      webContext += `   Source: ${item.link}\n\n`
+    })
+
+    return webContext
+  } catch (error) {
+    console.error('Web search error:', error)
+    return ''
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { message, conversationHistory } = await request.json()
@@ -17,38 +48,105 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
-    // 1. Rechercher des documents pertinents
+    // Extract keywords from the message for better search
+    const searchTerms = message.toLowerCase()
+
+    // Extract key words for better matching
+    const keywords = searchTerms
+      .replace(/[?.,!]/g, '')
+      .split(' ')
+      .filter(word => word.length > 3) // Keep words longer than 3 chars
+      .slice(0, 5) // Take max 5 keywords
+
+    // Build search conditions for multiple keywords
+    const searchConditions = keywords.map(keyword =>
+      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,category.ilike.%${keyword}%,description.ilike.%${keyword}%,name.ilike.%${keyword}%`
+    ).join(',')
+
+    // 1. Rechercher des documents pertinents avec recherche textuelle
     const { data: documents } = await supabase
       .from('Document')
       .select('title, reference, content, type, category')
       .eq('status', 'ACTIVE')
-      .limit(3)
+      .or(searchConditions || `title.ilike.%${searchTerms}%`)
+      .limit(5)
 
-    // 2. Rechercher des procédures pertinentes
+    // Fallback: si aucun document trouvé, prendre les plus récents
+    const { data: fallbackDocs } = documents && documents.length > 0
+      ? { data: null }
+      : await supabase
+          .from('Document')
+          .select('title, reference, content, type, category')
+          .eq('status', 'ACTIVE')
+          .order('createdAt', { ascending: false })
+          .limit(5)
+
+    const finalDocuments = documents && documents.length > 0 ? documents : fallbackDocs
+
+    // 2. Rechercher des procédures pertinentes avec recherche textuelle
     const { data: procedures } = await supabase
       .from('Procedure')
-      .select('name, description, steps, documents, costs, duration')
-      .limit(3)
+      .select('name, description, steps, documents, costs, duration, category')
+      .or(searchConditions || `name.ilike.%${searchTerms}%`)
+      .limit(5)
+
+    // Fallback: si aucune procédure trouvée, prendre les plus populaires
+    const { data: fallbackProcs } = procedures && procedures.length > 0
+      ? { data: null }
+      : await supabase
+          .from('Procedure')
+          .select('name, description, steps, documents, costs, duration, category')
+          .order('popularity', { ascending: false })
+          .limit(5)
+
+    const finalProcedures = procedures && procedures.length > 0 ? procedures : fallbackProcs
+
+    // 2.5. Si peu de résultats, chercher sur le web
+    let webResults = ''
+    const hasEnoughData = (finalDocuments && finalDocuments.length >= 2) || (finalProcedures && finalProcedures.length >= 2)
+
+    if (!hasEnoughData) {
+      webResults = await searchWeb(message)
+    }
 
     // 3. Construire le contexte pour Gemini
     let context = '# CONTEXTE JURIDIQUE ET ADMINISTRATIF DU CAMEROUN\n\n'
 
-    if (documents && documents.length > 0) {
+    if (finalDocuments && finalDocuments.length > 0) {
       context += '## Documents juridiques disponibles:\n'
-      documents.forEach(doc => {
+      finalDocuments.forEach(doc => {
         context += `- ${doc.title} (${doc.type})\n`
         context += `  Catégorie: ${doc.category}\n`
-        context += `  Référence: ${doc.reference || 'N/A'}\n\n`
+        context += `  Référence: ${doc.reference || 'N/A'}\n`
+        if (doc.content) {
+          context += `  Contenu: ${doc.content.substring(0, 500)}...\n`
+        }
+        context += '\n'
       })
     }
 
-    if (procedures && procedures.length > 0) {
+    if (finalProcedures && finalProcedures.length > 0) {
       context += '## Procédures administratives disponibles:\n'
-      procedures.forEach(proc => {
+      finalProcedures.forEach(proc => {
         context += `- ${proc.name}\n`
         context += `  Description: ${proc.description}\n`
-        context += `  Durée: ${proc.duration}\n\n`
+        context += `  Durée: ${proc.duration}\n`
+        if (proc.steps) {
+          context += `  Étapes: ${JSON.stringify(proc.steps)}\n`
+        }
+        if (proc.documents) {
+          context += `  Documents requis: ${JSON.stringify(proc.documents)}\n`
+        }
+        if (proc.costs) {
+          context += `  Coûts: ${JSON.stringify(proc.costs)}\n`
+        }
+        context += '\n'
       })
+    }
+
+    // 3.5. Ajouter les résultats web si disponibles
+    if (webResults) {
+      context += webResults
     }
 
     // 4. Construire l'historique de conversation
@@ -64,29 +162,34 @@ export async function POST(request: Request) {
     // 5. Configurer le modèle Gemini
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash-exp',
-      systemInstruction: `Tu es l'Assistant National du Cameroun, un assistant IA spécialisé dans le droit et les procédures administratives camerounaises.
+      systemInstruction: `Tu es l'Assistant National du Cameroun, un assistant IA expert dans le droit et les procédures administratives camerounaises.
 
 **Ton rôle:**
 - Aider les citoyens avec les démarches administratives (CNI, passeport, actes d'état civil, etc.)
 - Expliquer les lois et réglementations camerounaises
 - Guider les utilisateurs à travers les procédures administratives
-- Fournir des informations précises basées sur les documents officiels
+- Fournir des informations précises basées sur les documents officiels ET tes connaissances du Cameroun
 
-**Règles importantes:**
-1. Réponds UNIQUEMENT en français
-2. Sois précis et cite les références légales quand possible
-3. Si tu n'es pas sûr, dis-le clairement
-4. Fournis des réponses structurées et faciles à comprendre
-5. Utilise le contexte fourni pour répondre avec précision
-6. Indique toujours les coûts, délais et documents requis pour les procédures
+**Règles STRICTES:**
+1. Réponds TOUJOURS en français
+2. UTILISE EN PRIORITÉ le contexte fourni ci-dessous s'il est pertinent
+3. Si le contexte ne contient pas d'information pertinente, utilise tes connaissances générales sur les procédures administratives au Cameroun
+4. NE DIS JAMAIS "Je ne dispose pas d'informations" - fournis toujours une réponse utile basée sur tes connaissances
+5. Fournis des réponses structurées avec listes à puces pour les étapes
+6. Indique les coûts, délais et documents requis (utilise le contexte en priorité, sinon tes connaissances générales)
+7. Mets en **gras** les informations importantes
+8. Si tu utilises le contexte, cite les sources. Sinon, indique les informations générales
 
 ${context}
 
-**Format de réponse:**
-- Utilise des listes à puces pour les étapes
-- Mets en **gras** les informations importantes
-- Cite les sources et références légales
-- Sois concis mais complet`
+**Format de réponse obligatoire:**
+- Introduction courte expliquant la procédure (1-2 phrases)
+- Liste à puces claire des documents/étapes requis
+- Détails sur coûts approximatifs et durée estimée
+- Conseils pratiques si pertinent
+- Sois précis, complet et professionnel
+
+**Important:** Même si le contexte est vide ou non pertinent, réponds quand même en utilisant tes connaissances sur les procédures administratives au Cameroun.`
     })
 
     // 6. Générer la réponse
@@ -105,8 +208,8 @@ ${context}
       url: string
     }> = []
 
-    if (documents) {
-      documents.forEach(doc => {
+    if (finalDocuments) {
+      finalDocuments.forEach(doc => {
         if (responseText.includes(doc.title) || (doc.reference && responseText.includes(doc.reference))) {
           sources.push({
             title: doc.title,
@@ -117,8 +220,8 @@ ${context}
       })
     }
 
-    if (procedures) {
-      procedures.forEach(proc => {
+    if (finalProcedures) {
+      finalProcedures.forEach(proc => {
         if (responseText.includes(proc.name)) {
           sources.push({
             title: proc.name,

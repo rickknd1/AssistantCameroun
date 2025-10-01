@@ -39,6 +39,7 @@ export function ChatInterface() {
   const [isTyping, setIsTyping] = useState(false)
   const [conversationId, setConversationId] = useState<string>(() => `conv_${Date.now()}`)
   const [sessionId, setSessionId] = useState<string>("")
+  const [hasProcessedUrlQuery, setHasProcessedUrlQuery] = useState(false)
   const { language } = useLanguage()
 
   // Load conversations from localStorage on mount
@@ -186,7 +187,8 @@ export function ChatInterface() {
   // Handle initial question from URL parameter
   useEffect(() => {
     const question = searchParams.get('q')
-    if (question && messages.length === 0 && sessionId) {
+    if (question && messages.length === 0 && sessionId && !hasProcessedUrlQuery) {
+      setHasProcessedUrlQuery(true)
       // Use setTimeout to avoid the dependency warning and prevent infinite loop
       const timer = setTimeout(() => {
         handleSendMessage(question)
