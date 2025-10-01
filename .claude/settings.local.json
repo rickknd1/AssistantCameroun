@@ -4,7 +4,9 @@
       "Bash(pnpm import:procedures:*)",
       "Bash(git rm:*)",
       "Bash(git add:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npx tsx:*)",
+      "Bash(curl -s \"http://localhost:3001/api/quiz?category=entreprise&difficulty=Facile&limit=5\")"
     ],
     "deny": [],
     "ask": []

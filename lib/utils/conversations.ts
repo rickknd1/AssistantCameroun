@@ -1,31 +1,38 @@
-// ============================================
-// CONVERSATIONS MANAGEMENT - localStorage
-// Gestion des conversations locales (temporaires)
-// ============================================
+// Conversation utilities for chat interface
 
-import type { Message, Conversation } from '@/components/assistant/chat-interface'
+export interface Conversation {
+  id: string
+  title: string
+  category: string
+  messages: Message[]
+  createdAt: Date
+  updatedAt: Date
+}
 
-const CONVERSATIONS_KEY = 'assistant_conversations'
-const MAX_CONVERSATIONS = 20 // Limite pour éviter de surcharger localStorage
+export interface Message {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+}
 
-/**
- * Récupère toutes les conversations locales
- */
+const STORAGE_KEY = 'chat_conversations'
+
 export function getConversations(): Conversation[] {
-  if (typeof window === 'undefined') {
-    return []
-  }
+  if (typeof window === 'undefined') return []
 
   try {
-    const stored = localStorage.getItem(CONVERSATIONS_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
 
-    const conversations: Conversation[] = JSON.parse(stored)
-
-    // Convertir les dates en objets Date
-    return conversations.map(conv => ({
+    const conversations = JSON.parse(stored)
+    return conversations.map((conv: any) => ({
       ...conv,
-      timestamp: new Date(conv.timestamp)
+      createdAt: new Date(conv.createdAt),
+      updatedAt: new Date(conv.updatedAt),
+      messages: conv.messages.map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      }))
     }))
   } catch (error) {
     console.error('Error loading conversations:', error)
@@ -33,111 +40,49 @@ export function getConversations(): Conversation[] {
   }
 }
 
-/**
- * Sauvegarde une conversation
- */
-export function saveConversation(
-  id: string,
-  title: string,
-  lastMessage: string,
-  category?: string
-): void {
+export function saveConversation(conversation: Conversation): void {
   if (typeof window === 'undefined') return
 
   try {
     const conversations = getConversations()
+    const index = conversations.findIndex(c => c.id === conversation.id)
 
-    // Vérifier si la conversation existe déjà
-    const existingIndex = conversations.findIndex(c => c.id === id)
-
-    const conversation: Conversation = {
-      id,
-      title,
-      lastMessage,
-      timestamp: new Date(),
-      category
-    }
-
-    if (existingIndex >= 0) {
-      // Mettre à jour
-      conversations[existingIndex] = conversation
+    if (index >= 0) {
+      conversations[index] = conversation
     } else {
-      // Ajouter au début
       conversations.unshift(conversation)
-
-      // Limiter le nombre de conversations
-      if (conversations.length > MAX_CONVERSATIONS) {
-        conversations.pop()
-      }
     }
 
-    localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations))
+    // Keep only last 50 conversations
+    const trimmed = conversations.slice(0, 50)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
   } catch (error) {
     console.error('Error saving conversation:', error)
   }
 }
 
-/**
- * Supprime une conversation
- */
-export function deleteConversation(id: string): void {
-  if (typeof window === 'undefined') return
-
-  try {
-    const conversations = getConversations()
-    const filtered = conversations.filter(c => c.id !== id)
-    localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(filtered))
-  } catch (error) {
-    console.error('Error deleting conversation:', error)
-  }
+export function generateConversationTitle(firstMessage: string): string {
+  // Take first 50 characters of the message
+  const title = firstMessage.substring(0, 50).trim()
+  return title.length < firstMessage.length ? title + '...' : title
 }
 
-/**
- * Efface toutes les conversations
- */
-export function clearAllConversations(): void {
-  if (typeof window === 'undefined') return
-
-  try {
-    localStorage.removeItem(CONVERSATIONS_KEY)
-  } catch (error) {
-    console.error('Error clearing conversations:', error)
-  }
-}
-
-/**
- * Génère un titre de conversation à partir des messages
- */
-export function generateConversationTitle(messages: Message[]): string {
-  if (messages.length === 0) return 'Nouvelle conversation'
-
-  // Prendre la première question utilisateur
-  const firstUserMessage = messages.find(m => m.role === 'user')
-  if (!firstUserMessage) return 'Nouvelle conversation'
-
-  // Limiter à 50 caractères
-  const title = firstUserMessage.content
-  return title.length > 50 ? title.substring(0, 47) + '...' : title
-}
-
-/**
- * Détecte la catégorie d'une conversation basée sur le contenu
- */
-export function detectCategory(content: string): string | undefined {
+export function detectCategory(message: string): string {
   const keywords = {
-    'Identité': ['cni', 'carte', 'identité', 'passeport', 'acte', 'naissance'],
-    'Entreprise': ['entreprise', 'société', 'business', 'commerce', 'tax', 'enregistrement'],
-    'Juridique': ['droit', 'loi', 'justice', 'tribunal', 'avocat', 'plainte'],
-    'Foncier': ['terrain', 'titre', 'foncier', 'propriété', 'construire', 'permis']
+    identite: ['cni', 'carte', 'identite', 'passeport', 'acte', 'naissance', 'casier'],
+    entreprise: ['entreprise', 'societe', 'sarl', 'creation', 'impot', 'taxe', 'tva'],
+    juridique: ['droit', 'travail', 'salaire', 'conge', 'licenciement', 'mariage', 'divorce'],
+    foncier: ['terrain', 'foncier', 'titre', 'propriete', 'permis', 'construire'],
+    education: ['ecole', 'universite', 'etude', 'diplome', 'formation', 'bourse']
   }
 
-  const lowerContent = content.toLowerCase()
+  const lowerMessage = message.toLowerCase()
 
   for (const [category, words] of Object.entries(keywords)) {
-    if (words.some(word => lowerContent.includes(word))) {
+    if (words.some(word => lowerMessage.includes(word))) {
       return category
     }
   }
 
-  return undefined
+  return 'general'
 }

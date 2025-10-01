@@ -31,7 +31,9 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
       setLoading(true)
       const params = new URLSearchParams()
       params.append("category", categoryId)
-      params.append("difficulty", difficulty.toUpperCase())
+      // Capitalize first letter only: facile -> Facile
+      const capitalizedDifficulty = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase()
+      params.append("difficulty", capitalizedDifficulty)
 
       try {
         const res = await fetch(`/api/quiz?${params}`)
