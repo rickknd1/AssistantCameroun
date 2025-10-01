@@ -24,6 +24,29 @@ export async function POST(request: Request) {
       ? Buffer.from(ip).toString('base64').substring(0, 16)
       : undefined
 
+    // Validate event type before inserting
+    const validEvents = [
+      'PAGE_VIEW',
+      'SEARCH',
+      'DOCUMENT_VIEW',
+      'PROCEDURE_VIEW',
+      'NEWS_VIEW',
+      'QUIZ_START',
+      'QUIZ_COMPLETE',
+      'CONVERSATION_START',
+      'MESSAGE_SENT',
+      'MESSAGE_RECEIVED',
+      'MESSAGE_ERROR',
+      'CITATION_CLICKED',
+      'FEEDBACK_SUBMITTED'
+    ]
+
+    if (!validEvents.includes(event)) {
+      console.warn(`⚠️ Invalid analytics event: ${event}`)
+      // Return success to not break the app, but don't insert
+      return NextResponse.json({ success: true, warning: 'Invalid event type' })
+    }
+
     const { error } = await supabase.from('Analytics').insert({
       event,
       sessionId,
@@ -35,7 +58,8 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error('Error inserting analytics:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      // Return 200 with error details instead of 500 to not break the app
+      return NextResponse.json({ success: false, error: error.message })
     }
 
     return NextResponse.json({ success: true })
