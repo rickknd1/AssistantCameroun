@@ -10,19 +10,80 @@ import { Textarea } from "@/components/ui/textarea"
 interface ChatInputProps {
   onSendMessage: (message: string) => void
   isTyping: boolean
+  lastUserMessage?: string
 }
 
-const CONTEXTUAL_SUGGESTIONS = [
-  "Quels sont les délais ?",
-  "Combien ça coûte ?",
-  "Où dois-je aller ?",
-  "Quels documents apporter ?",
+// Suggestions par défaut
+const DEFAULT_SUGGESTIONS = [
+  "Comment obtenir ma carte nationale d'identité ?",
+  "Quels documents pour créer une entreprise au Cameroun ?",
 ]
 
-export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
+// Suggestions contextuelles basées sur le dernier message
+const getContextualSuggestions = (lastMessage: string = ""): string[] => {
+  const lowerMessage = lastMessage.toLowerCase()
+
+  // Suggestions pour CNI/Passeport
+  if (lowerMessage.includes('cni') || lowerMessage.includes('carte nationale') || lowerMessage.includes('identité')) {
+    return [
+      "Quels sont les délais d'obtention ?",
+      "Combien ça coûte ?",
+      "Quels documents sont nécessaires ?",
+      "Où faire la demande ?",
+    ]
+  }
+
+  // Suggestions pour passeport
+  if (lowerMessage.includes('passeport')) {
+    return [
+      "Quelle est la durée de validité ?",
+      "Quel est le coût ?",
+      "Où déposer le dossier ?",
+      "Quels sont les documents requis ?",
+    ]
+  }
+
+  // Suggestions pour entreprise
+  if (lowerMessage.includes('entreprise') || lowerMessage.includes('société') || lowerMessage.includes('business')) {
+    return [
+      "Quel est le capital minimum requis ?",
+      "Combien coûte la création ?",
+      "Quelles sont les étapes ?",
+      "Quels documents pour le RCCM ?",
+    ]
+  }
+
+  // Suggestions pour foncier
+  if (lowerMessage.includes('terrain') || lowerMessage.includes('titre foncier') || lowerMessage.includes('propriété')) {
+    return [
+      "Comment obtenir un titre foncier ?",
+      "Quelle est la procédure d'achat ?",
+      "Quels sont les frais ?",
+      "Où s'adresser ?",
+    ]
+  }
+
+  // Suggestions pour travail
+  if (lowerMessage.includes('travail') || lowerMessage.includes('emploi') || lowerMessage.includes('salarié')) {
+    return [
+      "Quels sont mes droits ?",
+      "Quel est le salaire minimum ?",
+      "Combien de jours de congé ?",
+      "Comment porter plainte ?",
+    ]
+  }
+
+  // Suggestions par défaut
+  return DEFAULT_SUGGESTIONS
+}
+
+export function ChatInput({ onSendMessage, isTyping, lastUserMessage }: ChatInputProps) {
   const [message, setMessage] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const maxLength = 1000
+
+  // Obtenir les suggestions contextuelles
+  const suggestions = getContextualSuggestions(lastUserMessage)
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -40,8 +101,10 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
   }
 
   const handleSuggestionClick = (suggestion: string) => {
-    setMessage(suggestion)
-    textareaRef.current?.focus()
+    if (!isTyping) {
+      onSendMessage(suggestion)
+      setMessage("")
+    }
   }
 
   return (
@@ -49,7 +112,7 @@ export function ChatInput({ onSendMessage, isTyping }: ChatInputProps) {
       <div className="mx-auto max-w-4xl px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4">
         {/* Contextual Suggestions */}
         <div className="mb-2 flex flex-wrap gap-1.5">
-          {CONTEXTUAL_SUGGESTIONS.map((suggestion) => (
+          {suggestions.map((suggestion) => (
             <button
               key={suggestion}
               onClick={() => handleSuggestionClick(suggestion)}

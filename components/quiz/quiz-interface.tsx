@@ -57,7 +57,8 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
     setSelectedAnswer(answerIndex)
     setShowExplanation(true)
 
-    const isCorrect = answerIndex === questions[currentQuestion].correctAnswerIndex
+    const correctAnswerIndex = parseInt(questions[currentQuestion].answer)
+    const isCorrect = answerIndex === correctAnswerIndex
     setAnswers([...answers, isCorrect])
 
     if (isCorrect) {
@@ -216,9 +217,10 @@ export function QuizInterface({ categoryId, difficulty, onRestart }: QuizInterfa
 
           {/* Options */}
           <div className="mt-8 space-y-3">
-            {(language === 'en' && question.optionsEn ? question.optionsEn : question.options).map((option, index) => {
+            {(Array.isArray(question.options) ? (language === 'en' && question.optionsEn ? question.optionsEn : question.options) : []).map((option, index) => {
               const isSelected = selectedAnswer === index
-              const isCorrect = index === question.correctAnswerIndex
+              const correctAnswerIndex = parseInt(question.answer)
+              const isCorrect = index === correctAnswerIndex
               const showResult = showExplanation
 
               let buttonClass = "w-full justify-start text-left p-4 h-auto border-2 transition-all"

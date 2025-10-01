@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Search, FileText, Scale, BookOpen } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -8,7 +9,15 @@ import { useLanguage } from "@/lib/i18n"
 
 export function HeroSection() {
   const { t } = useLanguage()
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/assistant?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
 
   const suggestions = [
     t('home.popularQuestions.q1').split('?')[0] + '?',
@@ -109,7 +118,7 @@ export function HeroSection() {
 
             {/* Search Bar */}
             <div className="mt-6 sm:mt-8">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="text"
@@ -118,7 +127,7 @@ export function HeroSection() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-12 sm:h-14 pl-10 sm:pl-11 pr-4 text-base shadow-sm"
                 />
-              </div>
+              </form>
 
               {/* Search Suggestions */}
               {searchQuery === "" && (
@@ -126,8 +135,9 @@ export function HeroSection() {
                   {suggestions.map((suggestion) => (
                     <button
                       key={suggestion}
+                      type="button"
                       className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-                      onClick={() => setSearchQuery(suggestion)}
+                      onClick={() => router.push(`/assistant?q=${encodeURIComponent(suggestion)}`)}
                     >
                       {suggestion}
                     </button>

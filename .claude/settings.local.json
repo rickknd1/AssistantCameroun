@@ -6,7 +6,8 @@
       "Bash(git add:*)",
       "Bash(powershell:*)",
       "Bash(npx tsx:*)",
-      "Bash(curl -s \"http://localhost:3001/api/quiz?category=entreprise&difficulty=Facile&limit=5\")"
+      "Bash(curl -s \"http://localhost:3001/api/quiz?category=entreprise&difficulty=Facile&limit=5\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Comment obtenir une CNI?\"\"}\")"
     ],
     "deny": [],
     "ask": []

@@ -148,7 +148,7 @@ export interface QuizQuestion {
   explanationEn?: string
 
   // Catégorie
-  category: 'droit-penal' | 'procedures-admin' | 'droit-travail' | 'entreprise' | 'foncier' | 'culture' | 'autre' | 'identite' | 'juridique' | 'education'
+  category: 'droit-penal' | 'procedures-admin' | 'droit-travail' | 'entreprise' | 'foncier' | 'culture' | 'autre'
   difficulty: 'Facile' | 'Moyen' | 'Difficile'
 
   // Source

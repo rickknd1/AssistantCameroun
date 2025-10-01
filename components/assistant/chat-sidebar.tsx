@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, MessageSquare, X, Compass, History, FileText, Building2, Scale, Home, GraduationCap, ChevronLeft } from "lucide-react"
+import { Plus, MessageSquare, X, Compass, History, FileText, Building2, Scale, Home, GraduationCap, ChevronLeft, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -24,6 +24,7 @@ const CATEGORY_ICONS: Record<string, any> = {
   'juridique': Scale,
   'foncier': Home,
   'education': GraduationCap,
+  'sante': Heart,
 }
 
 export function ChatSidebar({ conversations, isOpen, onToggle, onNewConversation, onQuestionClick }: ChatSidebarProps) {

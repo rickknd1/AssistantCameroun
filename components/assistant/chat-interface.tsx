@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { ChatSidebar } from "./chat-sidebar"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
@@ -31,6 +32,7 @@ export interface Conversation {
 }
 
 export function ChatInterface() {
+  const searchParams = useSearchParams()
   const [sidebarOpen, setSidebarOpen] = useState(false) // Fermé par défaut sur mobile
   const [messages, setMessages] = useState<Message[]>([])
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -181,6 +183,19 @@ export function ChatInterface() {
     setConversationId(`conv_${Date.now()}`)
   }
 
+  // Handle initial question from URL parameter
+  useEffect(() => {
+    const question = searchParams.get('q')
+    if (question && messages.length === 0 && sessionId) {
+      // Use setTimeout to avoid the dependency warning and prevent infinite loop
+      const timer = setTimeout(() => {
+        handleSendMessage(question)
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, sessionId])
+
   return (
     <div className="flex h-full w-full overflow-hidden">
       <ChatSidebar
@@ -216,7 +231,11 @@ export function ChatInterface() {
         </div>
 
         <div className="flex-shrink-0">
-          <ChatInput onSendMessage={handleSendMessage} isTyping={isTyping} />
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            isTyping={isTyping}
+            lastUserMessage={messages.filter(m => m.role === 'user').slice(-1)[0]?.content}
+          />
         </div>
       </div>
     </div>

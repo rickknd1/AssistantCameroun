@@ -84,12 +84,9 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Target className="h-6 w-6 text-green-600 dark:text-green-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.easy')}</h4>
+                      <h4 className="font-semibold text-foreground">Facile</h4>
                       <p className="text-sm text-muted-foreground">Questions de base, idéal pour débuter</p>
                     </div>
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                      10 {t('quiz.question')}s
-                    </Badge>
                   </button>
 
                   <button
@@ -100,12 +97,9 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Brain className="h-6 w-6 text-amber-600 dark:text-amber-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.medium')}</h4>
+                      <h4 className="font-semibold text-foreground">Moyen</h4>
                       <p className="text-sm text-muted-foreground">Questions intermédiaires, bon challenge</p>
                     </div>
-                    <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-                      15 {t('quiz.question')}s
-                    </Badge>
                   </button>
 
                   <button
@@ -116,10 +110,9 @@ export function QuizSelection({ onStartQuiz }: QuizSelectionProps) {
                       <Trophy className="h-6 w-6 text-red-600 dark:text-red-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{t('procedures.difficulty.hard')}</h4>
+                      <h4 className="font-semibold text-foreground">Difficile</h4>
                       <p className="text-sm text-muted-foreground">Questions avancées pour les experts</p>
                     </div>
-                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">20 {t('quiz.question')}s</Badge>
                   </button>
                 </div>
               </Card>
