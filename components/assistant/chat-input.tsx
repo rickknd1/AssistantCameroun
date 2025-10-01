@@ -11,12 +11,13 @@ interface ChatInputProps {
   onSendMessage: (message: string) => void
   isTyping: boolean
   lastUserMessage?: string
+  hasMessages?: boolean
 }
 
-// Suggestions par défaut
+// Suggestions par défaut (ne s'affichent que si la conversation a déjà commencé)
 const DEFAULT_SUGGESTIONS = [
-  "Comment obtenir ma carte nationale d'identité ?",
-  "Quels documents pour créer une entreprise au Cameroun ?",
+  "Quels sont les délais d'obtention ?",
+  "Combien ça coûte ?",
 ]
 
 // Suggestions contextuelles basées sur le dernier message
@@ -77,13 +78,13 @@ const getContextualSuggestions = (lastMessage: string = ""): string[] => {
   return DEFAULT_SUGGESTIONS
 }
 
-export function ChatInput({ onSendMessage, isTyping, lastUserMessage }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isTyping, lastUserMessage, hasMessages = false }: ChatInputProps) {
   const [message, setMessage] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const maxLength = 1000
 
-  // Obtenir les suggestions contextuelles
-  const suggestions = getContextualSuggestions(lastUserMessage)
+  // Obtenir les suggestions contextuelles seulement si la conversation a déjà commencé
+  const suggestions = hasMessages ? getContextualSuggestions(lastUserMessage) : []
 
   useEffect(() => {
     if (textareaRef.current) {

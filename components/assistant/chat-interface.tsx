@@ -237,6 +237,7 @@ export function ChatInterface() {
             onSendMessage={handleSendMessage}
             isTyping={isTyping}
             lastUserMessage={messages.filter(m => m.role === 'user').slice(-1)[0]?.content}
+            hasMessages={messages.length > 0}
           />
         </div>
       </div>

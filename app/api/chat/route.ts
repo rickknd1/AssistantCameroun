@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { rateLimitMiddleware } from '@/lib/utils/rate-limit'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -36,6 +37,16 @@ async function searchWeb(query: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting: 20 requêtes par minute par IP
+  const rateLimitResponse = await rateLimitMiddleware(request, {
+    interval: 60 * 1000, // 1 minute
+    uniqueTokenPerInterval: 20, // 20 requêtes max
+  })
+
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   try {
     const { message, conversationHistory } = await request.json()
 
