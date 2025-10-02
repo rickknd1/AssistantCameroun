@@ -29,14 +29,16 @@ export function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" id="main-header">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-x-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
         {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center gap-2 touch-manipulation">
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-secondary to-accent">
-              <span className="text-lg sm:text-xl font-bold text-white">AC</span>
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Assistant Cameroun"
+              className="h-16 w-16 sm:h-20 sm:w-20 object-contain"
+            />
             <span className="hidden text-base sm:text-lg font-semibold text-foreground sm:block">Assistant National</span>
           </Link>
         </div>

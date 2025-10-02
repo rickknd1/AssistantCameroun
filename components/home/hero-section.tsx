@@ -56,26 +56,26 @@ export function HeroSection() {
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Mobile: Image first, Desktop: Content first */}
           <div className="order-1 lg:order-2 flex items-center justify-center">
-            <div className="relative h-[280px] w-full max-w-md sm:h-[350px] lg:h-[500px]">
-              {/* Decorative elements */}
-              <div className="absolute left-0 top-0 h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-primary/10 blur-3xl" />
-              <div className="absolute bottom-0 right-0 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-secondary/10 blur-3xl" />
-              <div className="absolute right-1/4 top-1/4 h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-accent/20 blur-2xl" />
+            <div className="relative h-[220px] w-full max-w-md sm:h-[280px] lg:h-[600px] lg:w-[600px] lg:max-w-none">
+              {/* Decorative elements - hidden on mobile for cleaner look */}
+              <div className="hidden lg:block absolute left-0 top-0 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
+              <div className="hidden lg:block absolute bottom-0 right-0 h-40 w-40 rounded-full bg-secondary/10 blur-3xl" />
+              <div className="hidden lg:block absolute right-1/4 top-1/4 h-24 w-24 rounded-full bg-accent/20 blur-2xl" />
 
               {/* Main illustration */}
               <div className="relative flex h-full items-center justify-center">
                 <img
-                  src="/modern-african-person-using-tablet-with-ai-assista.jpg"
+                  src="/cameroon-hero-man.webp"
                   alt="Assistant IA Cameroun"
                   className="relative z-10 h-full w-full object-contain"
                 />
               </div>
 
-              {/* Floating cards - hidden on small mobile */}
-              <div className="hidden sm:block absolute left-0 top-16 lg:top-20 z-20 animate-float rounded-lg border border-border bg-card p-2.5 sm:p-3 shadow-lg">
+              {/* Floating cards - desktop only for cleaner mobile */}
+              <div className="hidden lg:block absolute left-0 top-20 z-20 animate-float rounded-lg border border-border bg-card p-3 shadow-lg">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-md bg-primary/10 p-1.5 sm:p-2">
-                    <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                  <div className="rounded-md bg-primary/10 p-2">
+                    <FileText className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-card-foreground">{t('home.hero.floating.cniObtained')}</p>
@@ -84,10 +84,10 @@ export function HeroSection() {
                 </div>
               </div>
 
-              <div className="hidden sm:block absolute bottom-16 lg:bottom-20 right-0 z-20 animate-float-delayed rounded-lg border border-border bg-card p-2.5 sm:p-3 shadow-lg">
+              <div className="hidden lg:block absolute bottom-20 right-0 z-20 animate-float-delayed rounded-lg border border-border bg-card p-3 shadow-lg">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-md bg-secondary/10 p-1.5 sm:p-2">
-                    <Scale className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-secondary" />
+                  <div className="rounded-md bg-secondary/10 p-2">
+                    <Scale className="h-4 w-4 text-secondary" />
                   </div>
                   <div>
                     <p className="text-xs font-medium text-card-foreground">{t('home.hero.floating.questionResolved')}</p>
@@ -100,7 +100,7 @@ export function HeroSection() {
 
           {/* Content */}
           <div className="order-2 lg:order-1 flex flex-col justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary">
+            <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
@@ -108,16 +108,16 @@ export function HeroSection() {
               {t('home.hero.availability')}
             </div>
 
-            <h1 className="mt-4 sm:mt-6 text-balance text-3xl sm:text-4xl font-bold tracking-tight text-foreground lg:text-5xl xl:text-6xl">
+            <h1 className="mt-2 sm:mt-6 text-balance text-2xl sm:text-4xl font-bold tracking-tight text-foreground lg:text-5xl xl:text-6xl">
               {t('home.hero.title')}
             </h1>
 
-            <p className="mt-4 sm:mt-6 text-pretty text-base sm:text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-3 sm:mt-6 text-pretty text-sm sm:text-lg leading-relaxed text-muted-foreground">
               {t('home.hero.description')}
             </p>
 
             {/* Search Bar */}
-            <div className="mt-6 sm:mt-8">
+            <div className="mt-4 sm:mt-8">
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 sm:h-5 sm:w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -125,13 +125,13 @@ export function HeroSection() {
                   placeholder={t('home.hero.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12 sm:h-14 pl-10 sm:pl-11 pr-4 text-base shadow-sm"
+                  className="h-11 sm:h-14 pl-10 sm:pl-11 pr-4 text-sm sm:text-base shadow-sm"
                 />
               </form>
 
-              {/* Search Suggestions */}
+              {/* Search Suggestions - hidden on mobile for cleaner look */}
               {searchQuery === "" && (
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-2 sm:mt-3 hidden sm:flex flex-wrap gap-2">
                   {suggestions.map((suggestion) => (
                     <button
                       key={suggestion}
@@ -146,20 +146,20 @@ export function HeroSection() {
               )}
             </div>
 
-            {/* Quick Categories */}
-            <div className="mt-6 sm:mt-8 grid gap-2.5 sm:gap-3 grid-cols-1 sm:grid-cols-3">
+            {/* Quick Categories - simplified on mobile */}
+            <div className="mt-4 sm:mt-8 grid gap-2 sm:gap-3 grid-cols-3 sm:grid-cols-3">
               {quickCategories.map((category) => (
                 <Link
                   key={category.label}
                   href={category.href}
-                  className="group relative overflow-hidden rounded-lg border border-border bg-card p-3 sm:p-4 transition-all hover:shadow-md active:scale-95"
+                  className="group relative overflow-hidden rounded-lg border border-border bg-card p-2.5 sm:p-4 transition-all hover:shadow-md active:scale-95"
                 >
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 transition-opacity group-hover:opacity-5`}
                   />
-                  <category.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                  <h3 className="mt-1.5 sm:mt-2 text-sm sm:text-base font-semibold text-card-foreground">{category.label}</h3>
-                  <p className="mt-0.5 sm:mt-1 text-xs text-muted-foreground">{category.description}</p>
+                  <category.icon className="h-4 w-4 sm:h-6 sm:w-6 text-primary mx-auto sm:mx-0" />
+                  <h3 className="mt-1 sm:mt-2 text-xs sm:text-base font-semibold text-card-foreground text-center sm:text-left">{category.label}</h3>
+                  <p className="hidden sm:block mt-1 text-xs text-muted-foreground">{category.description}</p>
                 </Link>
               ))}
             </div>

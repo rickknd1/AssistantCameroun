@@ -27,6 +27,7 @@ export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: Qui
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [shareSuccess, setShareSuccess] = useState(false)
 
   const handleExit = () => {
     if (quizCompleted || currentQuestion === 0) {
@@ -43,6 +44,27 @@ export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: Qui
 
   const cancelExit = () => {
     setShowExitConfirm(false)
+  }
+
+  const handleShare = async () => {
+    const percentage = Math.round((score / questions.length) * 100)
+    const shareText = `🎯 Quiz AssistantCameroun\n📊 Score: ${score}/${questions.length} (${percentage}%)\n💡 Catégorie: ${categoryId}\n🎚️ Difficulté: ${difficulty}`
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Mon score au quiz AssistantCameroun',
+          text: shareText,
+          url: window.location.href
+        })
+      } else {
+        await navigator.clipboard.writeText(shareText)
+        setShareSuccess(true)
+        setTimeout(() => setShareSuccess(false), 2000)
+      }
+    } catch (error) {
+      console.error('Erreur partage:', error)
+    }
   }
 
   useEffect(() => {
@@ -201,9 +223,18 @@ export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: Qui
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Recommencer
               </Button>
-              <Button>
-                <Share2 className="mr-2 h-4 w-4" />
-                Partager mon score
+              <Button onClick={handleShare}>
+                {shareSuccess ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4 text-green-600" />
+                    Copié !
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Partager mon score
+                  </>
+                )}
               </Button>
             </div>
           </Card>

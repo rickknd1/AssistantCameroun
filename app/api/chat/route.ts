@@ -5,6 +5,69 @@ import { rateLimitMiddleware } from '@/lib/utils/rate-limit'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
+// Helper: Générer un ID d'ancre HTML
+function generateAnchorId(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+// Helper: Normaliser les mots ordinaux en chiffres
+function normalizeOrdinalToNumber(text: string): string[] {
+  const ordinalMap: { [key: string]: string } = {
+    'premier': '1',
+    'première': '1',
+    'deuxième': '2',
+    'deuxieme': '2',
+    'second': '2',
+    'seconde': '2',
+    'troisième': '3',
+    'troisieme': '3',
+    'quatrième': '4',
+    'quatrieme': '4',
+    'cinquième': '5',
+    'cinquieme': '5',
+    'sixième': '6',
+    'sixieme': '6',
+    'septième': '7',
+    'septieme': '7',
+    'huitième': '8',
+    'huitieme': '8',
+    'neuvième': '9',
+    'neuvieme': '9',
+    'dixième': '10',
+    'dixieme': '10',
+  }
+
+  const variations: string[] = [text]
+  const lowerText = text.toLowerCase()
+
+  // Remplacer ordinaux par chiffres
+  Object.entries(ordinalMap).forEach(([ordinal, number]) => {
+    if (lowerText.includes(ordinal)) {
+      variations.push(text.replace(new RegExp(ordinal, 'gi'), number))
+      variations.push(text.replace(new RegExp(ordinal, 'gi'), 'PREMIER')) // Pour article premier
+    }
+  })
+
+  // Ajouter variation "article X" si contient un chiffre
+  const numberMatch = lowerText.match(/\d+/)
+  if (numberMatch) {
+    const num = parseInt(numberMatch[0])
+    if (num === 1) {
+      variations.push('article premier')
+      variations.push('ARTICLE PREMIER')
+    }
+  }
+
+  return [...new Set(variations)] // Retirer les doublons
+}
+
 // Function to search the web using Google Custom Search API
 async function searchWeb(query: string): Promise<string> {
   if (!process.env.GOOGLE_SEARCH_API_KEY || !process.env.GOOGLE_SEARCH_ENGINE_ID) {
@@ -48,7 +111,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { message, conversationHistory } = await request.json()
+    const { message, conversationHistory, conversationId, sessionId } = await request.json()
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -58,47 +121,81 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient()
+    const startTime = Date.now()
 
     // Extract keywords from the message for better search
     const searchTerms = message.toLowerCase()
 
+    // Normaliser le message pour détecter les variations d'articles
+    const normalizedVariations = normalizeOrdinalToNumber(message)
+
     // Extract key words for better matching
-    const keywords = searchTerms
+    let keywords = searchTerms
       .replace(/[?.,!]/g, '')
       .split(' ')
       .filter(word => word.length > 3) // Keep words longer than 3 chars
       .slice(0, 5) // Take max 5 keywords
 
-    // Build search conditions for multiple keywords
-    const searchConditions = keywords.map(keyword =>
-      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,category.ilike.%${keyword}%,description.ilike.%${keyword}%,name.ilike.%${keyword}%`
+    // Ajouter les variations normalisées aux mots-clés
+    normalizedVariations.forEach(variation => {
+      const variationWords = variation.toLowerCase()
+        .replace(/[?.,!]/g, '')
+        .split(' ')
+        .filter(word => word.length > 3)
+      keywords = [...keywords, ...variationWords]
+    })
+
+    // Retirer les doublons
+    keywords = [...new Set(keywords)].slice(0, 10) // Max 10 keywords avec variations
+
+    // Build search conditions for SECTIONS (only has title, content, reference)
+    const sectionSearchConditions = keywords.map(keyword =>
+      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,reference.ilike.%${keyword}%`
     ).join(',')
 
-    // 1. Rechercher des documents pertinents avec recherche textuelle
-    const { data: documents } = await supabase
-      .from('Document')
-      .select('title, reference, content, type, category')
-      .eq('status', 'ACTIVE')
-      .or(searchConditions || `title.ilike.%${searchTerms}%`)
-      .limit(5)
+    // Build search conditions for DOCUMENTS (has category)
+    const documentSearchConditions = keywords.map(keyword =>
+      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,category.ilike.%${keyword}%`
+    ).join(',')
 
-    // Fallback: si aucun document trouvé, prendre les plus récents
-    const { data: fallbackDocs } = documents && documents.length > 0
+    // Build search conditions for PROCEDURES (has name, description)
+    const procedureSearchConditions = keywords.map(keyword =>
+      `name.ilike.%${keyword}%,description.ilike.%${keyword}%,category.ilike.%${keyword}%`
+    ).join(',')
+
+    // 1. Rechercher des SECTIONS pertinentes (granularité article par article)
+    const { data: sections } = await supabase
+      .from('Section')
+      .select(`
+        id,
+        title,
+        content,
+        reference,
+        level,
+        position,
+        documentId,
+        Document!inner(id, slug, title, type, category, reference)
+      `)
+      .or(sectionSearchConditions || `title.ilike.%${searchTerms}%`)
+      .limit(10)
+
+    // Fallback: si aucune section trouvée, chercher dans les documents complets
+    const { data: documents } = sections && sections.length > 0
       ? { data: null }
       : await supabase
           .from('Document')
-          .select('title, reference, content, type, category')
+          .select('id, slug, title, reference, content, type, category')
           .eq('status', 'ACTIVE')
-          .order('createdAt', { ascending: false })
+          .or(documentSearchConditions || `title.ilike.%${searchTerms}%`)
           .limit(5)
 
-    const finalDocuments = documents && documents.length > 0 ? documents : fallbackDocs
+    const finalDocuments = documents
 
     // 2. Rechercher des procédures pertinentes avec recherche textuelle
     const { data: procedures } = await supabase
       .from('Procedure')
-      .select('name, description, steps, documents, costs, duration, category')
-      .or(searchConditions || `name.ilike.%${searchTerms}%`)
+      .select('slug, name, description, steps, documents, costs, duration, category, onlineUrl, formUrl, tips, faqs')
+      .or(procedureSearchConditions || `name.ilike.%${searchTerms}%`)
       .limit(5)
 
     // Fallback: si aucune procédure trouvée, prendre les plus populaires
@@ -106,7 +203,7 @@ export async function POST(request: Request) {
       ? { data: null }
       : await supabase
           .from('Procedure')
-          .select('name, description, steps, documents, costs, duration, category')
+          .select('slug, name, description, steps, documents, costs, duration, category, onlineUrl, formUrl, tips, faqs')
           .order('popularity', { ascending: false })
           .limit(5)
 
@@ -120,15 +217,38 @@ export async function POST(request: Request) {
       webResults = await searchWeb(message)
     }
 
-    // 3. Construire le contexte pour Gemini
+    // 3. Construire le contexte pour Gemini avec SECTIONS (granulaires)
     let context = '# CONTEXTE JURIDIQUE ET ADMINISTRATIF DU CAMEROUN\n\n'
 
-    if (finalDocuments && finalDocuments.length > 0) {
+    // Générer un mapping des ancres pour les citations
+    const anchorMap: Map<string, string> = new Map()
+
+    if (sections && sections.length > 0) {
+      context += '## Sections juridiques pertinentes (articles spécifiques):\n'
+      sections.forEach((section: any) => {
+        const doc = section.Document
+        const anchorId = generateAnchorId(section.reference || section.title)
+        const url = `/bibliotheque/${doc.slug}#${anchorId}`
+
+        // Stocker pour les citations
+        anchorMap.set(section.reference, url)
+
+        context += `- **${section.title}** (${doc.title})\n`
+        context += `  Document: ${doc.title} (${doc.type})\n`
+        context += `  Référence citée: ${section.reference}\n`
+        context += `  URL exacte: ${url}\n`
+        context += `  Contenu: ${section.content.substring(0, 400)}...\n`
+        context += '\n'
+      })
+    } else if (finalDocuments && finalDocuments.length > 0) {
+      // Fallback sur documents complets
       context += '## Documents juridiques disponibles:\n'
-      finalDocuments.forEach(doc => {
+      finalDocuments.forEach((doc: any) => {
+        const url = `/bibliotheque/${doc.slug}`
         context += `- ${doc.title} (${doc.type})\n`
         context += `  Catégorie: ${doc.category}\n`
         context += `  Référence: ${doc.reference || 'N/A'}\n`
+        context += `  URL: ${url}\n`
         if (doc.content) {
           context += `  Contenu: ${doc.content.substring(0, 500)}...\n`
         }
@@ -141,15 +261,16 @@ export async function POST(request: Request) {
       finalProcedures.forEach(proc => {
         context += `- ${proc.name}\n`
         context += `  Description: ${proc.description}\n`
-        context += `  Durée: ${proc.duration}\n`
+        context += `  Coûts: ${proc.costs || 'Non spécifié'}\n`
+        context += `  Durée: ${proc.duration || 'Non spécifié'}\n`
+        if (proc.onlineUrl) {
+          context += `  **Plateforme officielle**: ${proc.onlineUrl}\n`
+        }
         if (proc.steps) {
           context += `  Étapes: ${JSON.stringify(proc.steps)}\n`
         }
         if (proc.documents) {
           context += `  Documents requis: ${JSON.stringify(proc.documents)}\n`
-        }
-        if (proc.costs) {
-          context += `  Coûts: ${JSON.stringify(proc.costs)}\n`
         }
         context += '\n'
       })
@@ -189,12 +310,19 @@ export async function POST(request: Request) {
 5. Fournis des réponses structurées avec listes à puces pour les étapes
 6. Indique les coûts, délais et documents requis (utilise le contexte en priorité, sinon tes connaissances générales)
 7. Mets en **gras** les informations importantes
-8. **CITATIONS OBLIGATOIRES:** Ajoute des citations inline directement dans le texte entre parenthèses quand tu utilises le contexte
-   - Pour les documents: (Référence: Décret N°2005/104)
-   - Pour les procédures: (Source: Procédure CNI)
-   - Pour les lois: (Loi N°2016/007 du 12 juillet 2016)
-   - Pour le web: (Source: site-web.com)
-9. Place les citations juste après l'information qu'elles soutiennent, pas à la fin
+8. **COMPRÉHENSION CONTEXTUELLE (TRÈS IMPORTANT):**
+   - Comprends les équivalences: "article 1" = "article premier" = "premier article"
+   - "deuxième article" = "article 2", "troisième article" = "article 3", etc.
+   - Si l'utilisateur demande "l'article 1" et que tu trouves "Article PREMIER" dans le contexte, utilise-le!
+   - Sois intelligent dans la correspondance entre ordinaux (premier, deuxième...) et chiffres (1, 2...)
+9. **CITATIONS AVEC LIENS CLIQUABLES (TRÈS IMPORTANT):**
+   - Quand tu cites un article/section du contexte, utilise ce format EXACT:
+     [Article 26](/bibliotheque/constitution#article-26)
+   - Le contexte te donne l'URL exacte à utiliser (champ "URL exacte")
+   - Exemple: "Selon l'[Article 26](/bibliotheque/constitution#article-26) de la Constitution..."
+   - Pour les procédures: [Procédure CNI](/procedures/obtention-cni)
+   - NE METS PAS de texte entre parenthèses après, le lien doit être cliquable directement
+10. Place les liens inline dans le texte, pas à la fin en liste
 
 ${context}
 
@@ -202,8 +330,14 @@ ${context}
 - Introduction courte expliquant la procédure (1-2 phrases)
 - Liste à puces claire des documents/étapes requis
 - Détails sur coûts approximatifs et durée estimée
+- **TOUJOURS mentionner la plateforme officielle si disponible** (ex: www.idcam.cm pour CNI, https://portal.passcam.cm/ pour passeport)
 - Conseils pratiques si pertinent
 - Sois précis, complet et professionnel
+
+**INFORMATIONS OFFICIELLES CLÉS À TOUJOURS MENTIONNER:**
+- **CNI (Carte Nationale d'Identité)**: Plateforme www.idcam.cm, 10 000 FCFA, 48 heures, validité 15 ans
+- **Passeport**: Plateforme https://portal.passcam.cm/, 110 000 FCFA, 48 heures, validité 10 ans
+- Si la "Plateforme officielle" est dans le contexte, MENTIONNE-LA SYSTÉMATIQUEMENT dans ta réponse
 
 **Important:** Même si le contexte est vide ou non pertinent, réponds quand même en utilisant tes connaissances sur les procédures administratives au Cameroun.`
     })
@@ -217,32 +351,102 @@ ${context}
     const response = result.response
     const responseText = response.text()
 
-    // 7. Identifier les sources citées
+    // 7. Identifier les sources citées (depuis les sections ET les liens inline)
     const sources: Array<{
       title: string
       reference: string
       url: string
     }> = []
 
-    if (finalDocuments) {
-      finalDocuments.forEach(doc => {
-        if (responseText.includes(doc.title) || (doc.reference && responseText.includes(doc.reference))) {
+    // Extraire les liens markdown de la réponse
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+    const foundLinks = new Set<string>()
+    let match
+
+    while ((match = linkRegex.exec(responseText)) !== null) {
+      const [, linkText, linkUrl] = match
+      if (!foundLinks.has(linkUrl)) {
+        foundLinks.add(linkUrl)
+
+        // Trouver la section/document correspondant
+        if (sections && sections.length > 0) {
+          const section = sections.find((s: any) => {
+            const anchorId = generateAnchorId(s.reference || s.title)
+            const expectedUrl = `/bibliotheque/${s.Document.slug}#${anchorId}`
+            return expectedUrl === linkUrl
+          })
+
+          if (section) {
+            sources.push({
+              title: section.title,
+              reference: section.reference,
+              url: linkUrl
+            })
+          }
+        }
+      }
+    }
+
+    // Ajouter les procédures citées UNIQUEMENT si mentionnées dans la réponse
+    if (finalProcedures && finalProcedures.length > 0) {
+      finalProcedures.forEach((proc: any) => {
+        // Vérifier si la procédure est réellement mentionnée dans la réponse
+        const procNameVariants = [
+          proc.name.toLowerCase(),
+          proc.slug.replace(/-/g, ' '),
+          // Mots-clés spécifiques pour chaque procédure
+          proc.name.toLowerCase().includes('cni') ? 'carte nationale' : '',
+          proc.name.toLowerCase().includes('passeport') ? 'passeport' : '',
+          proc.name.toLowerCase().includes('naissance') ? 'naissance' : ''
+        ].filter(Boolean)
+
+        const isMentioned = procNameVariants.some(variant =>
+          responseText.toLowerCase().includes(variant)
+        )
+
+        // Vérifier si pas déjà ajouté
+        const alreadyAdded = sources.some(s => s.url === `/procedures/${proc.slug}`)
+
+        if (isMentioned && !alreadyAdded && sources.length < 4) {
           sources.push({
-            title: doc.title,
-            reference: doc.reference || '',
-            url: `/bibliotheque/${doc.title.toLowerCase().replace(/\s+/g, '-')}`
+            title: proc.name,
+            reference: `Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
+            url: `/procedures/${proc.slug}`
           })
         }
       })
     }
 
-    if (finalProcedures) {
-      finalProcedures.forEach(proc => {
-        if (responseText.includes(proc.name)) {
+    // Ajouter les documents complets UNIQUEMENT si mentionnés dans la réponse
+    if (finalDocuments && finalDocuments.length > 0) {
+      finalDocuments.forEach((doc: any) => {
+        // Vérifier si le document est réellement mentionné dans la réponse
+        const docMentioned =
+          responseText.toLowerCase().includes(doc.title.toLowerCase()) ||
+          (doc.reference && responseText.toLowerCase().includes(doc.reference.toLowerCase())) ||
+          responseText.toLowerCase().includes(doc.slug.replace(/-/g, ' '))
+
+        // Vérifier si pas déjà ajouté
+        const alreadyAdded = sources.some(s => s.url === `/bibliotheque/${doc.slug}`)
+
+        if (docMentioned && !alreadyAdded && sources.length < 4) {
           sources.push({
-            title: proc.name,
-            reference: `Durée: ${proc.duration}`,
-            url: `/procedures/${proc.name.toLowerCase().replace(/\s+/g, '-')}`
+            title: doc.title,
+            reference: doc.reference || doc.type || 'Document officiel',
+            url: `/bibliotheque/${doc.slug}`
+          })
+        }
+      })
+    }
+
+    // Ajouter les sources web si utilisées
+    if (webResults && webResults.length > 0 && sources.length < 4) {
+      webResults.slice(0, 4 - sources.length).forEach((result: any) => {
+        if (result.url) {
+          sources.push({
+            title: result.title || 'Source web',
+            reference: result.url,
+            url: result.url
           })
         }
       })
@@ -277,9 +481,157 @@ ${context}
     // Limiter entre 50% et 95%
     confidence = Math.max(50, Math.min(95, confidence))
 
+    // 9. Enregistrer la conversation et les messages dans la BD
+    const processingTime = Date.now() - startTime
+
+    try {
+      console.log('🔵 [DB] Starting database recording...')
+      console.log('🔵 [DB] conversationId:', conversationId)
+      console.log('🔵 [DB] sessionId:', sessionId)
+
+      // Créer ou récupérer la conversation
+      let dbConversationId = conversationId
+
+      if (conversationId && sessionId) {
+        // Vérifier si la conversation existe
+        console.log('🔵 [DB] Checking if conversation exists...')
+        const { data: existingConv, error: checkError } = await supabase
+          .from('Conversation')
+          .select('id')
+          .eq('id', conversationId)
+          .single()
+
+        if (checkError && checkError.code !== 'PGRST116') {
+          console.error('🔴 [DB] Error checking conversation:', checkError)
+        }
+
+        if (!existingConv) {
+          console.log('🔵 [DB] Creating new conversation...')
+          // Créer une nouvelle conversation
+          const { data: newConv, error: convError } = await supabase
+            .from('Conversation')
+            .insert({
+              id: conversationId,
+              sessionId: sessionId,
+              language: 'FR',
+              messageCount: 0
+            })
+            .select()
+            .single()
+
+          if (convError) {
+            console.error('🔴 [DB] Conversation insert error:', convError)
+            console.error('🔴 [DB] Conversation error details:', JSON.stringify(convError, null, 2))
+          } else {
+            console.log('✅ [DB] Conversation created:', newConv)
+            dbConversationId = newConv.id
+          }
+        } else {
+          console.log('✅ [DB] Conversation already exists')
+        }
+      } else {
+        console.warn('⚠️ [DB] Missing conversationId or sessionId')
+      }
+
+      // Enregistrer le message utilisateur
+      if (dbConversationId) {
+        console.log('🔵 [DB] Inserting user message...')
+        const { data: userMsg, error: userMsgError } = await supabase
+          .from('Message')
+          .insert({
+            conversationId: dbConversationId,
+            role: 'USER',
+            content: message,
+            language: 'FR'
+          })
+          .select()
+          .single()
+
+        if (userMsgError) {
+          console.error('🔴 [DB] User message insert error:', userMsgError)
+          console.error('🔴 [DB] User message error details:', JSON.stringify(userMsgError, null, 2))
+        } else {
+          console.log('✅ [DB] User message inserted:', userMsg?.id)
+        }
+
+        // Enregistrer le message assistant
+        console.log('🔵 [DB] Inserting assistant message...')
+        const { data: assistantMsg, error: assistantMsgError } = await supabase
+          .from('Message')
+          .insert({
+            conversationId: dbConversationId,
+            role: 'ASSISTANT',
+            content: responseText,
+            confidence: confidence,
+            processingTime: processingTime,
+            model: 'gemini-2.0-flash-exp',
+            language: 'FR'
+          })
+          .select()
+          .single()
+
+        if (assistantMsgError) {
+          console.error('🔴 [DB] Assistant message insert error:', assistantMsgError)
+          console.error('🔴 [DB] Assistant message error details:', JSON.stringify(assistantMsgError, null, 2))
+        } else {
+          console.log('✅ [DB] Assistant message inserted:', assistantMsg?.id)
+        }
+
+        // Enregistrer les citations (sources)
+        if (assistantMsg && sources.length > 0) {
+          console.log('🔵 [DB] Inserting citations...')
+          const citations = sources.map(source => ({
+            messageId: assistantMsg.id,
+            documentId: source.url.includes('/bibliotheque/')
+              ? source.url.split('/bibliotheque/')[1]?.split('#')[0]
+              : null,
+            excerpt: source.title,
+            reference: source.reference,
+            relevance: 0.8
+          })).filter(c => c.documentId) // Ne garder que les citations avec documentId
+
+          console.log('🔵 [DB] Citations to insert:', citations.length)
+
+          if (citations.length > 0) {
+            const { error: citationError } = await supabase.from('Citation').insert(citations)
+            if (citationError) {
+              console.error('🔴 [DB] Citation insert error:', citationError)
+              console.error('🔴 [DB] Citation error details:', JSON.stringify(citationError, null, 2))
+            } else {
+              console.log('✅ [DB] Citations inserted:', citations.length)
+            }
+          }
+        }
+
+        // Mettre à jour le compteur de messages de la conversation
+        console.log('🔵 [DB] Updating conversation message count...')
+        const { error: updateError } = await supabase
+          .from('Conversation')
+          .update({
+            messageCount: (conversationHistory?.length || 0) + 2 // +2 pour user + assistant
+          })
+          .eq('id', dbConversationId)
+
+        if (updateError) {
+          console.error('🔴 [DB] Conversation update error:', updateError)
+          console.error('🔴 [DB] Conversation update error details:', JSON.stringify(updateError, null, 2))
+        } else {
+          console.log('✅ [DB] Conversation updated')
+        }
+      } else {
+        console.warn('⚠️ [DB] No dbConversationId, skipping message recording')
+      }
+
+      console.log('✅ [DB] Database recording completed')
+    } catch (dbError) {
+      console.error('🔴 [DB] Database logging error:', dbError)
+      console.error('🔴 [DB] Error stack:', (dbError as Error).stack)
+      // Ne pas bloquer la réponse si l'enregistrement échoue
+    }
+
     return NextResponse.json({
       response: responseText,
-      sources: sources.slice(0, 3), // Max 3 sources
+      sources: sources.slice(0, 4), // Max 4 sources
       confidence
     })
 

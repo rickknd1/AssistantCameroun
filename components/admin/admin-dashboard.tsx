@@ -14,7 +14,11 @@ import {
   Users,
   LogOut,
   Download,
-  RefreshCw
+  RefreshCw,
+  MessageCircle,
+  Check,
+  Eye,
+  Archive
 } from 'lucide-react'
 
 interface DailyStat {
@@ -38,10 +42,21 @@ interface Analytics {
   language: string
 }
 
+interface Feedback {
+  id: string
+  messageId: string | null
+  rating: number
+  comment: string | null
+  categories: string | null
+  status: 'NEW' | 'IN_REVIEW' | 'RESOLVED' | 'ARCHIVED'
+  createdAt: string
+}
+
 export function AdminDashboard() {
   const [dailyStats, setDailyStats] = useState<DailyStat[]>([])
   const [popularSearches, setPopularSearches] = useState<PopularSearch[]>([])
   const [recentAnalytics, setRecentAnalytics] = useState<Analytics[]>([])
+  const [feedbackList, setFeedbackList] = useState<Feedback[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -74,6 +89,15 @@ export function AdminDashboard() {
         .limit(50)
 
       if (analytics) setRecentAnalytics(analytics)
+
+      // Load feedback/remarks
+      const { data: feedback } = await supabase
+        .from('Feedback')
+        .select('*')
+        .order('createdAt', { ascending: false })
+        .limit(100)
+
+      if (feedback) setFeedbackList(feedback)
 
     } catch (error) {
       console.error('Error loading dashboard data:', error)
@@ -122,6 +146,46 @@ export function AdminDashboard() {
   const totalMessages = dailyStats.reduce((acc, stat) => acc + (stat.messages_sent || 0), 0)
   const totalConversations = dailyStats.reduce((acc, stat) => acc + (stat.conversations_started || 0), 0)
   const totalSessions = dailyStats.reduce((acc, stat) => acc + (stat.unique_sessions || 0), 0)
+
+  // Feedback stats
+  const newFeedbackCount = feedbackList.filter(f => f.status === 'NEW').length
+  const inReviewFeedbackCount = feedbackList.filter(f => f.status === 'IN_REVIEW').length
+
+  const updateFeedbackStatus = async (id: string, status: 'NEW' | 'IN_REVIEW' | 'RESOLVED' | 'ARCHIVED') => {
+    try {
+      const { error } = await supabase
+        .from('Feedback')
+        .update({ status })
+        .eq('id', id)
+
+      if (!error) {
+        // Refresh data
+        loadData()
+      }
+    } catch (error) {
+      console.error('Error updating feedback status:', error)
+    }
+  }
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'NEW': return 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20'
+      case 'IN_REVIEW': return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20'
+      case 'RESOLVED': return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20'
+      case 'ARCHIVED': return 'bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20'
+      default: return 'bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20'
+    }
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'NEW': return 'Nouveau'
+      case 'IN_REVIEW': return 'En cours'
+      case 'RESOLVED': return 'Résolu'
+      case 'ARCHIVED': return 'Archivé'
+      default: return status
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -200,12 +264,158 @@ export function AdminDashboard() {
           </div>
 
           {/* Tabs for detailed data */}
-          <Tabs defaultValue="stats" className="space-y-4">
+          <Tabs defaultValue="feedback" className="space-y-4">
             <TabsList>
+              <TabsTrigger value="feedback" className="gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Remarques utilisateurs
+                {newFeedbackCount > 0 && (
+                  <span className="ml-1 rounded-full bg-blue-500 px-2 py-0.5 text-xs text-white">
+                    {newFeedbackCount}
+                  </span>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="stats">Statistiques quotidiennes</TabsTrigger>
               <TabsTrigger value="searches">Recherches populaires</TabsTrigger>
               <TabsTrigger value="events">Événements récents</TabsTrigger>
             </TabsList>
+
+            {/* Feedback/Remarks Tab */}
+            <TabsContent value="feedback" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Remarques et suggestions des utilisateurs</CardTitle>
+                      <CardDescription>
+                        {feedbackList.length} remarques au total • {newFeedbackCount} nouvelles • {inReviewFeedbackCount} en cours
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => loadData()}
+                      >
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Actualiser
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => exportToCSV(feedbackList, 'feedback')}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Exporter CSV
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[500px]">
+                    {feedbackList.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <MessageCircle className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                        <p className="text-sm text-muted-foreground">Aucune remarque pour le moment</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {feedbackList.map((feedback) => (
+                          <div
+                            key={feedback.id}
+                            className="rounded-lg border border-border bg-muted/30 p-4 space-y-3"
+                          >
+                            {/* Header with status and date */}
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeColor(feedback.status)}`}>
+                                  {getStatusLabel(feedback.status)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(feedback.createdAt).toLocaleString('fr-FR', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                                {feedback.rating && (
+                                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                                    Note: {feedback.rating}/5 {feedback.rating >= 4 ? '👍' : feedback.rating <= 2 ? '👎' : ''}
+                                  </span>
+                                )}
+                                {feedback.messageId && (
+                                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                                    Message: {feedback.messageId.substring(0, 8)}...
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Message content */}
+                            <div className="bg-background rounded-md p-3 border border-border">
+                              <p className="text-sm text-foreground whitespace-pre-wrap">
+                                {feedback.comment || 'Pas de commentaire'}
+                              </p>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs text-muted-foreground mr-2">Actions:</span>
+                              {feedback.status === 'NEW' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateFeedbackStatus(feedback.id, 'IN_REVIEW')}
+                                  className="h-7 text-xs gap-1"
+                                >
+                                  <Eye className="h-3 w-3" />
+                                  Examiner
+                                </Button>
+                              )}
+                              {feedback.status === 'IN_REVIEW' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateFeedbackStatus(feedback.id, 'RESOLVED')}
+                                  className="h-7 text-xs gap-1"
+                                >
+                                  <Check className="h-3 w-3" />
+                                  Marquer résolu
+                                </Button>
+                              )}
+                              {feedback.status !== 'ARCHIVED' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateFeedbackStatus(feedback.id, 'ARCHIVED')}
+                                  className="h-7 text-xs gap-1"
+                                >
+                                  <Archive className="h-3 w-3" />
+                                  Archiver
+                                </Button>
+                              )}
+                              {feedback.status !== 'NEW' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => updateFeedbackStatus(feedback.id, 'NEW')}
+                                  className="h-7 text-xs gap-1"
+                                >
+                                  <RefreshCw className="h-3 w-3" />
+                                  Réinitialiser
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Daily Stats Tab */}
             <TabsContent value="stats" className="space-y-4">

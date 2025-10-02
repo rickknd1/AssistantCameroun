@@ -117,7 +117,11 @@ export function ProcedureDetail({ slug }: ProcedureDetailProps) {
               <div>
                 <p className="text-xs text-muted-foreground">Coût</p>
                 <p className="font-semibold text-card-foreground">
-                  {procedure.costs[0]?.amount || 'Variable'}
+                  {typeof procedure.costs === 'string'
+                    ? procedure.costs
+                    : Array.isArray(procedure.costs) && procedure.costs.length > 0
+                    ? procedure.costs[0]?.amount
+                    : 'Variable'}
                 </p>
               </div>
             </div>
@@ -125,7 +129,9 @@ export function ProcedureDetail({ slug }: ProcedureDetailProps) {
               <FileText className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-xs text-muted-foreground">Documents</p>
-                <p className="font-semibold text-card-foreground">{procedure.documents.length} requis</p>
+                <p className="font-semibold text-card-foreground">
+                  {Array.isArray(procedure.documents) ? procedure.documents.length : 0} requis
+                </p>
               </div>
             </div>
           </div>
@@ -161,12 +167,25 @@ export function ProcedureDetail({ slug }: ProcedureDetailProps) {
             <h2 className="text-2xl font-bold text-foreground">Documents requis</h2>
             <Card className="mt-4 p-6">
               <ul className="space-y-3">
-                {procedure.documents.map((doc, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <span className="text-sm text-card-foreground">{doc}</span>
-                  </li>
-                ))}
+                {procedure.documents.map((doc, index) => {
+                  const docName = typeof doc === 'string' ? doc : (doc as any).name
+                  const docDescription = typeof doc === 'object' && doc !== null ? (doc as any).description : null
+                  const isMandatory = typeof doc === 'object' && doc !== null ? (doc as any).mandatory : true
+
+                  return (
+                    <li key={index} className="flex items-start gap-3">
+                      <CheckCircle2 className={`mt-0.5 h-5 w-5 shrink-0 ${isMandatory ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <div>
+                        <span className={`text-sm ${isMandatory ? 'font-medium text-card-foreground' : 'text-muted-foreground'}`}>
+                          {docName}{!isMandatory && ' (optionnel)'}
+                        </span>
+                        {docDescription && (
+                          <p className="text-xs text-muted-foreground mt-1">{docDescription}</p>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             </Card>
           </section>
@@ -174,72 +193,89 @@ export function ProcedureDetail({ slug }: ProcedureDetailProps) {
           {/* Costs */}
           <section>
             <h2 className="text-2xl font-bold text-foreground">Coûts détaillés</h2>
-            <Card className="mt-4 overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Élément</th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-foreground">Montant</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {procedure.costs.map((cost, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 text-sm text-card-foreground">{cost.item}</td>
-                      <td className="px-6 py-4 text-right text-sm font-medium text-card-foreground">{cost.amount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <Card className="mt-4 p-6">
+              {typeof procedure.costs === 'string' ? (
+                <div className="flex items-center gap-3">
+                  <Coins className="h-5 w-5 text-primary" />
+                  <p className="text-lg font-semibold text-card-foreground">{procedure.costs}</p>
+                </div>
+              ) : Array.isArray(procedure.costs) && procedure.costs.length > 0 ? (
+                <div className="overflow-hidden -m-6">
+                  <table className="w-full">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Élément</th>
+                        <th className="px-6 py-3 text-right text-sm font-semibold text-foreground">Montant</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {procedure.costs.map((cost, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 text-sm text-card-foreground">{(cost as any).item}</td>
+                          <td className="px-6 py-4 text-right text-sm font-medium text-card-foreground">{(cost as any).amount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">Coût variable selon votre situation</p>
+              )}
             </Card>
           </section>
 
           {/* Locations */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground">Où s'adresser</h2>
-            <Card className="mt-4 p-6">
-              <ul className="space-y-3">
-                {procedure.locations.map((location, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                    <div>
-                      <p className="text-sm font-semibold text-card-foreground">{location.name}</p>
-                      <p className="text-sm text-muted-foreground">{location.address}</p>
-                      <p className="text-xs text-muted-foreground">{location.hours}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </section>
+          {Array.isArray(procedure.locations) && procedure.locations.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold text-foreground">Où s'adresser</h2>
+              <Card className="mt-4 p-6">
+                <ul className="space-y-3">
+                  {procedure.locations.map((location, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                      <div>
+                        <p className="text-sm font-semibold text-card-foreground">{location.name}</p>
+                        <p className="text-sm text-muted-foreground">{location.address}</p>
+                        <p className="text-xs text-muted-foreground">{location.hours}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </section>
+          )}
 
           {/* Tips */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground">Conseils pratiques</h2>
-            <Card className="mt-4 p-6">
-              <ul className="space-y-3">
-                {procedure.tips.map((tip, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
-                    <span className="text-sm text-card-foreground">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </section>
+          {Array.isArray(procedure.tips) && procedure.tips.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold text-foreground">Conseils pratiques</h2>
+              <Card className="mt-4 p-6">
+                <ul className="space-y-3">
+                  {procedure.tips.map((tip, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+                      <span className="text-sm text-card-foreground">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </section>
+          )}
 
           {/* FAQs */}
-          <section>
-            <h2 className="text-2xl font-bold text-foreground">Questions fréquentes</h2>
-            <Accordion type="single" collapsible className="mt-4">
-              {procedure.faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </section>
+          {Array.isArray(procedure.faqs) && procedure.faqs.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold text-foreground">Questions fréquentes</h2>
+              <Accordion type="single" collapsible className="mt-4">
+                {procedure.faqs.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`}>
+                    <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          )}
 
           {/* CTA */}
           <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 p-8 text-center">

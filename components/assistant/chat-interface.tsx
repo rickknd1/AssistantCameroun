@@ -129,7 +129,9 @@ export function ChatInterface() {
           conversationHistory: messages.map(m => ({
             role: m.role,
             content: m.content
-          }))
+          })),
+          conversationId: conversationId,
+          sessionId: sessionId
         })
       })
 

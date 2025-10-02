@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Calendar, ExternalLink, Share2 } from 'lucide-react'
+import { ArrowLeft, Calendar, ExternalLink, Share2, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -19,6 +19,7 @@ export function NewsDetail({ slug }: NewsDetailProps) {
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [shareSuccess, setShareSuccess] = useState(false)
 
   useEffect(() => {
     async function fetchArticle() {
@@ -42,6 +43,29 @@ export function NewsDetail({ slug }: NewsDetailProps) {
 
     fetchArticle()
   }, [slug])
+
+  const handleShare = async () => {
+    if (!article) return
+
+    const shareText = language === 'en' && article.titleEn ? article.titleEn : article.title
+    const shareDescription = language === 'en' && article.summaryEn ? article.summaryEn : article.summary
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: shareText,
+          text: shareDescription || shareText,
+          url: window.location.href
+        })
+      } else {
+        await navigator.clipboard.writeText(window.location.href)
+        setShareSuccess(true)
+        setTimeout(() => setShareSuccess(false), 2000)
+      }
+    } catch (error) {
+      console.error('Erreur partage:', error)
+    }
+  }
 
   if (loading) {
     return (
@@ -118,9 +142,18 @@ export function NewsDetail({ slug }: NewsDetailProps) {
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Share2 className="h-4 w-4 mr-2" />
-                Partager
+              <Button variant="outline" size="sm" onClick={handleShare}>
+                {shareSuccess ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    Copié !
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Partager
+                  </>
+                )}
               </Button>
             </div>
           </div>

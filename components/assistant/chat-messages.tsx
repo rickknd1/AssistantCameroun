@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { Bot, User, ThumbsUp, ThumbsDown, Copy, ExternalLink, AlertCircle } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Bot, User, ThumbsUp, ThumbsDown, Copy, Check, ExternalLink, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Message } from "./chat-interface"
@@ -15,6 +15,7 @@ interface ChatMessagesProps {
 export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -24,8 +25,31 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
     scrollToBottom()
   }, [messages, isTyping])
 
-  const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content)
+  const handleCopy = async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopiedId(messageId)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch (error) {
+      console.error('Erreur copie:', error)
+    }
+  }
+
+  const handleFeedback = async (messageId: string, rating: number) => {
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messageId,
+          rating,
+          type: rating >= 4 ? 'positive' : 'negative',
+          page: 'assistant'
+        })
+      })
+    } catch (error) {
+      console.error('Feedback error:', error)
+    }
   }
 
   return (
@@ -95,13 +119,22 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
               {/* Actions */}
               {message.role === "assistant" && (
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" className="h-7 px-2 touch-manipulation" onClick={() => handleCopy(message.content)}>
-                    <Copy className="h-3 w-3" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 touch-manipulation"
+                    onClick={() => handleCopy(message.content, message.id)}
+                  >
+                    {copiedId === message.id ? (
+                      <Check className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 touch-manipulation">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 touch-manipulation" onClick={() => handleFeedback(message.id, 5)}>
                     <ThumbsUp className="h-3 w-3" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 touch-manipulation">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 touch-manipulation" onClick={() => handleFeedback(message.id, 1)}>
                     <ThumbsDown className="h-3 w-3" />
                   </Button>
                 </div>
