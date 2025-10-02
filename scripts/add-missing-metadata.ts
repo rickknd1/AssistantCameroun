@@ -27,6 +27,10 @@ async function addMissingMetadata() {
       tags: ['code', 'justice administrative', 'droit administratif', 'contentieux', 'cameroun'],
       summary: 'Code régissant l\'organisation et le fonctionnement de la justice administrative au Cameroun.'
     },
+    'code-penal-camerounais': {
+      tags: ['code pénal', 'droit pénal', 'infractions', 'peines', 'sanctions', 'justice', 'cameroun'],
+      summary: 'Code Pénal du Cameroun définissant les infractions, les peines et les sanctions pénales applicables au Cameroun.'
+    },
   }
 
   for (const [slug, meta] of Object.entries(metadata)) {

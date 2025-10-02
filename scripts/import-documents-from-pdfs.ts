@@ -54,6 +54,14 @@ const pdfDocuments: PDFDocument[] = [
     type: 'ARRÊTÉ',
     category: 'Droit administratif',
     reference: 'Arrêté N° 1833'
+  },
+  {
+    filename: 'Cameroun-Code-2016-penal1.pdf',
+    title: 'Code Pénal Camerounais',
+    type: 'CODE',
+    category: 'Droit pénal',
+    reference: 'Code Pénal du Cameroun',
+    dateEnacted: '2016-07-12'
   }
 ]
 

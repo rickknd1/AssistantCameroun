@@ -198,16 +198,8 @@ export async function POST(request: Request) {
       .or(procedureSearchConditions || `name.ilike.%${searchTerms}%`)
       .limit(5)
 
-    // Fallback: si aucune procédure trouvée, prendre les plus populaires
-    const { data: fallbackProcs } = procedures && procedures.length > 0
-      ? { data: null }
-      : await supabase
-          .from('Procedure')
-          .select('slug, name, description, steps, documents, costs, duration, category, onlineUrl, formUrl, tips, faqs')
-          .order('popularity', { ascending: false })
-          .limit(5)
-
-    const finalProcedures = procedures && procedures.length > 0 ? procedures : fallbackProcs
+    // NE PAS utiliser de fallback - seulement les procédures pertinentes
+    const finalProcedures = procedures && procedures.length > 0 ? procedures : null
 
     // 2.5. Si peu de résultats, chercher sur le web
     let webResults = ''
@@ -315,14 +307,22 @@ export async function POST(request: Request) {
    - "deuxième article" = "article 2", "troisième article" = "article 3", etc.
    - Si l'utilisateur demande "l'article 1" et que tu trouves "Article PREMIER" dans le contexte, utilise-le!
    - Sois intelligent dans la correspondance entre ordinaux (premier, deuxième...) et chiffres (1, 2...)
-9. **CITATIONS AVEC LIENS CLIQUABLES (TRÈS IMPORTANT):**
-   - Quand tu cites un article/section du contexte, utilise ce format EXACT:
-     [Article 26](/bibliotheque/constitution#article-26)
+9. **CITATIONS AVEC LIENS CLIQUABLES (OBLIGATOIRE - TRÈS IMPORTANT):**
+   - Tu DOIS TOUJOURS citer des articles juridiques dans tes réponses avec des liens cliquables
+   - Format EXACT obligatoire: [Article X du Code Y](/bibliotheque/slug#article-x)
    - Le contexte te donne l'URL exacte à utiliser (champ "URL exacte")
-   - Exemple: "Selon l'[Article 26](/bibliotheque/constitution#article-26) de la Constitution..."
-   - Pour les procédures: [Procédure CNI](/procedures/obtention-cni)
-   - NE METS PAS de texte entre parenthèses après, le lien doit être cliquable directement
-10. Place les liens inline dans le texte, pas à la fin en liste
+   - Exemples OBLIGATOIRES:
+     * "Selon l'[Article 26 de la Constitution](/bibliotheque/constitution-de-la-republique-du-cameroun#article-26), ..."
+     * "Comme stipulé dans l'[Article 1 du Code Pénal](/bibliotheque/code-penal-camerounais#article-1), ..."
+     * "Conformément à l'[Article 34 du Code Civil](/bibliotheque/code-civil-camerounais#art-34), ..."
+   - CHAQUE réponse juridique DOIT contenir AU MOINS 1-2 liens vers des articles spécifiques
+   - Place les liens INLINE dans le texte (intégrés naturellement dans les phrases)
+   - NE METS JAMAIS les liens en liste à la fin
+   - Si tu cites un article, il DOIT être cliquable
+10. **STYLE DE CITATION OBLIGATOIRE:**
+   - Toujours introduire avec "Selon", "Conformément à", "Comme indiqué dans", "D'après"
+   - Toujours préciser le document source: "Article X du [Nom du Code/Loi]"
+   - Exemples: "Selon l'[Article 5 du Code du Travail](/bibliotheque/code-du-travail-au-cameroun#art-5), le salaire minimum..."
 
 ${context}
 
@@ -387,27 +387,36 @@ ${context}
       }
     }
 
-    // Ajouter les procédures citées UNIQUEMENT si mentionnées dans la réponse
+    // Ajouter les procédures citées UNIQUEMENT si réellement mentionnées dans la réponse
     if (finalProcedures && finalProcedures.length > 0) {
       finalProcedures.forEach((proc: any) => {
-        // Vérifier si la procédure est réellement mentionnée dans la réponse
-        const procNameVariants = [
-          proc.name.toLowerCase(),
-          proc.slug.replace(/-/g, ' '),
-          // Mots-clés spécifiques pour chaque procédure
-          proc.name.toLowerCase().includes('cni') ? 'carte nationale' : '',
-          proc.name.toLowerCase().includes('passeport') ? 'passeport' : '',
-          proc.name.toLowerCase().includes('naissance') ? 'naissance' : ''
-        ].filter(Boolean)
+        // Extraire les mots-clés significatifs du nom (ignorer mots trop courts ou communs)
+        const procKeywords = proc.name.toLowerCase()
+          .split(/[\s-()]+/)
+          .filter((w: string) => w.length > 4 && !['carte', 'document', 'acte'].includes(w))
 
-        const isMentioned = procNameVariants.some(variant =>
-          responseText.toLowerCase().includes(variant)
-        )
+        // Vérifier si AU MOINS 3 mots-clés du nom sont dans la réponse (seuil augmenté)
+        const matchCount = procKeywords.filter((keyword: string) =>
+          responseText.toLowerCase().includes(keyword)
+        ).length
 
         // Vérifier si pas déjà ajouté
         const alreadyAdded = sources.some(s => s.url === `/procedures/${proc.slug}`)
 
-        if (isMentioned && !alreadyAdded && sources.length < 4) {
+        // Vérifier le slug exact ou des acronymes
+        const slugMentioned = responseText.toLowerCase().includes(proc.slug.replace(/-/g, ' '))
+        const procName = proc.name.toLowerCase()
+
+        // Vérifier si le nom complet ou des parties clés sont mentionnés
+        const directMention = responseText.toLowerCase().includes(procName) ||
+          (procName.includes('cni') && responseText.toLowerCase().includes('cni')) ||
+          (procName.includes('passeport') && responseText.toLowerCase().includes('passeport'))
+
+        // Ajouter SEULEMENT si:
+        // - Le nom complet est mentionné directement OU
+        // - Au moins 3 mots-clés significatifs matchent OU
+        // - Le slug complet est mentionné
+        if ((directMention || matchCount >= 3 || slugMentioned) && !alreadyAdded && sources.length < 4) {
           sources.push({
             title: proc.name,
             reference: `Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
@@ -420,16 +429,33 @@ ${context}
     // Ajouter les documents complets UNIQUEMENT si mentionnés dans la réponse
     if (finalDocuments && finalDocuments.length > 0) {
       finalDocuments.forEach((doc: any) => {
-        // Vérifier si le document est réellement mentionné dans la réponse
-        const docMentioned =
-          responseText.toLowerCase().includes(doc.title.toLowerCase()) ||
-          (doc.reference && responseText.toLowerCase().includes(doc.reference.toLowerCase())) ||
-          responseText.toLowerCase().includes(doc.slug.replace(/-/g, ' '))
+        // Extraire les mots-clés significatifs du titre (ignorer mots courts ou communs)
+        const docKeywords = doc.title.toLowerCase()
+          .split(/[\s-,()]+/)
+          .filter((w: string) => w.length > 5 && !['cameroun', 'republique', 'document'].includes(w))
+
+        // Compter combien de mots-clés significatifs sont dans la réponse
+        const matchCount = docKeywords.filter((keyword: string) =>
+          responseText.toLowerCase().includes(keyword)
+        ).length
+
+        // Vérifier si référence exacte mentionnée
+        const refMentioned = doc.reference && responseText.toLowerCase().includes(doc.reference.toLowerCase())
 
         // Vérifier si pas déjà ajouté
         const alreadyAdded = sources.some(s => s.url === `/bibliotheque/${doc.slug}`)
 
-        if (docMentioned && !alreadyAdded && sources.length < 4) {
+        // Vérifier si le titre complet ou des parties clés sont mentionnés
+        const docTitle = doc.title.toLowerCase()
+        const directMention = responseText.toLowerCase().includes(docTitle) ||
+          (docTitle.includes('constitution') && responseText.toLowerCase().includes('constitution')) ||
+          (docTitle.includes('code') && responseText.toLowerCase().includes('code'))
+
+        // Ajouter SEULEMENT si:
+        // - Le titre complet est mentionné directement OU
+        // - Au moins 3 mots-clés significatifs matchent OU
+        // - La référence exacte est mentionnée
+        if ((directMention || matchCount >= 3 || refMentioned) && !alreadyAdded && sources.length < 4) {
           sources.push({
             title: doc.title,
             reference: doc.reference || doc.type || 'Document officiel',
@@ -480,6 +506,11 @@ ${context}
 
     // Limiter entre 50% et 95%
     confidence = Math.max(50, Math.min(95, confidence))
+
+    // Log pour debug
+    console.log('📊 [SOURCES] Sources finales:', sources.length)
+    sources.forEach((s, i) => console.log(`  ${i + 1}. ${s.title} (${s.url})`))
+    console.log('🎯 [CONFIDENCE] Niveau de confiance:', confidence + '%')
 
     // 9. Enregistrer la conversation et les messages dans la BD
     const processingTime = Date.now() - startTime

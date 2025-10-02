@@ -73,7 +73,20 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
               >
                 {message.role === "assistant" ? (
                   <div className="prose prose-sm max-w-none dark:prose-invert text-xs sm:text-sm leading-relaxed">
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        a: ({ node, ...props }) => (
+                          <a
+                            {...props}
+                            className="text-primary hover:text-primary/80 underline font-medium transition-colors"
+                            target={props.href?.startsWith('http') ? '_blank' : '_self'}
+                            rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          />
+                        )
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   </div>
                 ) : (
                   <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
