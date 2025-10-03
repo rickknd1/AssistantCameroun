@@ -8,6 +8,7 @@ export interface Translations {
   'header.procedures': string
   'header.news': string
   'header.quiz': string
+  'header.infos': string
   'header.changeLanguage': string
   'header.changeTheme': string
   'header.menu': string
@@ -283,6 +284,7 @@ export const translations: Record<Language, Translations> = {
     'header.procedures': 'Procédures',
     'header.news': 'Actualités',
     'header.quiz': 'Quiz',
+    'header.infos': 'Infos',
     'header.changeLanguage': 'Changer de langue',
     'header.changeTheme': 'Changer de thème',
     'header.menu': 'Menu',
@@ -556,6 +558,7 @@ export const translations: Record<Language, Translations> = {
     'header.procedures': 'Procedures',
     'header.news': 'News',
     'header.quiz': 'Quiz',
+    'header.infos': 'Info',
     'header.changeLanguage': 'Change language',
     'header.changeTheme': 'Change theme',
     'header.menu': 'Menu',

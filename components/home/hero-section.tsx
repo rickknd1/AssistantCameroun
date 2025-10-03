@@ -56,7 +56,7 @@ export function HeroSection() {
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Mobile: Image first, Desktop: Content first */}
           <div className="order-1 lg:order-2 flex items-center justify-center">
-            <div className="relative h-[220px] w-full max-w-md sm:h-[280px] lg:h-[600px] lg:w-[600px] lg:max-w-none">
+            <div className="relative h-[120px] sm:h-[150px] lg:h-[600px] w-full max-w-md lg:w-[600px] lg:max-w-none">
               {/* Decorative elements - hidden on mobile for cleaner look */}
               <div className="hidden lg:block absolute left-0 top-0 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
               <div className="hidden lg:block absolute bottom-0 right-0 h-40 w-40 rounded-full bg-secondary/10 blur-3xl" />
@@ -64,10 +64,34 @@ export function HeroSection() {
 
               {/* Main illustration */}
               <div className="relative flex h-full items-center justify-center">
+                {/* Mobile: Simple Animated Cameroon Flag */}
+                <div className="lg:hidden relative z-10 w-[90%]">
+                  <div className="relative flex items-center h-24 sm:h-28 rounded-xl overflow-hidden shadow-lg border border-white/10 animate-gentle-float">
+                    {/* Green stripe */}
+                    <div className="flex-1 h-full bg-[#008751]"></div>
+
+                    {/* Red stripe with star */}
+                    <div className="relative flex-1 h-full bg-[#CE1126]">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#FCD116] animate-subtle-pulse" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Yellow stripe */}
+                    <div className="flex-1 h-full bg-[#FCD116]"></div>
+                  </div>
+
+                  {/* Subtle glow effect */}
+                  <div className="absolute inset-0 -m-2 rounded-xl blur-lg bg-gradient-to-r from-[#008751]/20 via-[#CE1126]/20 to-[#FCD116]/20 -z-10"></div>
+                </div>
+
+                {/* Desktop: Original illustration */}
                 <img
                   src="/cameroon-hero-man.webp"
                   alt="Assistant IA Cameroun"
-                  className="relative z-10 h-full w-full object-contain"
+                  className="hidden lg:block relative z-10 h-full w-full object-contain"
                 />
               </div>
 

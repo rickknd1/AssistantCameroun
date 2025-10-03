@@ -24,8 +24,8 @@ export function Header() {
     { name: t('header.assistant'), href: "/assistant" },
     { name: t('header.library'), href: "/bibliotheque" },
     { name: t('header.procedures'), href: "/procedures" },
-    { name: t('header.news'), href: "/actualites" },
     { name: t('header.quiz'), href: "/quiz" },
+    { name: t('header.infos'), href: "/infos" },
   ]
 
   return (

@@ -128,10 +128,10 @@ export class IntelligentSearchAgent {
    */
   private extractKeywords(message: string): string[] {
     const normalized = message.toLowerCase()
-
-    // Extraire les numéros d'articles
-    const articleMatches = message.match(/article\s+(\d+|premier|première)/gi)
     const keywords: string[] = []
+
+    // Extraire les numéros d'articles avec référence au document
+    const articleMatches = message.match(/article\s+(\d+|premier|première)/gi)
 
     if (articleMatches) {
       articleMatches.forEach(match => {
@@ -142,6 +142,22 @@ export class IntelligentSearchAgent {
         }
       })
     }
+
+    // Détecter le document cible (IMPORTANT!)
+    const documentKeywords: { [key: string]: string[] } = {
+      'constitution': ['Constitution', 'constitution', 'constitutionnelle'],
+      'code pénal': ['pénal', 'penal', 'pénale', 'penale', 'criminel'],
+      'code civil': ['civil', 'civile'],
+      'code du travail': ['travail', 'travailleur', 'employeur'],
+      'loi de finances': ['finances', 'budget', 'budgétaire']
+    }
+
+    // Ajouter le document détecté en priorité
+    Object.entries(documentKeywords).forEach(([docName, docKeys]) => {
+      if (docKeys.some(key => normalized.includes(key))) {
+        keywords.unshift(docName) // Ajouter en premier (priorité)
+      }
+    })
 
     // Ajouter mots-clés généraux
     const words = normalized
@@ -162,13 +178,21 @@ export class IntelligentSearchAgent {
 
     console.log('🔍 Recherche intelligente:', { questionType, keywords })
 
+    // Détecter le document cible prioritaire
+    const targetDocument = keywords.find(k =>
+      ['constitution', 'code pénal', 'code civil', 'code du travail', 'loi de finances'].includes(k.toLowerCase())
+    )
+
+    console.log('📄 Document cible détecté:', targetDocument || 'aucun')
+
     // Construire les conditions de recherche
-    const sectionConditions = keywords.map(k =>
+    const sectionKeywords = keywords.filter(k => k !== targetDocument)
+    const sectionConditions = sectionKeywords.map(k =>
       `title.ilike.%${k}%,content.ilike.%${k}%,reference.ilike.%${k}%`
     ).join(',')
 
     // 1. Rechercher les sections (articles spécifiques)
-    const { data: sections } = await this.supabase
+    let query = this.supabase
       .from('Section')
       .select(`
         id,
@@ -180,8 +204,18 @@ export class IntelligentSearchAgent {
         documentId,
         Document!inner(id, slug, title, type, category)
       `)
-      .or(sectionConditions)
-      .limit(10)
+
+    // Si un document cible est détecté, filtrer par ce document
+    if (targetDocument) {
+      query = query.ilike('Document.title', `%${targetDocument}%`)
+    }
+
+    // Ajouter les conditions de recherche sur le contenu
+    if (sectionConditions) {
+      query = query.or(sectionConditions)
+    }
+
+    const { data: sections } = await query.limit(10)
 
     // 2. Valider toutes les sections trouvées
     const validatedArticles: ValidatedArticle[] = []
@@ -274,11 +308,21 @@ export class ExpertFormatterAgent {
 
     // Articles validés
     if (searchContext.articles.length > 0) {
-      context += '## Articles juridiques validés (avec liens directs):\n\n'
-      searchContext.articles.forEach(article => {
-        context += `**${article.reference}** - ${article.documentTitle}\n`
-        context += `- URL exacte: ${article.url}\n`
-        context += `- Contenu: ${article.content.substring(0, 500)}...\n\n`
+      context += '## ⚠️ ARTICLES JURIDIQUES VALIDÉS - TU DOIS LES CITER AVEC LIENS ⚠️\n\n'
+      context += '**INSTRUCTIONS CRITIQUES:**\n'
+      context += '- Pour CHAQUE article listé ci-dessous, tu DOIS créer un lien markdown cliquable\n'
+      context += '- Format EXACT: [Nom de l\'article](URL_EXACTE)\n'
+      context += '- L\'URL exacte est fournie pour chaque article\n'
+      context += '- Exemple: [Article 20 de la Constitution](/bibliotheque/constitution#article-20)\n\n'
+
+      searchContext.articles.forEach((article, index) => {
+        context += `### Article ${index + 1}:\n`
+        context += `**Référence:** ${article.reference}\n`
+        context += `**Document:** ${article.documentTitle}\n`
+        context += `**Titre:** ${article.title}\n`
+        context += `**Contenu:** ${article.content.substring(0, 500)}...\n`
+        context += `**URL pour créer le lien:** ${article.url}\n`
+        context += `**Format du lien:** [${article.reference}](${article.url})\n\n`
       })
     }
 
@@ -315,48 +359,62 @@ export class ExpertFormatterAgent {
 
     const systemInstruction = `Tu es l'Assistant National du Cameroun, un expert juridique et administratif.
 
-**RÈGLES ABSOLUES:**
-
-1. **CITATIONS OBLIGATOIRES (Questions juridiques):**
-   ${searchContext.questionType === 'juridique' ? `
-   - Tu DOIS citer des articles avec des liens cliquables
-   - Format EXACT: [Article X du Code Y](URL_EXACTE)
-   - Les URLs sont fournies dans le contexte (champ "URL exacte")
-   - Exemple: "Selon l'[Article 26 de la Constitution](/bibliotheque/constitution#article-26), ..."
-   - MINIMUM 1-2 liens par réponse juridique
-   ` : '- Pas besoin de liens pour ce type de question'}
-
-2. **PRÉCISION:**
-   - Cite le contenu EXACT de l'article
-   - Ne dis JAMAIS "lisez tout le code"
-   - Donne la réponse précise demandée
-
-3. **ADAPTATION:**
-   - Question juridique → Cite des articles avec liens
-   - Question procédure → Étapes claires + plateforme officielle
-   - Question générale → Réponse concise sans liens
-
-4. **FORMAT:**
-   - Réponds en français
-   - Structure claire avec listes à puces
-   - **Gras** pour les informations importantes
-
 ${context}
 
-**Type de question détecté:** ${searchContext.questionType}
-**Articles disponibles:** ${searchContext.articles.length}
-**Procédures disponibles:** ${searchContext.procedures.length}`
+**TYPE DE QUESTION:** ${searchContext.questionType}
+**NOMBRE D'ARTICLES TROUVÉS:** ${searchContext.articles.length}
+**NOMBRE DE PROCÉDURES:** ${searchContext.procedures.length}
+
+${searchContext.questionType === 'juridique' && searchContext.articles.length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  RÈGLE CRITIQUE - CITATIONS OBLIGATOIRES  ⚠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu as ${searchContext.articles.length} articles validés dans le contexte ci-dessus.
+
+🔴 TU DOIS ABSOLUMENT:
+1. Citer AU MOINS 1 article avec un lien cliquable
+2. Utiliser le format EXACT: [Nom de l'article](URL)
+3. L'URL est fournie dans le contexte (champ "URL EXACTE À UTILISER")
+4. Intégrer les liens DANS le texte, pas en liste à la fin
+
+🔴 INTERDICTIONS ABSOLUES:
+- ❌ NE DIS JAMAIS "l'article n'est pas disponible"
+- ❌ NE DIS JAMAIS "je ne trouve pas l'article"
+- ❌ NE DIS JAMAIS "lisez tout le code"
+- ❌ Les articles SONT dans le contexte ci-dessus, UTILISE-LES!
+
+✅ EXEMPLE DE RÉPONSE CORRECTE:
+"Selon l'[Article 20 de la Constitution](/bibliotheque/constitution#article-20),
+le Président de la République est élu au suffrage universel direct..."
+
+✅ FORMAT OBLIGATOIRE:
+[Référence - Titre](URL_EXACTE_DU_CONTEXTE)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+` : ''}
+
+**RÈGLES GÉNÉRALES:**
+- Réponds en français
+- Structure claire avec listes à puces si nécessaire
+- **Gras** pour les informations importantes
+- Sois précis et cite le contenu exact des articles`
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash-exp',
       systemInstruction
     })
 
-    const chat = model.startChat({
-      history: conversationHistory.map((msg: any) => ({
+    // Filtrer l'historique pour éviter les messages vides
+    const validHistory = conversationHistory
+      .filter((msg: any) => msg.content && msg.content.trim().length > 0)
+      .map((msg: any) => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }]
       }))
+
+    const chat = model.startChat({
+      history: validHistory
     })
 
     const result = await chat.sendMessage(message)

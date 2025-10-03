@@ -43,13 +43,19 @@ export function ChatSidebar({ conversations, isOpen, onToggle, onNewConversation
   return (
     <>
       {/* Mobile overlay */}
-      {isOpen && <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden" onClick={onToggle} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden touch-none"
+          onClick={onToggle}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-80 border-r border-border bg-card transition-transform lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-80 border-r border-border bg-card transition-transform duration-300 lg:static lg:translate-x-0 touch-none select-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{ touchAction: 'pan-y pinch-zoom' }}
       >
         <div className="flex h-full flex-col">
           {/* Header */}

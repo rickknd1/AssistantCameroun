@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { rateLimitMiddleware } from '@/lib/utils/rate-limit'
+import { IntelligentSearchAgent, ExpertFormatterAgent } from '@/lib/ai/multi-agent-system'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -123,155 +124,21 @@ export async function POST(request: Request) {
     const supabase = await createClient()
     const startTime = Date.now()
 
-    // Extract keywords from the message for better search
-    const searchTerms = message.toLowerCase()
+    // =====================================================
+    // SYSTÈME MULTI-AGENTS À 2 NIVEAUX
+    // =====================================================
 
-    // Normaliser le message pour détecter les variations d'articles
-    const normalizedVariations = normalizeOrdinalToNumber(message)
+    console.log('🤖 [AGENT 1] Analyseur + Chercheur Intelligent - Démarrage...')
 
-    // Extract key words for better matching
-    let keywords = searchTerms
-      .replace(/[?.,!]/g, '')
-      .split(' ')
-      .filter(word => word.length > 3) // Keep words longer than 3 chars
-      .slice(0, 5) // Take max 5 keywords
+    // Agent 1: Recherche intelligente avec validation
+    const searchAgent = new IntelligentSearchAgent(supabase)
+    const searchContext = await searchAgent.search(message)
 
-    // Ajouter les variations normalisées aux mots-clés
-    normalizedVariations.forEach(variation => {
-      const variationWords = variation.toLowerCase()
-        .replace(/[?.,!]/g, '')
-        .split(' ')
-        .filter(word => word.length > 3)
-      keywords = [...keywords, ...variationWords]
-    })
-
-    // Retirer les doublons
-    keywords = [...new Set(keywords)].slice(0, 10) // Max 10 keywords avec variations
-
-    // Build search conditions for SECTIONS (only has title, content, reference)
-    const sectionSearchConditions = keywords.map(keyword =>
-      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,reference.ilike.%${keyword}%`
-    ).join(',')
-
-    // Build search conditions for DOCUMENTS (has category)
-    const documentSearchConditions = keywords.map(keyword =>
-      `title.ilike.%${keyword}%,content.ilike.%${keyword}%,category.ilike.%${keyword}%`
-    ).join(',')
-
-    // Build search conditions for PROCEDURES (has name, description)
-    const procedureSearchConditions = keywords.map(keyword =>
-      `name.ilike.%${keyword}%,description.ilike.%${keyword}%,category.ilike.%${keyword}%`
-    ).join(',')
-
-    // 1. Rechercher des SECTIONS pertinentes (granularité article par article)
-    const { data: sections } = await supabase
-      .from('Section')
-      .select(`
-        id,
-        title,
-        content,
-        reference,
-        level,
-        position,
-        documentId,
-        Document!inner(id, slug, title, type, category, reference)
-      `)
-      .or(sectionSearchConditions || `title.ilike.%${searchTerms}%`)
-      .limit(10)
-
-    // Fallback: si aucune section trouvée, chercher dans les documents complets
-    const { data: documents } = sections && sections.length > 0
-      ? { data: null }
-      : await supabase
-          .from('Document')
-          .select('id, slug, title, reference, content, type, category')
-          .eq('status', 'ACTIVE')
-          .or(documentSearchConditions || `title.ilike.%${searchTerms}%`)
-          .limit(5)
-
-    const finalDocuments = documents
-
-    // 2. Rechercher des procédures pertinentes avec recherche textuelle
-    const { data: procedures } = await supabase
-      .from('Procedure')
-      .select('slug, name, description, steps, documents, costs, duration, category, onlineUrl, formUrl, tips, faqs')
-      .or(procedureSearchConditions || `name.ilike.%${searchTerms}%`)
-      .limit(5)
-
-    // NE PAS utiliser de fallback - seulement les procédures pertinentes
-    const finalProcedures = procedures && procedures.length > 0 ? procedures : null
-
-    // 2.5. Si peu de résultats, chercher sur le web
-    let webResults = ''
-    const hasEnoughData = (finalDocuments && finalDocuments.length >= 2) || (finalProcedures && finalProcedures.length >= 2)
-
-    if (!hasEnoughData) {
-      webResults = await searchWeb(message)
-    }
-
-    // 3. Construire le contexte pour Gemini avec SECTIONS (granulaires)
-    let context = '# CONTEXTE JURIDIQUE ET ADMINISTRATIF DU CAMEROUN\n\n'
-
-    // Générer un mapping des ancres pour les citations
-    const anchorMap: Map<string, string> = new Map()
-
-    if (sections && sections.length > 0) {
-      context += '## Sections juridiques pertinentes (articles spécifiques):\n'
-      sections.forEach((section: any) => {
-        const doc = section.Document
-        const anchorId = generateAnchorId(section.reference || section.title)
-        const url = `/bibliotheque/${doc.slug}#${anchorId}`
-
-        // Stocker pour les citations
-        anchorMap.set(section.reference, url)
-
-        context += `- **${section.title}** (${doc.title})\n`
-        context += `  Document: ${doc.title} (${doc.type})\n`
-        context += `  Référence citée: ${section.reference}\n`
-        context += `  URL exacte: ${url}\n`
-        context += `  Contenu: ${section.content.substring(0, 400)}...\n`
-        context += '\n'
-      })
-    } else if (finalDocuments && finalDocuments.length > 0) {
-      // Fallback sur documents complets
-      context += '## Documents juridiques disponibles:\n'
-      finalDocuments.forEach((doc: any) => {
-        const url = `/bibliotheque/${doc.slug}`
-        context += `- ${doc.title} (${doc.type})\n`
-        context += `  Catégorie: ${doc.category}\n`
-        context += `  Référence: ${doc.reference || 'N/A'}\n`
-        context += `  URL: ${url}\n`
-        if (doc.content) {
-          context += `  Contenu: ${doc.content.substring(0, 500)}...\n`
-        }
-        context += '\n'
-      })
-    }
-
-    if (finalProcedures && finalProcedures.length > 0) {
-      context += '## Procédures administratives disponibles:\n'
-      finalProcedures.forEach(proc => {
-        context += `- ${proc.name}\n`
-        context += `  Description: ${proc.description}\n`
-        context += `  Coûts: ${proc.costs || 'Non spécifié'}\n`
-        context += `  Durée: ${proc.duration || 'Non spécifié'}\n`
-        if (proc.onlineUrl) {
-          context += `  **Plateforme officielle**: ${proc.onlineUrl}\n`
-        }
-        if (proc.steps) {
-          context += `  Étapes: ${JSON.stringify(proc.steps)}\n`
-        }
-        if (proc.documents) {
-          context += `  Documents requis: ${JSON.stringify(proc.documents)}\n`
-        }
-        context += '\n'
-      })
-    }
-
-    // 3.5. Ajouter les résultats web si disponibles
-    if (webResults) {
-      context += webResults
-    }
+    console.log('📊 [AGENT 1] Résultats:')
+    console.log(`   - Type de question: ${searchContext.questionType}`)
+    console.log(`   - Articles validés: ${searchContext.articles.length}`)
+    console.log(`   - Procédures: ${searchContext.procedures.length}`)
+    console.log(`   - Web results: ${searchContext.webResults ? 'Oui' : 'Non'}`)
 
     // 4. Construire l'historique de conversation
     let chatHistory: Array<{ role: string; parts: Array<{ text: string }> }> = []
@@ -283,200 +150,38 @@ export async function POST(request: Request) {
       }))
     }
 
-    // 5. Configurer le modèle Gemini
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
-      systemInstruction: `Tu es l'Assistant National du Cameroun, un assistant IA expert dans le droit et les procédures administratives camerounaises.
+    console.log('🤖 [AGENT 2] Formateur Expert - Démarrage...')
 
-**Ton rôle:**
-- Aider les citoyens avec les démarches administratives (CNI, passeport, actes d'état civil, etc.)
-- Expliquer les lois et réglementations camerounaises
-- Guider les utilisateurs à travers les procédures administratives
-- Fournir des informations précises basées sur les documents officiels ET tes connaissances du Cameroun
+    // Agent 2: Génération de réponse formatée
+    const formatterAgent = new ExpertFormatterAgent()
+    const responseText = await formatterAgent.generateResponse(
+      message,
+      searchContext,
+      chatHistory
+    )
 
-**Règles STRICTES:**
-1. Réponds TOUJOURS en français
-2. UTILISE EN PRIORITÉ le contexte fourni ci-dessous s'il est pertinent
-3. Si le contexte ne contient pas d'information pertinente, utilise tes connaissances générales sur les procédures administratives au Cameroun
-4. NE DIS JAMAIS "Je ne dispose pas d'informations" - fournis toujours une réponse utile basée sur tes connaissances
-5. Fournis des réponses structurées avec listes à puces pour les étapes
-6. Indique les coûts, délais et documents requis (utilise le contexte en priorité, sinon tes connaissances générales)
-7. Mets en **gras** les informations importantes
-8. **COMPRÉHENSION CONTEXTUELLE (TRÈS IMPORTANT):**
-   - Comprends les équivalences: "article 1" = "article premier" = "premier article"
-   - "deuxième article" = "article 2", "troisième article" = "article 3", etc.
-   - Si l'utilisateur demande "l'article 1" et que tu trouves "Article PREMIER" dans le contexte, utilise-le!
-   - Sois intelligent dans la correspondance entre ordinaux (premier, deuxième...) et chiffres (1, 2...)
-9. **CITATIONS AVEC LIENS CLIQUABLES (OBLIGATOIRE - TRÈS IMPORTANT):**
-   - Tu DOIS TOUJOURS citer des articles juridiques dans tes réponses avec des liens cliquables
-   - Format EXACT obligatoire: [Article X du Code Y](/bibliotheque/slug#article-x)
-   - Le contexte te donne l'URL exacte à utiliser (champ "URL exacte")
-   - Exemples OBLIGATOIRES:
-     * "Selon l'[Article 26 de la Constitution](/bibliotheque/constitution-de-la-republique-du-cameroun#article-26), ..."
-     * "Comme stipulé dans l'[Article 1 du Code Pénal](/bibliotheque/code-penal-camerounais#article-1), ..."
-     * "Conformément à l'[Article 34 du Code Civil](/bibliotheque/code-civil-camerounais#art-34), ..."
-   - CHAQUE réponse juridique DOIT contenir AU MOINS 1-2 liens vers des articles spécifiques
-   - Place les liens INLINE dans le texte (intégrés naturellement dans les phrases)
-   - NE METS JAMAIS les liens en liste à la fin
-   - Si tu cites un article, il DOIT être cliquable
-10. **STYLE DE CITATION OBLIGATOIRE:**
-   - Toujours introduire avec "Selon", "Conformément à", "Comme indiqué dans", "D'après"
-   - Toujours préciser le document source: "Article X du [Nom du Code/Loi]"
-   - Exemples: "Selon l'[Article 5 du Code du Travail](/bibliotheque/code-du-travail-au-cameroun#art-5), le salaire minimum..."
+    console.log('✅ [AGENT 2] Réponse générée')
 
-${context}
+    // 7. Extraire les sources citées de la réponse
+    const sources = formatterAgent.extractSources(responseText, searchContext)
 
-**Format de réponse obligatoire:**
-- Introduction courte expliquant la procédure (1-2 phrases)
-- Liste à puces claire des documents/étapes requis
-- Détails sur coûts approximatifs et durée estimée
-- **TOUJOURS mentionner la plateforme officielle si disponible** (ex: www.idcam.cm pour CNI, https://portal.passcam.cm/ pour passeport)
-- Conseils pratiques si pertinent
-- Sois précis, complet et professionnel
+    // Ajouter les procédures au tableau de sources
+    searchContext.procedures.forEach((proc: any) => {
+      const procName = proc.name.toLowerCase()
+      const directMention = responseText.toLowerCase().includes(procName) ||
+        (procName.includes('cni') && responseText.toLowerCase().includes('cni')) ||
+        (procName.includes('passeport') && responseText.toLowerCase().includes('passeport'))
 
-**INFORMATIONS OFFICIELLES CLÉS À TOUJOURS MENTIONNER:**
-- **CNI (Carte Nationale d'Identité)**: Plateforme www.idcam.cm, 10 000 FCFA, 48 heures, validité 15 ans
-- **Passeport**: Plateforme https://portal.passcam.cm/, 110 000 FCFA, 48 heures, validité 10 ans
-- Si la "Plateforme officielle" est dans le contexte, MENTIONNE-LA SYSTÉMATIQUEMENT dans ta réponse
+      const alreadyAdded = sources.some(s => s.url === `/procedures/${proc.slug}`)
 
-**Important:** Même si le contexte est vide ou non pertinent, réponds quand même en utilisant tes connaissances sur les procédures administratives au Cameroun.`
-    })
-
-    // 6. Générer la réponse
-    const chat = model.startChat({
-      history: chatHistory
-    })
-
-    const result = await chat.sendMessage(message)
-    const response = result.response
-    const responseText = response.text()
-
-    // 7. Identifier les sources citées (depuis les sections ET les liens inline)
-    const sources: Array<{
-      title: string
-      reference: string
-      url: string
-    }> = []
-
-    // Extraire les liens markdown de la réponse
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-    const foundLinks = new Set<string>()
-    let match
-
-    while ((match = linkRegex.exec(responseText)) !== null) {
-      const [, linkText, linkUrl] = match
-      if (!foundLinks.has(linkUrl)) {
-        foundLinks.add(linkUrl)
-
-        // Trouver la section/document correspondant
-        if (sections && sections.length > 0) {
-          const section = sections.find((s: any) => {
-            const anchorId = generateAnchorId(s.reference || s.title)
-            const expectedUrl = `/bibliotheque/${s.Document.slug}#${anchorId}`
-            return expectedUrl === linkUrl
-          })
-
-          if (section) {
-            sources.push({
-              title: section.title,
-              reference: section.reference,
-              url: linkUrl
-            })
-          }
-        }
+      if (directMention && !alreadyAdded && sources.length < 4) {
+        sources.push({
+          title: proc.name,
+          reference: `Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
+          url: `/procedures/${proc.slug}`
+        })
       }
-    }
-
-    // Ajouter les procédures citées UNIQUEMENT si réellement mentionnées dans la réponse
-    if (finalProcedures && finalProcedures.length > 0) {
-      finalProcedures.forEach((proc: any) => {
-        // Extraire les mots-clés significatifs du nom (ignorer mots trop courts ou communs)
-        const procKeywords = proc.name.toLowerCase()
-          .split(/[\s-()]+/)
-          .filter((w: string) => w.length > 4 && !['carte', 'document', 'acte'].includes(w))
-
-        // Vérifier si AU MOINS 3 mots-clés du nom sont dans la réponse (seuil augmenté)
-        const matchCount = procKeywords.filter((keyword: string) =>
-          responseText.toLowerCase().includes(keyword)
-        ).length
-
-        // Vérifier si pas déjà ajouté
-        const alreadyAdded = sources.some(s => s.url === `/procedures/${proc.slug}`)
-
-        // Vérifier le slug exact ou des acronymes
-        const slugMentioned = responseText.toLowerCase().includes(proc.slug.replace(/-/g, ' '))
-        const procName = proc.name.toLowerCase()
-
-        // Vérifier si le nom complet ou des parties clés sont mentionnés
-        const directMention = responseText.toLowerCase().includes(procName) ||
-          (procName.includes('cni') && responseText.toLowerCase().includes('cni')) ||
-          (procName.includes('passeport') && responseText.toLowerCase().includes('passeport'))
-
-        // Ajouter SEULEMENT si:
-        // - Le nom complet est mentionné directement OU
-        // - Au moins 3 mots-clés significatifs matchent OU
-        // - Le slug complet est mentionné
-        if ((directMention || matchCount >= 3 || slugMentioned) && !alreadyAdded && sources.length < 4) {
-          sources.push({
-            title: proc.name,
-            reference: `Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
-            url: `/procedures/${proc.slug}`
-          })
-        }
-      })
-    }
-
-    // Ajouter les documents complets UNIQUEMENT si mentionnés dans la réponse
-    if (finalDocuments && finalDocuments.length > 0) {
-      finalDocuments.forEach((doc: any) => {
-        // Extraire les mots-clés significatifs du titre (ignorer mots courts ou communs)
-        const docKeywords = doc.title.toLowerCase()
-          .split(/[\s-,()]+/)
-          .filter((w: string) => w.length > 5 && !['cameroun', 'republique', 'document'].includes(w))
-
-        // Compter combien de mots-clés significatifs sont dans la réponse
-        const matchCount = docKeywords.filter((keyword: string) =>
-          responseText.toLowerCase().includes(keyword)
-        ).length
-
-        // Vérifier si référence exacte mentionnée
-        const refMentioned = doc.reference && responseText.toLowerCase().includes(doc.reference.toLowerCase())
-
-        // Vérifier si pas déjà ajouté
-        const alreadyAdded = sources.some(s => s.url === `/bibliotheque/${doc.slug}`)
-
-        // Vérifier si le titre complet ou des parties clés sont mentionnés
-        const docTitle = doc.title.toLowerCase()
-        const directMention = responseText.toLowerCase().includes(docTitle) ||
-          (docTitle.includes('constitution') && responseText.toLowerCase().includes('constitution')) ||
-          (docTitle.includes('code') && responseText.toLowerCase().includes('code'))
-
-        // Ajouter SEULEMENT si:
-        // - Le titre complet est mentionné directement OU
-        // - Au moins 3 mots-clés significatifs matchent OU
-        // - La référence exacte est mentionnée
-        if ((directMention || matchCount >= 3 || refMentioned) && !alreadyAdded && sources.length < 4) {
-          sources.push({
-            title: doc.title,
-            reference: doc.reference || doc.type || 'Document officiel',
-            url: `/bibliotheque/${doc.slug}`
-          })
-        }
-      })
-    }
-
-    // Ajouter les sources web si utilisées
-    if (webResults && webResults.length > 0 && sources.length < 4) {
-      webResults.slice(0, 4 - sources.length).forEach((result: any) => {
-        if (result.url) {
-          sources.push({
-            title: result.title || 'Source web',
-            reference: result.url,
-            url: result.url
-          })
-        }
-      })
-    }
+    })
 
     // 8. Calculer le niveau de confiance de manière dynamique
     let confidence = 50 // Base minimale
@@ -484,23 +189,18 @@ ${context}
     // +10 points par source (max 3 sources = +30)
     confidence += Math.min(sources.length * 10, 30)
 
-    // +20 points si des documents officiels sont trouvés
-    if (finalDocuments && finalDocuments.length > 0) {
+    // +20 points si des articles validés sont trouvés
+    if (searchContext.articles.length > 0) {
       confidence += 20
     }
 
     // +15 points si des procédures sont trouvées
-    if (finalProcedures && finalProcedures.length > 0) {
+    if (searchContext.procedures.length > 0) {
       confidence += 15
     }
 
-    // +10 points si plusieurs mots-clés matchent
-    if (keywords.length >= 3) {
-      confidence += 10
-    }
-
     // -15 points si web search a été utilisée (données moins fiables)
-    if (webResults) {
+    if (searchContext.webResults) {
       confidence -= 15
     }
 
