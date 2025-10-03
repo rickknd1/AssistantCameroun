@@ -239,11 +239,13 @@ export function ChatInterface() {
         </div>
 
         {/* Messages Area - Responsive padding */}
-        <div className="flex-1 overflow-y-auto pb-[180px] sm:pb-[160px] lg:pb-[140px]">
+        <div className="flex-1 overflow-hidden">
           {messages.length === 0 ? (
             <WelcomeScreen onQuestionClick={handleSendMessage} />
           ) : (
-            <ChatMessages messages={messages} isTyping={isTyping} />
+            <div className="h-full pb-[140px] sm:pb-[130px] lg:pb-[120px] overflow-y-auto">
+              <ChatMessages messages={messages} isTyping={isTyping} />
+            </div>
           )}
         </div>
 
