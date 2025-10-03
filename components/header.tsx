@@ -29,8 +29,8 @@ export function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" id="main-header">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-x-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" id="main-header" role="banner">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-x-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-8" aria-label="Navigation principale">
         {/* Logo */}
         <div className="flex lg:flex-1">
           <Link href="/" className="flex items-center gap-2 touch-manipulation">
@@ -116,6 +116,9 @@ export function Header() {
             size="icon"
             className="h-9 w-9 lg:hidden touch-manipulation shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             <span className="sr-only">{t('header.menu')}</span>
@@ -125,8 +128,8 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border">
-          <div className="space-y-0.5 px-3 pb-3 pt-2">
+        <div className="lg:hidden border-t border-border" id="mobile-menu">
+          <div className="space-y-0.5 px-3 pb-3 pt-2" role="menu">
             {navigation.map((item) => (
               <Link
                 key={item.name}

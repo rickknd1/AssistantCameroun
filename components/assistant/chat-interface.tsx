@@ -249,8 +249,8 @@ export function ChatInterface() {
           )}
         </div>
 
-        {/* Fixed Input Area - Always visible at bottom, above safe area */}
-        <div className="flex-none border-t border-border bg-background sticky bottom-0 z-10" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        {/* Fixed Input Area - Always visible at bottom, well above safe area */}
+        <div className="flex-none border-t border-border bg-background sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
           <ChatInput
             onSendMessage={handleSendMessage}
             isTyping={isTyping}

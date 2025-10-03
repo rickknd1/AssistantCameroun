@@ -25,7 +25,7 @@
   --accent-foreground: oklch(0.15 0 0);
 
   --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.5 0 0);
+  --muted-foreground: oklch(0.45 0 0); /* Improved contrast from 0.5 to 0.45 */
 
   --destructive: oklch(0.55 0.24 27);
   --destructive-foreground: oklch(0.99 0 0);
@@ -71,7 +71,7 @@
   --accent-foreground: oklch(0.12 0 0);
 
   --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted-foreground: oklch(0.72 0 0); /* Improved contrast from 0.65 to 0.72 */
 
   --destructive: oklch(0.5 0.24 27);
   --destructive-foreground: oklch(0.98 0 0);
@@ -142,6 +142,13 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Focus visible for accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   html, body {
     @apply bg-background text-foreground;
     width: 100%;
@@ -155,6 +162,17 @@
   input, textarea, select {
     font-size: 16px !important;
     touch-action: manipulation;
+  }
+
+  /* Safe area for iOS */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  @supports (padding: max(0px)) {
+    .pb-safe {
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
   }
 
   /* Prevent double-tap zoom */
