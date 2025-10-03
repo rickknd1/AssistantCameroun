@@ -66,75 +66,79 @@ export function WelcomeScreen({ onQuestionClick }: WelcomeScreenProps) {
   const selectedCat = CATEGORIES.find(c => c.id === selectedCategory)
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-3 sm:p-6 lg:p-8">
+    <div className="flex flex-1 flex-col items-center justify-center p-3 sm:p-6 lg:p-8 relative z-10">
       <div className="w-full max-w-4xl space-y-6 sm:space-y-8 text-center">
-        {/* Avatar */}
-        <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-lg">
-          <Bot className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+        {/* Avatar with gradient border */}
+        <div className="mx-auto relative">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500 via-yellow-500 to-red-500 blur-lg opacity-30 animate-pulse"></div>
+          <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-gradient-to-br from-green-500 via-yellow-500 to-red-500 shadow-2xl">
+            <Bot className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
+          </div>
         </div>
 
         {/* Welcome Message */}
         <div className="space-y-3 sm:space-y-4">
-          <h1 className="text-balance text-2xl sm:text-3xl font-bold text-foreground lg:text-4xl">
+          <h1 className="text-balance text-3xl sm:text-4xl font-bold text-foreground lg:text-5xl bg-gradient-to-r from-green-600 via-yellow-600 to-red-600 bg-clip-text text-transparent">
             {t('assistant.welcome.title')}
           </h1>
-          <p className="text-pretty text-sm sm:text-base lg:text-lg text-muted-foreground px-2">
+          <p className="text-pretty text-base sm:text-lg lg:text-xl text-muted-foreground px-2 max-w-2xl mx-auto">
             {t('assistant.welcome.subtitle')}
           </p>
         </div>
 
-        {/* Features */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-            <span>{t('assistant.welcome.feature1')}</span>
+        {/* Features with enhanced styling */}
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm sm:text-base">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+            <span className="font-medium text-green-700 dark:text-green-400">{t('assistant.welcome.feature1')}</span>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-secondary" />
-            <span>{t('assistant.welcome.feature2')}</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+            <span className="font-medium text-yellow-700 dark:text-yellow-400">{t('assistant.welcome.feature2')}</span>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-accent" />
-            <span>{t('assistant.welcome.feature3')}</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+            <span className="font-medium text-red-700 dark:text-red-400">{t('assistant.welcome.feature3')}</span>
           </div>
         </div>
 
         {/* Categories */}
         {!selectedCategory ? (
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-xs sm:text-sm font-medium text-foreground">{t('assistant.welcome.chooseCategory')}</p>
-            <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-4 sm:space-y-6">
+            <p className="text-sm sm:text-base font-semibold text-foreground">{t('assistant.welcome.chooseCategory')}</p>
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
               {CATEGORIES.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`group rounded-lg border border-border ${category.bgColor} p-3 sm:p-4 text-center transition-all hover:border-primary hover:shadow-md active:scale-95 touch-manipulation`}
+                  className={`group relative overflow-hidden rounded-xl border-2 border-transparent ${category.bgColor} p-4 sm:p-6 text-center transition-all hover:border-current hover:shadow-xl hover:scale-105 active:scale-95 touch-manipulation`}
                 >
-                  <category.icon className={`mx-auto h-6 w-6 sm:h-8 sm:w-8 mb-2 ${category.color}`} />
-                  <span className="text-xs sm:text-sm font-semibold text-foreground">{category.name}</span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <category.icon className={`relative mx-auto h-8 w-8 sm:h-10 sm:w-10 mb-3 ${category.color} group-hover:scale-110 transition-transform`} />
+                  <span className="relative text-sm sm:text-base font-bold text-foreground">{category.name}</span>
                 </button>
               ))}
             </div>
           </div>
         ) : (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-4 sm:space-y-6">
             <div className="flex items-center justify-between">
-              <p className="text-xs sm:text-sm font-medium text-foreground">{selectedCat?.name} :</p>
+              <p className="text-sm sm:text-base font-semibold text-foreground">{selectedCat?.name} :</p>
               <button
                 onClick={() => setSelectedCategory(null)}
-                className="text-xs sm:text-sm text-primary hover:underline touch-manipulation"
+                className="text-sm sm:text-base text-primary hover:underline font-medium touch-manipulation flex items-center gap-1"
               >
-                {t('assistant.welcome.back')}
+                ← {t('assistant.welcome.back')}
               </button>
             </div>
-            <div className="grid gap-2 sm:gap-3">
+            <div className="grid gap-3 sm:gap-4">
               {selectedCat?.questions.map((question) => (
                 <button
                   key={question}
                   onClick={() => onQuestionClick(question)}
-                  className="rounded-lg border border-border bg-card p-3 sm:p-4 text-left text-xs sm:text-sm transition-all hover:border-primary hover:shadow-md active:scale-[0.98] touch-manipulation"
+                  className="group rounded-xl border-2 border-border bg-card p-4 sm:p-5 text-left text-sm sm:text-base transition-all hover:border-primary hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] touch-manipulation"
                 >
-                  <span className="text-card-foreground">{question}</span>
+                  <span className="text-card-foreground group-hover:text-primary transition-colors">{question}</span>
                 </button>
               ))}
             </div>

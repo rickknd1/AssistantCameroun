@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { translateArray } from '@/lib/services/translate'
 
 export async function GET(request: Request) {
   try {
@@ -8,8 +9,9 @@ export async function GET(request: Request) {
     const category = searchParams.get('category')
     const difficulty = searchParams.get('difficulty')
     const limit = parseInt(searchParams.get('limit') || '10')
+    const lang = searchParams.get('lang') as 'en' | 'fr' || 'fr'
 
-    console.log('Quiz API - Params:', { category, difficulty, limit })
+    console.log('Quiz API - Params:', { category, difficulty, limit, lang })
 
     const supabase = await createClient()
 
@@ -41,9 +43,25 @@ export async function GET(request: Request) {
 
     console.log(`Quiz API - Found ${data?.length || 0} questions`)
 
+    // Traduire si langue = EN
+    let translatedData = data || []
+    if (lang === 'en' && data && data.length > 0) {
+      try {
+        translatedData = await translateArray(
+          data,
+          ['question', 'explanation', 'option1', 'option2', 'option3', 'option4'],
+          'en',
+          'fr'
+        )
+        console.log(`✅ Quiz traduit en anglais (${translatedData.length} questions)`)
+      } catch (translateError) {
+        console.error('⚠️ Erreur traduction quiz, données FR retournées:', translateError)
+      }
+    }
+
     return NextResponse.json({
-      data,
-      count: data?.length || 0
+      data: translatedData,
+      count: translatedData?.length || 0
     })
   } catch (error: any) {
     console.error('Error fetching quiz questions:', {

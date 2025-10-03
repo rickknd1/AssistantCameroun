@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import type { Document } from '@/lib/types/database'
+import { translateArray } from '@/lib/services/translate'
 
 export async function GET(request: Request) {
   try {
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
     const status = searchParams.get('status') || 'ACTIVE'
     const limit = parseInt(searchParams.get('limit') || '50')
     const search = searchParams.get('search')
+    const lang = searchParams.get('lang') as 'en' | 'fr' || 'fr'
 
     // Si slug fourni, retourner un seul document
     if (slug) {
@@ -56,9 +58,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Traduire si langue = EN
+    let translatedData = data || []
+    if (lang === 'en' && data && data.length > 0) {
+      try {
+        translatedData = await translateArray(
+          data,
+          ['title', 'description'],
+          'en',
+          'fr'
+        )
+        console.log(`✅ Documents traduits en anglais (${translatedData.length} docs)`)
+      } catch (translateError) {
+        console.error('⚠️ Erreur traduction documents, données FR retournées:', translateError)
+      }
+    }
+
     return NextResponse.json({
-      data,
-      count: data?.length || 0
+      data: translatedData,
+      count: translatedData?.length || 0
     })
   } catch (error) {
     console.error('Unexpected error:', error)

@@ -35,7 +35,7 @@ const getCategoryIcon = (category: string): React.ElementType => {
 }
 
 export function ProceduresContent() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [procedures, setProcedures] = useState<Procedure[]>([])
@@ -62,6 +62,7 @@ export function ProceduresContent() {
       if (searchQuery) {
         params.append("search", searchQuery)
       }
+      params.append("lang", language) // Ajouter la langue
 
       try {
         const res = await fetch(`/api/procedures?${params}`)
@@ -75,7 +76,7 @@ export function ProceduresContent() {
     }
 
     fetchProcedures()
-  }, [activeCategory, searchQuery])
+  }, [activeCategory, searchQuery, language])
 
   const proceduresWithIcons: ProcedureWithIcon[] = procedures.map((proc) => ({
     ...proc,
@@ -146,15 +147,15 @@ export function ProceduresContent() {
       {/* Main Content */}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Tabs value={activeCategory} onValueChange={setActiveCategory}>
-          <TabsList className="mb-8 flex w-full flex-wrap justify-start gap-2 bg-transparent">
+          <TabsList className="mb-8 grid w-full grid-cols-2 gap-2 bg-transparent sm:flex sm:flex-wrap sm:justify-start md:h-auto">
             {CATEGORIES.map((category) => (
               <TabsTrigger
                 key={category.id}
                 value={category.id}
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex items-center gap-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <category.icon className="h-4 w-4" />
-                {category.label}
+                <span className="text-xs sm:text-sm">{category.label}</span>
               </TabsTrigger>
             ))}
           </TabsList>

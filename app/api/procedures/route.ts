@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { translateArray } from '@/lib/services/translate'
 
 export async function GET(request: Request) {
   try {
@@ -10,6 +11,7 @@ export async function GET(request: Request) {
     const difficulty = searchParams.get('difficulty')
     const limit = parseInt(searchParams.get('limit') || '50')
     const search = searchParams.get('search')
+    const lang = searchParams.get('lang') as 'en' | 'fr' || 'fr'
 
     let query = supabase
       .from('Procedure')
@@ -36,9 +38,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Traduire si langue = EN
+    let translatedData = data || []
+    if (lang === 'en' && data && data.length > 0) {
+      try {
+        translatedData = await translateArray(
+          data,
+          ['name', 'description'],
+          'en',
+          'fr'
+        )
+        console.log(`✅ Procédures traduites en anglais (${translatedData.length} procédures)`)
+      } catch (translateError) {
+        console.error('⚠️ Erreur traduction procédures, données FR retournées:', translateError)
+      }
+    }
+
     return NextResponse.json({
-      data,
-      count: data?.length || 0
+      data: translatedData,
+      count: translatedData?.length || 0
     })
   } catch (error) {
     console.error('Unexpected error:', error)

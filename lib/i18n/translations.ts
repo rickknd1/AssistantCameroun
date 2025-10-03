@@ -279,7 +279,7 @@ export const translations: Record<Language, Translations> = {
   fr: {
     // Header
     'header.home': 'Accueil',
-    'header.assistant': 'Cami',
+    'header.assistant': 'Chatbot Cami',
     'header.library': 'Bibliothèque',
     'header.procedures': 'Procédures',
     'header.news': 'Actualités',
@@ -553,7 +553,7 @@ export const translations: Record<Language, Translations> = {
   en: {
     // Header
     'header.home': 'Home',
-    'header.assistant': 'Cami',
+    'header.assistant': 'Cami Chatbot',
     'header.library': 'Library',
     'header.procedures': 'Procedures',
     'header.news': 'News',

@@ -19,7 +19,7 @@ export function LibraryContent() {
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
 
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const documentTypes = ["CODE", "LOI", "DÉCRET", "ORDONNANCE"]
 
@@ -37,6 +37,7 @@ export function LibraryContent() {
       if (searchQuery) {
         params.append('search', searchQuery)
       }
+      params.append('lang', language) // Ajouter la langue
 
       try {
         const res = await fetch(`/api/documents?${params}`)
@@ -50,7 +51,7 @@ export function LibraryContent() {
     }
 
     fetchDocuments()
-  }, [selectedTypes, selectedCategory, searchQuery])
+  }, [selectedTypes, selectedCategory, searchQuery, language])
 
   const filteredDocuments = documents
 

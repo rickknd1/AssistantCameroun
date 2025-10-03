@@ -21,7 +21,8 @@
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Comment obtenir une CNI au Cameroun?\"\"}\")",
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Qui est le président du Cameroun?\"\"}\")",
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Combien coûte un passeport?\"\"}\")",
-      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Article 1 Code Pénal Cameroun infraction\"\"}\")"
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Article 1 Code Pénal Cameroun infraction\"\"}\")",
+      "Read(//c/Users/kayze/Pictures/Screenshots/**)"
     ],
     "deny": [],
     "ask": []

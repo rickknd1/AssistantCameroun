@@ -6,6 +6,7 @@ import { ChatSidebar } from "./chat-sidebar"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
 import { WelcomeScreen } from "./welcome-screen"
+import { FloatingElements } from "./floating-elements"
 import { getConversations, saveConversation, generateConversationTitle, detectCategory } from "@/lib/utils/conversations"
 import { getSessionId } from "@/lib/utils/session"
 import { useLanguage } from "@/lib/i18n"
@@ -212,7 +213,10 @@ export function ChatInterface() {
   }, [searchParams, sessionId])
 
   return (
-    <div className="flex h-full w-full overflow-hidden touch-none" style={{ touchAction: 'pan-y pinch-zoom' }}>
+    <div className="flex h-full w-full overflow-hidden touch-none relative" style={{ touchAction: 'pan-y pinch-zoom' }}>
+      {/* Floating Elements - Desktop Only */}
+      <FloatingElements />
+
       <ChatSidebar
         conversations={conversations}
         isOpen={sidebarOpen}
@@ -238,8 +242,8 @@ export function ChatInterface() {
           </div>
         </div>
 
-        {/* Scrollable Messages Area - Takes remaining space */}
-        <div className="flex-1 min-h-0 overflow-hidden">
+        {/* Scrollable Messages Area - Takes remaining space, padding bottom for input */}
+        <div className="flex-1 min-h-0 overflow-hidden pb-28 sm:pb-32">
           {messages.length === 0 ? (
             <div className="h-full overflow-y-auto">
               <WelcomeScreen onQuestionClick={handleSendMessage} />
@@ -250,7 +254,7 @@ export function ChatInterface() {
         </div>
 
         {/* Fixed Input Area - Always visible at bottom, well above safe area */}
-        <div className="flex-none border-t border-border bg-background sticky bottom-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+        <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border bg-background z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
           <ChatInput
             onSendMessage={handleSendMessage}
             isTyping={isTyping}

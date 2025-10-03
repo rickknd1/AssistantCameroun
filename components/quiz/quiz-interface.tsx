@@ -75,6 +75,7 @@ export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: Qui
       // Capitalize first letter only: facile -> Facile
       const capitalizedDifficulty = difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase()
       params.append("difficulty", capitalizedDifficulty)
+      params.append("lang", language) // Ajouter la langue
 
       try {
         const res = await fetch(`/api/quiz?${params}`)
@@ -88,7 +89,7 @@ export function QuizInterface({ categoryId, difficulty, onRestart, onBack }: Qui
     }
 
     fetchQuestions()
-  }, [categoryId, difficulty])
+  }, [categoryId, difficulty, language])
 
   const progress = questions.length > 0 ? ((currentQuestion + 1) / questions.length) * 100 : 0
 
