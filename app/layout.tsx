@@ -8,13 +8,65 @@ import { LanguageProvider } from "@/lib/i18n"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Assistant National du Cameroun",
-  description: "Votre guide intelligent pour naviguer au Cameroun - Droit, procédures administratives, culture",
-  generator: "v0.app",
+  metadataBase: new URL('https://assistantcameroun.com'), // À remplacer par votre domaine
+  title: {
+    default: "Cami - Assistant IA Cameroun | Procédures & Droit",
+    template: "%s | Cami - Assistant Cameroun"
+  },
+  description: "Cami, votre assistant IA gratuit pour les procédures administratives (CNI, passeport, entreprise) et le droit camerounais. Disponible 24/7, réponses instantanées avec sources officielles.",
+  keywords: [
+    "Cameroun",
+    "assistant IA",
+    "procédures administratives",
+    "CNI Cameroun",
+    "passeport Cameroun",
+    "création entreprise Cameroun",
+    "droit camerounais",
+    "code pénal Cameroun",
+    "constitution Cameroun",
+    "Cami",
+    "intelligence artificielle",
+    "administration Cameroun"
+  ],
+  authors: [{ name: "KENDEM MBA Rick Dylan" }],
+  creator: "KENDEM MBA Rick Dylan",
+  publisher: "Assistant National du Cameroun",
+  generator: "Next.js",
+  applicationName: "Cami - Assistant Cameroun",
+  referrer: "origin-when-cross-origin",
   icons: {
     icon: "/logo.svg",
     apple: "/logo.svg",
   },
+  manifest: "/manifest.json",
+
+  openGraph: {
+    type: "website",
+    locale: "fr_CM",
+    url: "https://assistantcameroun.com",
+    title: "Cami - Assistant IA pour le Cameroun",
+    description: "Assistant intelligent gratuit pour vos démarches administratives et juridiques au Cameroun. CNI, passeport, entreprise, droit - Réponses instantanées 24/7.",
+    siteName: "Cami - Assistant Cameroun",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Cami - Assistant IA Cameroun",
+    description: "Simplifiez vos démarches administratives au Cameroun avec l'IA",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+
   viewport: {
     width: "device-width",
     initialScale: 1,

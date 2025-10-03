@@ -39,7 +39,7 @@ export function Header() {
               alt="Assistant Cameroun"
               className="h-16 w-16 sm:h-20 sm:w-20 object-contain"
             />
-            <span className="hidden text-base sm:text-lg font-semibold text-foreground sm:block">Assistant National</span>
+            <span className="hidden text-base sm:text-lg font-semibold text-foreground sm:block">Cami</span>
           </Link>
         </div>
 

@@ -123,8 +123,8 @@ export function HeroSection() {
           </div>
 
           {/* Content */}
-          <div className="order-2 lg:order-1 flex flex-col justify-center">
-            <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary">
+          <div className="order-2 lg:order-1 flex flex-col justify-center text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary mx-auto lg:mx-0 w-fit">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
@@ -132,7 +132,7 @@ export function HeroSection() {
               {t('home.hero.availability')}
             </div>
 
-            <h1 className="mt-2 sm:mt-6 text-balance text-2xl sm:text-4xl font-bold tracking-tight text-foreground lg:text-5xl xl:text-6xl">
+            <h1 className="mt-4 sm:mt-6 text-balance text-2xl sm:text-4xl font-bold tracking-tight text-foreground lg:text-5xl xl:text-6xl">
               {t('home.hero.title')}
             </h1>
 

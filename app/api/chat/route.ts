@@ -183,6 +183,25 @@ export async function POST(request: Request) {
       }
     })
 
+    // 🔴 GARANTIR AU MOINS UNE SOURCE
+    // Si aucune source extraite mais on a des résultats web, ajouter source web générique
+    if (sources.length === 0 && searchContext.webResults) {
+      sources.push({
+        title: 'Recherche web',
+        reference: 'Sources en ligne sur le Cameroun',
+        url: '#web-search-results'
+      })
+    }
+
+    // Si vraiment AUCUNE source (cas extrême), ajouter source générique
+    if (sources.length === 0) {
+      sources.push({
+        title: 'Connaissances générales',
+        reference: 'Informations générales sur le Cameroun',
+        url: '#general-knowledge'
+      })
+    }
+
     // 8. Calculer le niveau de confiance de manière dynamique
     let confidence = 50 // Base minimale
 

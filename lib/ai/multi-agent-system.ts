@@ -130,24 +130,39 @@ export class IntelligentSearchAgent {
     const normalized = message.toLowerCase()
     const keywords: string[] = []
 
-    // Extraire les numéros d'articles avec référence au document
-    const articleMatches = message.match(/article\s+(\d+|premier|première)/gi)
+    // Extraire les numéros d'articles avec référence au document - AMÉLIORÉ
+    const articleMatches = message.match(/article\s+(\d+|premier|première|1er|1ère)/gi)
 
     if (articleMatches) {
       articleMatches.forEach(match => {
         keywords.push(match)
-        // Ajouter variations
-        if (match.toLowerCase().includes('premier')) {
-          keywords.push('article 1', 'art. 1', 'article premier', 'ARTICLE PREMIER')
+        // Extraire le numéro
+        const numberMatch = match.match(/\d+/)
+        if (numberMatch) {
+          const num = numberMatch[0]
+          // Ajouter multiples variations AVEC priorité haute
+          keywords.unshift(`ARTICLE ${num}`) // Priorité maximale - exactement comme dans la BD
+          keywords.push(`article ${num}`)
+          keywords.push(`art. ${num}`)
+          keywords.push(`art ${num}`)
+          keywords.push(`Article ${num}`)
+          keywords.push(`Art. ${num}`)
+          keywords.push(`Art ${num}`)
+        }
+        // Variations pour "premier" / "1"
+        if (match.toLowerCase().includes('premier') || match.toLowerCase().includes('1er') || match.includes(' 1')) {
+          keywords.unshift('ARTICLE 1') // Priorité maximale
+          keywords.push('article 1', 'art. 1', 'article premier', 'ARTICLE PREMIER', 'Article 1', 'art 1', 'Art. 1', 'Art 1')
         }
       })
     }
 
     // Détecter le document cible (IMPORTANT!)
+    // Mapping des mots-clés vers les noms EXACTS des documents dans la BD
     const documentKeywords: { [key: string]: string[] } = {
-      'constitution': ['Constitution', 'constitution', 'constitutionnelle'],
-      'code pénal': ['pénal', 'penal', 'pénale', 'penale', 'criminel'],
-      'code civil': ['civil', 'civile'],
+      'constitution': ['constitution', 'constitutionnelle'],
+      'code penal camerounais': ['pénal', 'penal', 'pénale', 'penale', 'criminel'],
+      'code civil camerounais': ['civil', 'civile'],
       'code du travail': ['travail', 'travailleur', 'employeur'],
       'loi de finances': ['finances', 'budget', 'budgétaire']
     }
@@ -170,7 +185,7 @@ export class IntelligentSearchAgent {
   }
 
   /**
-   * Recherche intelligente dans la base de données
+   * Recherche intelligente dans la base de données - PARCOURS COMPLET
    */
   async search(message: string): Promise<SearchContext> {
     const questionType = this.analyzeQuestionType(message)
@@ -180,76 +195,89 @@ export class IntelligentSearchAgent {
 
     // Détecter le document cible prioritaire
     const targetDocument = keywords.find(k =>
-      ['constitution', 'code pénal', 'code civil', 'code du travail', 'loi de finances'].includes(k.toLowerCase())
+      ['constitution', 'code penal camerounais', 'code civil camerounais', 'code du travail', 'loi de finances'].includes(k.toLowerCase())
     )
 
     console.log('📄 Document cible détecté:', targetDocument || 'aucun')
 
-    // Construire les conditions de recherche
-    const sectionKeywords = keywords.filter(k => k !== targetDocument)
-    const sectionConditions = sectionKeywords.map(k =>
-      `title.ilike.%${k}%,content.ilike.%${k}%,reference.ilike.%${k}%`
-    ).join(',')
+    // STRATÉGIE DE RECHERCHE À PLUSIEURS NIVEAUX
+    let validatedArticles: ValidatedArticle[] = []
 
-    // 1. Rechercher les sections (articles spécifiques)
-    let query = this.supabase
-      .from('Section')
-      .select(`
-        id,
-        title,
-        content,
-        reference,
-        level,
-        position,
-        documentId,
-        Document!inner(id, slug, title, type, category)
-      `)
+    // 1️⃣ RECHERCHE CIBLÉE (si document spécifique détecté)
+    if (targetDocument && keywords.length > 1) {
+      const sectionKeywords = keywords.filter(k => k !== targetDocument)
+      const conditions = sectionKeywords.map(k =>
+        `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
+      ).join(',')
 
-    // Si un document cible est détecté, filtrer par ce document
-    if (targetDocument) {
-      query = query.ilike('Document.title', `%${targetDocument}%`)
+      const { data: targetedSections } = await this.supabase
+        .from('Section')
+        .select(`
+          id, title, content, reference, level, position, documentId,
+          Document!inner(id, slug, title, type, category)
+        `)
+        .ilike('Document.title', `%${targetDocument}%`)
+        .or(conditions)
+        .order('level', { ascending: true })
+        .limit(30)
+
+      if (targetedSections && targetedSections.length > 0) {
+        for (const section of targetedSections) {
+          const validated = await this.validateSection(section as Section)
+          if (validated.exists) validatedArticles.push(validated)
+        }
+      }
     }
 
-    // Ajouter les conditions de recherche sur le contenu
-    if (sectionConditions) {
-      query = query.or(sectionConditions)
-    }
+    // 2️⃣ RECHERCHE ÉLARGIE (si rien trouvé, chercher dans TOUS les documents)
+    if (validatedArticles.length === 0) {
+      console.log('🔄 Recherche élargie dans TOUS les documents...')
 
-    const { data: sections } = await query.limit(10)
+      const conditions = keywords.map(k =>
+        `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
+      ).join(',')
 
-    // 2. Valider toutes les sections trouvées
-    const validatedArticles: ValidatedArticle[] = []
+      const { data: allSections } = await this.supabase
+        .from('Section')
+        .select(`
+          id, title, content, reference, level, position, documentId,
+          Document!inner(id, slug, title, type, category)
+        `)
+        .or(conditions)
+        .order('level', { ascending: true })
+        .limit(50) // Augmenté pour parcourir plus de documents
 
-    if (sections && sections.length > 0) {
-      for (const section of sections) {
-        const validated = await this.validateSection(section as Section)
-        if (validated.exists) {
-          validatedArticles.push(validated)
+      if (allSections && allSections.length > 0) {
+        for (const section of allSections) {
+          const validated = await this.validateSection(section as Section)
+          if (validated.exists) validatedArticles.push(validated)
         }
       }
     }
 
     console.log(`✅ ${validatedArticles.length} articles validés trouvés`)
 
-    // 3. Rechercher les procédures si pertinent
+    // 3️⃣ Rechercher les procédures si pertinent
     let procedures: any[] = []
-    if (questionType === 'procedure') {
+    if (questionType === 'procedure' || validatedArticles.length === 0) {
       const procConditions = keywords.map(k =>
-        `name.ilike.%${k}%,description.ilike.%${k}%`
+        `name.ilike.%${k}%,description.ilike.%${k}%,steps.ilike.%${k}%`
       ).join(',')
 
       const { data: procs } = await this.supabase
         .from('Procedure')
         .select('*')
         .or(procConditions)
-        .limit(5)
+        .limit(10)
 
       procedures = procs || []
+      console.log(`📋 ${procedures.length} procédures trouvées`)
     }
 
-    // 4. Recherche web en dernier recours
+    // 4️⃣ RECHERCHE WEB EN FALLBACK (TOUJOURS si aucune source locale)
     let webResults = ''
     if (validatedArticles.length === 0 && procedures.length === 0) {
+      console.log('🌐 Activation recherche web fallback...')
       webResults = await this.searchWeb(message)
     }
 
@@ -357,48 +385,63 @@ export class ExpertFormatterAgent {
   ): Promise<string> {
     const context = this.buildContext(searchContext)
 
-    const systemInstruction = `Tu es l'Assistant National du Cameroun, un expert juridique et administratif.
+    const systemInstruction = `Tu es Cami, l'Assistant National du Cameroun, un expert juridique et administratif.
 
 ${context}
 
 **TYPE DE QUESTION:** ${searchContext.questionType}
 **NOMBRE D'ARTICLES TROUVÉS:** ${searchContext.articles.length}
 **NOMBRE DE PROCÉDURES:** ${searchContext.procedures.length}
+**RÉSULTATS WEB:** ${searchContext.webResults ? 'OUI' : 'NON'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  RÈGLES ABSOLUES - RÉPONSE OBLIGATOIRE  ⚠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔴 INTERDICTIONS ABSOLUES:
+- ❌ NE DIS JAMAIS "Je n'ai pas d'informations"
+- ❌ NE DIS JAMAIS "Je ne peux pas répondre"
+- ❌ NE DIS JAMAIS "l'article n'est pas disponible"
+- ❌ TU DOIS TOUJOURS FOURNIR UNE RÉPONSE
+
+✅ OBLIGATION DE RÉPONSE:
+1. Si tu as des articles/procédures dans le contexte → Utilise-les avec liens cliquables
+2. Si tu as des résultats web → Résume-les et cite la source web
+3. Si tu n'as RIEN → Utilise tes connaissances générales sur le Cameroun
+4. TOUJOURS fournir une réponse utile, JAMAIS dire "je ne sais pas"
 
 ${searchContext.questionType === 'juridique' && searchContext.articles.length > 0 ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️  RÈGLE CRITIQUE - CITATIONS OBLIGATOIRES  ⚠️
+⚠️  CITATIONS OBLIGATOIRES POUR ARTICLES JURIDIQUES  ⚠️
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Tu as ${searchContext.articles.length} articles validés dans le contexte ci-dessus.
+Tu as ${searchContext.articles.length} articles validés dans le contexte.
 
-🔴 TU DOIS ABSOLUMENT:
-1. Citer AU MOINS 1 article avec un lien cliquable
-2. Utiliser le format EXACT: [Nom de l'article](URL)
-3. L'URL est fournie dans le contexte (champ "URL EXACTE À UTILISER")
-4. Intégrer les liens DANS le texte, pas en liste à la fin
+🔴 FORMAT OBLIGATOIRE:
+[Nom de l'article](URL_EXACTE_DU_CONTEXTE)
 
-🔴 INTERDICTIONS ABSOLUES:
-- ❌ NE DIS JAMAIS "l'article n'est pas disponible"
-- ❌ NE DIS JAMAIS "je ne trouve pas l'article"
-- ❌ NE DIS JAMAIS "lisez tout le code"
-- ❌ Les articles SONT dans le contexte ci-dessus, UTILISE-LES!
-
-✅ EXEMPLE DE RÉPONSE CORRECTE:
+✅ EXEMPLE:
 "Selon l'[Article 20 de la Constitution](/bibliotheque/constitution#article-20),
 le Président de la République est élu au suffrage universel direct..."
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+` : ''}
 
-✅ FORMAT OBLIGATOIRE:
-[Référence - Titre](URL_EXACTE_DU_CONTEXTE)
+${searchContext.webResults ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  UTILISATION DES RÉSULTATS WEB  ⚠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Tu as des résultats de recherche web. Utilise-les pour construire ta réponse.
+Mentionne "Selon des sources en ligne" et résume les informations.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''}
 
 **RÈGLES GÉNÉRALES:**
-- Réponds en français
+- Réponds TOUJOURS en français
 - Structure claire avec listes à puces si nécessaire
 - **Gras** pour les informations importantes
-- Sois précis et cite le contenu exact des articles`
+- Sois précis et cite le contenu exact des articles
+- TOUJOURS fournir une réponse, JAMAIS refuser de répondre`
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash-exp',

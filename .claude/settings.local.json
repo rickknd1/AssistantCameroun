@@ -15,7 +15,13 @@
       "Bash(curl -s \"http://localhost:3001/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Que dit l''article 1 du Code Penal?\"\"}\")",
       "Bash(ren:*)",
       "Bash(mv:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Quel est l''article 1 du Code Pénal?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Que dit l''article 20 de la Constitution?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Comment obtenir une CNI au Cameroun?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Qui est le président du Cameroun?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Combien coûte un passeport?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Article 1 Code Pénal Cameroun infraction\"\"}\")"
     ],
     "deny": [],
     "ask": []

@@ -279,7 +279,7 @@ export const translations: Record<Language, Translations> = {
   fr: {
     // Header
     'header.home': 'Accueil',
-    'header.assistant': 'Assistant IA',
+    'header.assistant': 'Cami',
     'header.library': 'Bibliothèque',
     'header.procedures': 'Procédures',
     'header.news': 'Actualités',
@@ -389,8 +389,8 @@ export const translations: Record<Language, Translations> = {
     'home.features.quiz.desc': 'Testez vos connaissances',
 
     // Assistant
-    'assistant.welcome.title': 'Bonjour ! Je suis votre Assistant National',
-    'assistant.welcome.subtitle': 'Posez-moi vos questions sur les procédures administratives, le droit camerounais, ou tout autre sujet concernant la vie au Cameroun.',
+    'assistant.welcome.title': 'Bonjour ! Je suis Cami 👋',
+    'assistant.welcome.subtitle': 'Votre assistant IA pour les procédures administratives, le droit camerounais, et tout ce qui concerne la vie au Cameroun.',
     'assistant.welcome.feature1': 'Instantané',
     'assistant.welcome.feature2': 'Sources officielles',
     'assistant.welcome.feature3': 'Bilingue',
@@ -408,7 +408,7 @@ export const translations: Record<Language, Translations> = {
     'assistant.sidebar.noQuestionsFound': 'Aucune question trouvée',
     'assistant.input.placeholder': 'Posez votre question...',
     'assistant.input.send': 'Envoyer',
-    'assistant.typing': 'L\'assistant est en train d\'écrire...',
+    'assistant.typing': 'Cami est en train d\'écrire...',
 
     // Categories
     'category.identity': 'Identité & Documents',
@@ -529,7 +529,7 @@ export const translations: Record<Language, Translations> = {
     'admin.loading': 'Chargement...',
 
     // Footer
-    'footer.brand': 'Assistant National du Cameroun',
+    'footer.brand': 'Cami - Assistant National du Cameroun',
     'footer.description': 'Votre guide intelligent pour naviguer au Cameroun. Droit, procédures administratives, culture - Toutes les réponses dont vous avez besoin.',
     'footer.links': 'Liens utiles',
     'footer.about': 'À propos',
@@ -553,7 +553,7 @@ export const translations: Record<Language, Translations> = {
   en: {
     // Header
     'header.home': 'Home',
-    'header.assistant': 'AI Assistant',
+    'header.assistant': 'Cami',
     'header.library': 'Library',
     'header.procedures': 'Procedures',
     'header.news': 'News',
@@ -663,8 +663,8 @@ export const translations: Record<Language, Translations> = {
     'home.features.quiz.desc': 'Test your knowledge',
 
     // Assistant
-    'assistant.welcome.title': 'Hello! I am your National Assistant',
-    'assistant.welcome.subtitle': 'Ask me questions about administrative procedures, Cameroonian law, or any other topic concerning life in Cameroon.',
+    'assistant.welcome.title': 'Hello! I\'m Cami 👋',
+    'assistant.welcome.subtitle': 'Your AI assistant for administrative procedures, Cameroonian law, and everything about life in Cameroon.',
     'assistant.welcome.feature1': 'Instant',
     'assistant.welcome.feature2': 'Official sources',
     'assistant.welcome.feature3': 'Bilingual',
@@ -682,7 +682,7 @@ export const translations: Record<Language, Translations> = {
     'assistant.sidebar.noQuestionsFound': 'No questions found',
     'assistant.input.placeholder': 'Ask your question...',
     'assistant.input.send': 'Send',
-    'assistant.typing': 'The assistant is typing...',
+    'assistant.typing': 'Cami is typing...',
 
     // Categories
     'category.identity': 'Identity & Documents',

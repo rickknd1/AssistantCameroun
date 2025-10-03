@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Assistant IA - Assistant National du Cameroun",
-  description: "Posez vos questions sur les procédures administratives et le droit camerounais",
+  title: "Cami - L'Assistant IA du Cameroun",
+  description: "Discutez avec Cami, votre assistant IA pour les procédures administratives et le droit camerounais",
   viewport: {
     width: "device-width",
     initialScale: 1,
