@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "QuestionCache" (
   "verifiedBy" TEXT, -- 'auto', 'admin', 'feedback'
   "verificationScore" INTEGER DEFAULT 0, -- Score de véracité (0-100)
 
-  -- Statistiques d'usage
+  -- Statistiques dusage
   "usageCount" INTEGER DEFAULT 0,
   "successCount" INTEGER DEFAULT 0, -- Nombre de feedbacks positifs
   "failureCount" INTEGER DEFAULT 0, -- Nombre de feedbacks négatifs
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS "ResponseFeedback" (
 
   -- Relations
   "questionCacheId" UUID REFERENCES "QuestionCache"("id") ON DELETE CASCADE,
-  "messageId" UUID REFERENCES "Message"("id") ON DELETE SET NULL,
+  "messageId" TEXT, -- Type TEXT pour correspondre à Message.id (pas de foreign key à cause du type)
   "sessionId" TEXT,
 
   -- Feedback

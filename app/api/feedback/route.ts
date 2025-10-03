@@ -1,14 +1,33 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { QuestionCacheService } from '@/lib/ai/question-cache-service'
 
 export async function POST(request: Request) {
   try {
     console.log('🔵 [FEEDBACK] Receiving feedback request...')
     const supabase = await createClient()
+    const cacheService = new QuestionCacheService(supabase)
     const body = await request.json()
     console.log('🔵 [FEEDBACK] Request body:', JSON.stringify(body, null, 2))
 
-    const { messageId, rating, comment, message, type, page } = body
+    const { messageId, cacheId, rating, comment, message, type, page, feedbackType } = body
+
+    // NOUVEAU: Feedback sur cache intelligent
+    if (cacheId && rating !== undefined) {
+      console.log('🔵 [FEEDBACK] Cache feedback detected')
+      console.log('🔵 [FEEDBACK] cacheId:', cacheId, 'rating:', rating)
+
+      await cacheService.addFeedback(
+        cacheId,
+        messageId || null,
+        rating,
+        feedbackType || (rating >= 4 ? 'helpful' : 'not_helpful'),
+        comment
+      )
+
+      console.log('✅ [FEEDBACK] Cache feedback saved')
+      return NextResponse.json({ success: true })
+    }
 
     // Si c'est un feedback sur un message (like/dislike)
     if (messageId && rating !== undefined) {

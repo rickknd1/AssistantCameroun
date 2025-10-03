@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { rateLimitMiddleware } from '@/lib/utils/rate-limit'
 import { IntelligentSearchAgent, ExpertFormatterAgent } from '@/lib/ai/multi-agent-system'
+import { QuestionCacheService } from '@/lib/ai/question-cache-service'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -123,6 +124,35 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
     const startTime = Date.now()
+
+    // =====================================================
+    // ÉTAPE 0: RECHERCHE DANS LE CACHE INTELLIGENT
+    // =====================================================
+
+    const cacheService = new QuestionCacheService(supabase)
+    const cacheResult = await cacheService.searchCache(message)
+
+    // Si question trouvée en cache avec haute similarité, retourner immédiatement
+    if (cacheResult.found && cacheResult.cached) {
+      console.log(`⚡ [CACHE HIT] Réponse instantanée (similarité: ${cacheResult.similarity}%)`)
+
+      // Incrémenter le compteur d'usage
+      await cacheService.incrementUsage(cacheResult.cached.id)
+
+      const processingTime = Date.now() - startTime
+
+      return NextResponse.json({
+        response: cacheResult.cached.response,
+        sources: cacheResult.cached.sources.slice(0, 4),
+        confidence: cacheResult.cached.confidence,
+        // Masqué pour l'utilisateur - juste pour analytics backend
+        _cached: true,
+        _cacheId: cacheResult.cached.id,
+        _similarity: cacheResult.similarity
+      })
+    }
+
+    console.log('❌ [CACHE MISS] Génération d\'une nouvelle réponse...')
 
     // =====================================================
     // SYSTÈME MULTI-AGENTS À 2 NIVEAUX
@@ -377,6 +407,27 @@ export async function POST(request: Request) {
       console.error('🔴 [DB] Database logging error:', dbError)
       console.error('🔴 [DB] Error stack:', (dbError as Error).stack)
       // Ne pas bloquer la réponse si l'enregistrement échoue
+    }
+
+    // =====================================================
+    // ÉTAPE FINALE: AJOUTER AU CACHE INTELLIGENT
+    // =====================================================
+
+    try {
+      const cacheId = await cacheService.addToCache(
+        message,
+        responseText,
+        sources,
+        confidence,
+        searchContext.questionType
+      )
+
+      if (cacheId) {
+        console.log(`✅ [CACHE] Question ajoutée au cache (ID: ${cacheId})`)
+      }
+    } catch (cacheError) {
+      console.error('🔴 [CACHE] Erreur ajout au cache:', cacheError)
+      // Ne pas bloquer la réponse si le cache échoue
     }
 
     return NextResponse.json({
