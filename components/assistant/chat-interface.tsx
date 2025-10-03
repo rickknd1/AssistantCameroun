@@ -6,7 +6,6 @@ import { ChatSidebar } from "./chat-sidebar"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
 import { WelcomeScreen } from "./welcome-screen"
-import { FloatingElements } from "./floating-elements"
 import { getConversations, saveConversation, generateConversationTitle, detectCategory } from "@/lib/utils/conversations"
 import { getSessionId } from "@/lib/utils/session"
 import { useLanguage } from "@/lib/i18n"
@@ -213,10 +212,7 @@ export function ChatInterface() {
   }, [searchParams, sessionId])
 
   return (
-    <div className="flex h-full w-full overflow-hidden touch-none relative" style={{ touchAction: 'pan-y pinch-zoom' }}>
-      {/* Floating Elements - Desktop Only */}
-      <FloatingElements />
-
+    <div className="flex h-full w-full overflow-hidden touch-none" style={{ touchAction: 'pan-y pinch-zoom' }}>
       <ChatSidebar
         conversations={conversations}
         isOpen={sidebarOpen}

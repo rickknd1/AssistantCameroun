@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Search, FileText, Scale, BookOpen } from "lucide-react"
+import { Search, FileText, Scale, BookOpen, Bot, Building2, Briefcase, GraduationCap, Zap, MessageCircle, Star } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useLanguage } from "@/lib/i18n"
 
@@ -95,27 +95,103 @@ export function HeroSection() {
                 />
               </div>
 
-              {/* Floating cards - desktop only for cleaner mobile */}
-              <div className="hidden lg:block absolute left-0 top-20 z-20 animate-float rounded-lg border border-border bg-card p-3 shadow-lg">
+              {/* Floating badges - desktop only */}
+              <div className="hidden lg:block absolute left-[-60px] top-16 z-20 animate-float rounded-xl border border-green-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-md bg-primary/10 p-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                  </div>
+                  <Bot className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-xs font-medium text-card-foreground">{t('home.hero.floating.cniObtained')}</p>
-                    <p className="text-xs text-muted-foreground">{t('home.hero.floating.inSteps')}</p>
+                    <p className="text-sm font-semibold text-gray-900">Chat IA</p>
+                    <p className="text-xs text-gray-600">Instantané</p>
                   </div>
                 </div>
               </div>
 
-              <div className="hidden lg:block absolute bottom-20 right-0 z-20 animate-float-delayed rounded-lg border border-border bg-card p-3 shadow-lg">
+              <div className="hidden lg:block absolute left-[-40px] top-40 z-20 animate-float-delayed rounded-xl border border-yellow-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-md bg-secondary/10 p-2">
-                    <Scale className="h-4 w-4 text-secondary" />
-                  </div>
+                  <FileText className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-xs font-medium text-card-foreground">{t('home.hero.floating.questionResolved')}</p>
-                    <p className="text-xs text-muted-foreground">{t('home.hero.floating.inMinutes')}</p>
+                    <p className="text-sm font-semibold text-gray-900">CNI & Passeport</p>
+                    <p className="text-xs text-gray-600">En 3 étapes</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute right-[-60px] top-12 z-20 animate-float rounded-xl border border-yellow-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '0.4s'}}>
+                <div className="flex items-center gap-2">
+                  <Scale className="h-6 w-6 text-yellow-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Code Pénal</p>
+                    <p className="text-xs text-gray-600">& Civil</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute right-[-50px] top-36 z-20 animate-float-delayed rounded-xl border border-green-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '0.6s'}}>
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-6 w-6 text-green-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Création</p>
+                    <p className="text-xs text-gray-600">Entreprise</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute right-[-40px] bottom-32 z-20 animate-float rounded-xl border border-green-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '0.8s'}}>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-6 w-6 text-green-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">+10K articles</p>
+                    <p className="text-xs text-gray-600">Juridiques</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute right-[-60px] bottom-16 z-20 animate-float-delayed rounded-xl border border-yellow-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '1s'}}>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-6 w-6 text-yellow-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Réponses</p>
+                    <p className="text-xs text-gray-600">En 30s</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute left-[-50px] bottom-32 z-20 animate-float rounded-xl border border-red-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '1.2s'}}>
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="h-6 w-6 text-red-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Quiz</p>
+                    <p className="text-xs text-gray-600">Interactifs</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute left-[-60px] bottom-12 z-20 animate-float-delayed rounded-xl border border-yellow-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '1.4s'}}>
+                <div className="flex items-center gap-2">
+                  <Star className="h-6 w-6 text-yellow-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">100%</p>
+                    <p className="text-xs text-gray-600">Cameroun</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute left-[-70px] top-1/2 -translate-y-1/2 z-20 animate-float rounded-xl border border-green-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '1.6s'}}>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-6 w-6 text-green-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Disponible</p>
+                    <p className="text-xs text-gray-600">24/7</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden lg:block absolute right-[-70px] top-1/2 -translate-y-1/2 z-20 animate-float-delayed rounded-xl border border-red-200 bg-white/90 backdrop-blur-sm p-3 shadow-xl" style={{animationDelay: '1.8s'}}>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-6 w-6 text-red-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Code du</p>
+                    <p className="text-xs text-gray-600">Travail</p>
                   </div>
                 </div>
               </div>

@@ -15,51 +15,68 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://assistantcameroun.com'), // À remplacer par votre domaine
+  metadataBase: new URL('https://assistantcameroun.com'),
   title: {
-    default: "Cami - Assistant IA Cameroun | Procédures & Droit",
-    template: "%s | Cami - Assistant Cameroun"
+    default: "Assistant Digital Cameroun - IA pour Procédures & Droit Camerounais",
+    template: "%s | Assistant Digital Cameroun"
   },
-  description: "Cami, votre assistant IA gratuit pour les procédures administratives (CNI, passeport, entreprise) et le droit camerounais. Disponible 24/7, réponses instantanées avec sources officielles.",
+  description: "Assistant IA gratuit 24/7 pour vos démarches au Cameroun : CNI, passeport, création entreprise, Code Pénal, Constitution. Réponses instantanées avec sources officielles.",
   keywords: [
-    "Cameroun",
-    "assistant IA",
-    "procédures administratives",
-    "CNI Cameroun",
-    "passeport Cameroun",
+    "Assistant Digital Cameroun",
+    "Cameroun IA",
+    "procédures administratives Cameroun",
+    "CNI Cameroun en ligne",
+    "passeport Cameroun démarches",
     "création entreprise Cameroun",
+    "Code Pénal Cameroun",
+    "Code Civil Cameroun",
+    "Constitution Cameroun",
+    "Code du Travail Cameroun",
     "droit camerounais",
-    "code pénal Cameroun",
-    "constitution Cameroun",
-    "Cami",
-    "intelligence artificielle",
-    "administration Cameroun"
+    "assistant juridique Cameroun",
+    "chatbot Cameroun",
+    "intelligence artificielle Cameroun",
+    "administration camerounaise"
   ],
-  authors: [{ name: "KENDEM MBA Rick Dylan" }],
-  creator: "KENDEM MBA Rick Dylan",
-  publisher: "Assistant National du Cameroun",
+  authors: [{ name: "Assistant Digital Cameroun" }],
+  creator: "Assistant Digital Cameroun",
+  publisher: "Assistant Digital Cameroun",
   generator: "Next.js",
-  applicationName: "Cami - Assistant Cameroun",
+  applicationName: "Assistant Digital Cameroun",
   referrer: "origin-when-cross-origin",
   icons: {
-    icon: "/logo.svg",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" }
+    ],
     apple: "/logo.svg",
+    shortcut: "/logo.svg",
   },
   manifest: "/manifest.json",
 
   openGraph: {
     type: "website",
     locale: "fr_CM",
+    alternateLocale: "en_CM",
     url: "https://assistantcameroun.com",
-    title: "Cami - Assistant IA pour le Cameroun",
-    description: "Assistant intelligent gratuit pour vos démarches administratives et juridiques au Cameroun. CNI, passeport, entreprise, droit - Réponses instantanées 24/7.",
-    siteName: "Cami - Assistant Cameroun",
+    title: "Assistant Digital Cameroun - Votre IA pour Démarches & Droit",
+    description: "Assistant intelligent gratuit 24/7 pour toutes vos démarches administratives et juridiques au Cameroun. CNI, passeport, entreprise, Code Pénal, Constitution - Réponses instantanées avec sources officielles.",
+    siteName: "Assistant Digital Cameroun",
+    images: [
+      {
+        url: "/logo.svg",
+        width: 1200,
+        height: 630,
+        alt: "Assistant Digital Cameroun - Votre assistant IA",
+      }
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Cami - Assistant IA Cameroun",
-    description: "Simplifiez vos démarches administratives au Cameroun avec l'IA",
+    title: "Assistant Digital Cameroun - IA pour le Cameroun",
+    description: "Démarches administratives & juridiques au Cameroun simplifiées avec l'IA. Gratuit 24/7.",
+    images: ["/logo.svg"],
   },
 
   robots: {
@@ -72,6 +89,10 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+
+  other: {
+    "google-site-verification": "votre-code-verification-google",
   },
 }
 

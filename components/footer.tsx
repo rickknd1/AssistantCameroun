@@ -1,82 +1,57 @@
 "use client"
 
 import Link from "next/link"
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import { MessageCircle, BookOpen, FileText, GraduationCap } from "lucide-react"
 import { useLanguage } from "@/lib/i18n"
 
 export function Footer() {
   const { t } = useLanguage()
 
   const footerLinks = {
-    legal: [
-      { name: t('footer.about'), href: "/about" },
-      { name: t('footer.contact'), href: "/contact" },
-      { name: t('footer.legal'), href: "/legal" },
-      { name: t('footer.privacy'), href: "/privacy" },
-    ],
-    social: [
-      { name: "Facebook", icon: Facebook, href: "#" },
-      { name: "Twitter", icon: Twitter, href: "#" },
-      { name: "Instagram", icon: Instagram, href: "#" },
-      { name: "LinkedIn", icon: Linkedin, href: "#" },
+    services: [
+      { name: t('header.assistant'), href: "/assistant", icon: MessageCircle },
+      { name: t('header.library'), href: "/bibliotheque", icon: BookOpen },
+      { name: t('header.procedures'), href: "/procedures", icon: FileText },
+      { name: t('header.quiz'), href: "/quiz", icon: GraduationCap },
     ],
   }
 
   return (
     <footer className="border-t border-border bg-muted/30">
-      <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
+        <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-secondary to-accent">
-                <span className="text-xl font-bold text-white">AC</span>
-              </div>
-              <span className="text-lg font-semibold text-foreground">{t('footer.brand')}</span>
-            </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              {t('footer.description')}
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground">{t('footer.links')}</h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Social */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground">{t('footer.followUs')}</h3>
-            <div className="mt-4 flex gap-3">
-              {footerLinks.social.map((social) => (
-                <Link
-                  key={social.name}
-                  href={social.href}
-                  className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  <social.icon className="h-4 w-4" />
-                  <span className="sr-only">{social.name}</span>
-                </Link>
-              ))}
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.svg"
+              alt="Assistant Digital Cameroun"
+              className="h-12 w-12 object-contain"
+            />
+            <div>
+              <p className="text-base font-semibold text-foreground">Assistant Digital Cameroun</p>
+              <p className="text-xs text-muted-foreground">{t('footer.description')}</p>
             </div>
           </div>
+
+          {/* Quick Links */}
+          <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+            {footerLinks.services.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <link.icon className="h-4 w-4" />
+                {link.name}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <div className="mt-8 border-t border-border pt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            {t('footer.designedBy')} <a href="https://eoweb.site" className="hover:text-foreground">eoweb</a> • © {new Date().getFullYear()} {t('footer.brand')}. {t('footer.rights')}
+        {/* Copyright */}
+        <div className="mt-6 border-t border-border pt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            Conçu par <a href="https://eoweb.site" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground">eoweb</a> • © {new Date().getFullYear()} Assistant Digital Cameroun. Tous droits réservés.
           </p>
         </div>
       </div>
