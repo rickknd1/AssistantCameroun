@@ -66,8 +66,8 @@ export function WelcomeScreen({ onQuestionClick }: WelcomeScreenProps) {
   const selectedCat = CATEGORIES.find(c => c.id === selectedCategory)
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-3 sm:p-6 lg:p-8">
-      <div className="w-full max-w-4xl space-y-6 sm:space-y-8 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 sm:p-8 lg:p-12">
+      <div className="w-full max-w-4xl space-y-8 sm:space-y-10 text-center">
         {/* Avatar */}
         <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent shadow-lg">
           <Bot className="h-8 w-8 sm:h-10 sm:w-10 text-white" />

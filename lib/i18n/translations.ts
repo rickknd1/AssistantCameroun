@@ -23,6 +23,25 @@ export interface Translations {
   'home.hero.floating.inSteps': string
   'home.hero.floating.questionResolved': string
   'home.hero.floating.inMinutes': string
+  'home.hero.badges.aiChat': string
+  'home.hero.badges.instant': string
+  'home.hero.badges.cniPassport': string
+  'home.hero.badges.penalCode': string
+  'home.hero.badges.civilCode': string
+  'home.hero.badges.creation': string
+  'home.hero.badges.business': string
+  'home.hero.badges.articles': string
+  'home.hero.badges.legal': string
+  'home.hero.badges.answers': string
+  'home.hero.badges.in30s': string
+  'home.hero.badges.quiz': string
+  'home.hero.badges.interactive': string
+  'home.hero.badges.percent': string
+  'home.hero.badges.cameroon': string
+  'home.hero.badges.available': string
+  'home.hero.badges.24_7': string
+  'home.hero.badges.laborCode': string
+  'home.hero.badges.work': string
 
   // Home Page - Quick Categories
   'home.quickCategories.procedures': string
@@ -299,6 +318,26 @@ export const translations: Record<Language, Translations> = {
     'home.hero.floating.inSteps': 'En 3 étapes',
     'home.hero.floating.questionResolved': 'Question résolue',
     'home.hero.floating.inMinutes': 'En 2 minutes',
+    'home.hero.badges.aiChat': 'Chat IA',
+    'home.hero.badges.instant': 'Instantané',
+    'home.hero.badges.cniPassport': 'CNI & Passeport',
+    'home.hero.badges.inSteps': 'En 3 étapes',
+    'home.hero.badges.penalCode': 'Code Pénal',
+    'home.hero.badges.civilCode': '& Civil',
+    'home.hero.badges.creation': 'Création',
+    'home.hero.badges.business': 'Entreprise',
+    'home.hero.badges.articles': '+10K articles',
+    'home.hero.badges.legal': 'Juridiques',
+    'home.hero.badges.answers': 'Réponses',
+    'home.hero.badges.in30s': 'En 30s',
+    'home.hero.badges.quiz': 'Quiz',
+    'home.hero.badges.interactive': 'Interactifs',
+    'home.hero.badges.percent': '100%',
+    'home.hero.badges.cameroon': 'Cameroun',
+    'home.hero.badges.available': 'Disponible',
+    'home.hero.badges.24_7': '24/7',
+    'home.hero.badges.laborCode': 'Code du',
+    'home.hero.badges.work': 'Travail',
 
     // Home Page - Quick Categories
     'home.quickCategories.procedures': 'Procédures',
@@ -573,6 +612,26 @@ export const translations: Record<Language, Translations> = {
     'home.hero.floating.inSteps': 'In 3 steps',
     'home.hero.floating.questionResolved': 'Question resolved',
     'home.hero.floating.inMinutes': 'In 2 minutes',
+    'home.hero.badges.aiChat': 'AI Chat',
+    'home.hero.badges.instant': 'Instant',
+    'home.hero.badges.cniPassport': 'ID & Passport',
+    'home.hero.badges.inSteps': 'In 3 steps',
+    'home.hero.badges.penalCode': 'Penal Code',
+    'home.hero.badges.civilCode': '& Civil',
+    'home.hero.badges.creation': 'Business',
+    'home.hero.badges.business': 'Creation',
+    'home.hero.badges.articles': '+10K articles',
+    'home.hero.badges.legal': 'Legal',
+    'home.hero.badges.answers': 'Answers',
+    'home.hero.badges.in30s': 'In 30s',
+    'home.hero.badges.quiz': 'Quiz',
+    'home.hero.badges.interactive': 'Interactive',
+    'home.hero.badges.percent': '100%',
+    'home.hero.badges.cameroon': 'Cameroon',
+    'home.hero.badges.available': 'Available',
+    'home.hero.badges.24_7': '24/7',
+    'home.hero.badges.laborCode': 'Labor',
+    'home.hero.badges.work': 'Code',
 
     // Home Page - Quick Categories
     'home.quickCategories.procedures': 'Procedures',

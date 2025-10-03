@@ -175,6 +175,17 @@
     }
   }
 
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Responsive viewport height */
+  @supports (height: 100dvh) {
+    .h-screen {
+      height: 100dvh;
+    }
+  }
+
   /* Prevent double-tap zoom */
   button, a {
     touch-action: manipulation;

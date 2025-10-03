@@ -53,10 +53,10 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-2 sm:p-3 lg:p-4" ref={containerRef}>
-      <div className="mx-auto max-w-4xl space-y-3 sm:space-y-4 pb-3">
+    <div className="h-full w-full overflow-y-auto px-3 py-4 sm:px-4 sm:py-6" ref={containerRef}>
+      <div className="mx-auto max-w-4xl space-y-4 sm:space-y-5">
         {messages.map((message) => (
-          <div key={message.id} className={`flex gap-2 sm:gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={message.id} className={`flex gap-2.5 sm:gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             {message.role === "assistant" && (
               <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary via-secondary to-accent">
                 <Bot className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />

@@ -212,7 +212,7 @@ export function ChatInterface() {
   }, [searchParams, sessionId])
 
   return (
-    <div className="flex h-full w-full overflow-hidden touch-none" style={{ touchAction: 'pan-y pinch-zoom' }}>
+    <div className="flex h-full w-full overflow-hidden">
       <ChatSidebar
         conversations={conversations}
         isOpen={sidebarOpen}
@@ -221,10 +221,10 @@ export function ChatInterface() {
         onQuestionClick={handleSendMessage}
       />
 
-      {/* Main chat area - Fixed height messaging layout */}
-      <div className="flex flex-1 flex-col h-full overflow-hidden relative">
+      {/* Main chat area - Adaptive layout */}
+      <div className="flex flex-1 flex-col h-full overflow-hidden">
         {/* Fixed Header - Mobile only */}
-        <div className="flex-none border-b border-border bg-background px-3 py-2.5 sm:px-4 sm:py-3 lg:hidden">
+        <div className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur-sm px-4 py-3 lg:hidden">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -238,19 +238,17 @@ export function ChatInterface() {
           </div>
         </div>
 
-        {/* Scrollable Messages Area - Takes remaining space, padding bottom for input */}
-        <div className="flex-1 min-h-0 overflow-hidden pb-28 sm:pb-32">
+        {/* Messages Area - Responsive padding */}
+        <div className="flex-1 overflow-y-auto pb-[180px] sm:pb-[160px] lg:pb-[140px]">
           {messages.length === 0 ? (
-            <div className="h-full overflow-y-auto">
-              <WelcomeScreen onQuestionClick={handleSendMessage} />
-            </div>
+            <WelcomeScreen onQuestionClick={handleSendMessage} />
           ) : (
             <ChatMessages messages={messages} isTyping={isTyping} />
           )}
         </div>
 
-        {/* Fixed Input Area - Always visible at bottom, well above safe area */}
-        <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border bg-background z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+        {/* Fixed Input Area - Responsive positioning */}
+        <div className="fixed bottom-0 left-0 right-0 lg:left-80 border-t border-border bg-background/95 backdrop-blur-sm z-30 safe-bottom">
           <ChatInput
             onSendMessage={handleSendMessage}
             isTyping={isTyping}

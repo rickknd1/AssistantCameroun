@@ -52,7 +52,7 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-background to-muted/20">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8 lg:py-24">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Mobile: Image first, Desktop: Content first */}
           <div className="order-1 lg:order-2 flex items-center justify-center">
@@ -100,8 +100,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Bot className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Chat IA</p>
-                    <p className="text-xs text-gray-600">Instantané</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.aiChat')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.instant')}</p>
                   </div>
                 </div>
               </div>
@@ -110,8 +110,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <FileText className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">CNI & Passeport</p>
-                    <p className="text-xs text-gray-600">En 3 étapes</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.cniPassport')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.inSteps')}</p>
                   </div>
                 </div>
               </div>
@@ -120,8 +120,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Scale className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Code Pénal</p>
-                    <p className="text-xs text-gray-600">& Civil</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.penalCode')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.civilCode')}</p>
                   </div>
                 </div>
               </div>
@@ -130,8 +130,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Building2 className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Création</p>
-                    <p className="text-xs text-gray-600">Entreprise</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.creation')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.business')}</p>
                   </div>
                 </div>
               </div>
@@ -140,8 +140,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">+10K articles</p>
-                    <p className="text-xs text-gray-600">Juridiques</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.articles')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.legal')}</p>
                   </div>
                 </div>
               </div>
@@ -150,8 +150,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Zap className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Réponses</p>
-                    <p className="text-xs text-gray-600">En 30s</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.answers')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.in30s')}</p>
                   </div>
                 </div>
               </div>
@@ -160,8 +160,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-6 w-6 text-red-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Quiz</p>
-                    <p className="text-xs text-gray-600">Interactifs</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.quiz')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.interactive')}</p>
                   </div>
                 </div>
               </div>
@@ -170,8 +170,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Star className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">100%</p>
-                    <p className="text-xs text-gray-600">Cameroun</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.percent')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.cameroon')}</p>
                   </div>
                 </div>
               </div>
@@ -180,8 +180,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <MessageCircle className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Disponible</p>
-                    <p className="text-xs text-gray-600">24/7</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.available')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.24_7')}</p>
                   </div>
                 </div>
               </div>
@@ -190,8 +190,8 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-6 w-6 text-red-600" />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Code du</p>
-                    <p className="text-xs text-gray-600">Travail</p>
+                    <p className="text-sm font-semibold text-gray-900">{t('home.hero.badges.laborCode')}</p>
+                    <p className="text-xs text-gray-600">{t('home.hero.badges.work')}</p>
                   </div>
                 </div>
               </div>
