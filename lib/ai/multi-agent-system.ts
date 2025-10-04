@@ -186,12 +186,38 @@ export class IntelligentSearchAgent {
 
   /**
    * Recherche intelligente dans la base de données - PARCOURS COMPLET
+   * PRIORITÉ: Procédures > Articles juridiques > Web
    */
   async search(message: string): Promise<SearchContext> {
     const questionType = this.analyzeQuestionType(message)
     const keywords = this.extractKeywords(message)
 
     console.log('🔍 Recherche intelligente:', { questionType, keywords })
+
+    // =====================================================
+    // ÉTAPE 1: TOUJOURS CHERCHER DANS LES PROCÉDURES D'ABORD
+    // =====================================================
+    let procedures: any[] = []
+
+    const procConditions = keywords.map(k =>
+      `name.ilike.%${k}%,description.ilike.%${k}%,steps.ilike.%${k}%`
+    ).join(',')
+
+    const { data: procs } = await this.supabase
+      .from('Procedure')
+      .select('*')
+      .or(procConditions)
+      .limit(10)
+
+    procedures = procs || []
+    console.log(`📋 ${procedures.length} procédures trouvées`)
+
+    // =====================================================
+    // ÉTAPE 2: CHERCHER DANS LES DOCUMENTS JURIDIQUES
+    // Seulement si:
+    // - Aucune procédure trouvée OU
+    // - Question explicitement juridique (article, code, loi)
+    // =====================================================
 
     // Détecter le document cible prioritaire
     const targetDocument = keywords.find(k =>
@@ -200,81 +226,71 @@ export class IntelligentSearchAgent {
 
     console.log('📄 Document cible détecté:', targetDocument || 'aucun')
 
-    // STRATÉGIE DE RECHERCHE À PLUSIEURS NIVEAUX
     let validatedArticles: ValidatedArticle[] = []
 
-    // 1️⃣ RECHERCHE CIBLÉE (si document spécifique détecté)
-    if (targetDocument && keywords.length > 1) {
-      const sectionKeywords = keywords.filter(k => k !== targetDocument)
-      const conditions = sectionKeywords.map(k =>
-        `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
-      ).join(',')
+    // Chercher dans les articles juridiques SI:
+    // - Pas de procédure trouvée OU question explicitement juridique
+    const shouldSearchArticles = procedures.length === 0 || questionType === 'juridique'
 
-      const { data: targetedSections } = await this.supabase
-        .from('Section')
-        .select(`
-          id, title, content, reference, level, position, documentId,
-          Document!inner(id, slug, title, type, category)
-        `)
-        .ilike('Document.title', `%${targetDocument}%`)
-        .or(conditions)
-        .order('level', { ascending: true })
-        .limit(30)
+    if (shouldSearchArticles) {
+      // 2a. RECHERCHE CIBLÉE (si document spécifique détecté)
+      if (targetDocument && keywords.length > 1) {
+        const sectionKeywords = keywords.filter(k => k !== targetDocument)
+        const conditions = sectionKeywords.map(k =>
+          `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
+        ).join(',')
 
-      if (targetedSections && targetedSections.length > 0) {
-        for (const section of targetedSections) {
-          const validated = await this.validateSection(section as Section)
-          if (validated.exists) validatedArticles.push(validated)
+        const { data: targetedSections } = await this.supabase
+          .from('Section')
+          .select(`
+            id, title, content, reference, level, position, documentId,
+            Document!inner(id, slug, title, type, category)
+          `)
+          .ilike('Document.title', `%${targetDocument}%`)
+          .or(conditions)
+          .order('level', { ascending: true })
+          .limit(30)
+
+        if (targetedSections && targetedSections.length > 0) {
+          for (const section of targetedSections) {
+            const validated = await this.validateSection(section as any as Section)
+            if (validated.exists) validatedArticles.push(validated)
+          }
         }
       }
-    }
 
-    // 2️⃣ RECHERCHE ÉLARGIE (si rien trouvé, chercher dans TOUS les documents)
-    if (validatedArticles.length === 0) {
-      console.log('🔄 Recherche élargie dans TOUS les documents...')
+      // 2b. RECHERCHE ÉLARGIE (si rien trouvé, chercher dans TOUS les documents)
+      if (validatedArticles.length === 0) {
+        console.log('🔄 Recherche élargie dans TOUS les documents juridiques...')
 
-      const conditions = keywords.map(k =>
-        `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
-      ).join(',')
+        const conditions = keywords.map(k =>
+          `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
+        ).join(',')
 
-      const { data: allSections } = await this.supabase
-        .from('Section')
-        .select(`
-          id, title, content, reference, level, position, documentId,
-          Document!inner(id, slug, title, type, category)
-        `)
-        .or(conditions)
-        .order('level', { ascending: true })
-        .limit(50) // Augmenté pour parcourir plus de documents
+        const { data: allSections } = await this.supabase
+          .from('Section')
+          .select(`
+            id, title, content, reference, level, position, documentId,
+            Document!inner(id, slug, title, type, category)
+          `)
+          .or(conditions)
+          .order('level', { ascending: true })
+          .limit(50)
 
-      if (allSections && allSections.length > 0) {
-        for (const section of allSections) {
-          const validated = await this.validateSection(section as Section)
-          if (validated.exists) validatedArticles.push(validated)
+        if (allSections && allSections.length > 0) {
+          for (const section of allSections) {
+            const validated = await this.validateSection(section as any as Section)
+            if (validated.exists) validatedArticles.push(validated)
+          }
         }
       }
+
+      console.log(`✅ ${validatedArticles.length} articles validés trouvés`)
     }
 
-    console.log(`✅ ${validatedArticles.length} articles validés trouvés`)
-
-    // 3️⃣ Rechercher les procédures si pertinent
-    let procedures: any[] = []
-    if (questionType === 'procedure' || validatedArticles.length === 0) {
-      const procConditions = keywords.map(k =>
-        `name.ilike.%${k}%,description.ilike.%${k}%,steps.ilike.%${k}%`
-      ).join(',')
-
-      const { data: procs } = await this.supabase
-        .from('Procedure')
-        .select('*')
-        .or(procConditions)
-        .limit(10)
-
-      procedures = procs || []
-      console.log(`📋 ${procedures.length} procédures trouvées`)
-    }
-
-    // 4️⃣ RECHERCHE WEB EN FALLBACK (TOUJOURS si aucune source locale)
+    // =====================================================
+    // ÉTAPE 3: RECHERCHE WEB EN FALLBACK
+    // =====================================================
     let webResults = ''
     if (validatedArticles.length === 0 && procedures.length === 0) {
       console.log('🌐 Activation recherche web fallback...')
@@ -330,18 +346,44 @@ export class IntelligentSearchAgent {
 export class ExpertFormatterAgent {
   /**
    * Construit le contexte structuré pour Gemini
+   * PRIORITÉ: Procédures administratives en premier
    */
   buildContext(searchContext: SearchContext): string {
     let context = '# CONTEXTE JURIDIQUE ET ADMINISTRATIF DU CAMEROUN\n\n'
 
-    // Articles validés
+    // =====================================================
+    // PRIORITÉ 1: PROCÉDURES ADMINISTRATIVES
+    // =====================================================
+    if (searchContext.procedures.length > 0) {
+      context += '## 🔴 PROCÉDURES ADMINISTRATIVES OFFICIELLES - PRIORITÉ ABSOLUE 🔴\n\n'
+      context += '**⚠️ INSTRUCTIONS CRITIQUES:**\n'
+      context += '- Ces procédures contiennent les informations LES PLUS À JOUR\n'
+      context += '- TOUJOURS utiliser ces informations EN PRIORITÉ\n'
+      context += '- Si un conflit existe avec d\'autres documents, TOUJOURS privilégier les procédures\n'
+      context += '- Les procédures reflètent la réalité administrative actuelle du Cameroun\n\n'
+
+      searchContext.procedures.forEach(proc => {
+        context += `### ✅ ${proc.name}\n`
+        context += `- **Description:** ${proc.description}\n`
+        if (proc.costs) context += `- **Coûts actuels:** ${proc.costs}\n`
+        if (proc.duration) context += `- **Durée:** ${proc.duration}\n`
+        if (proc.onlineUrl) context += `- **Plateforme en ligne:** ${proc.onlineUrl}\n`
+        if (proc.steps) context += `- **Étapes:** ${proc.steps}\n`
+        context += '\n'
+      })
+    }
+
+    // =====================================================
+    // PRIORITÉ 2: ARTICLES JURIDIQUES (si pertinent)
+    // =====================================================
     if (searchContext.articles.length > 0) {
-      context += '## ⚠️ ARTICLES JURIDIQUES VALIDÉS - TU DOIS LES CITER AVEC LIENS ⚠️\n\n'
-      context += '**INSTRUCTIONS CRITIQUES:**\n'
+      context += '## ⚖️ ARTICLES JURIDIQUES VALIDÉS - TU DOIS LES CITER AVEC LIENS ⚖️\n\n'
+      context += '**INSTRUCTIONS:**\n'
       context += '- Pour CHAQUE article listé ci-dessous, tu DOIS créer un lien markdown cliquable\n'
       context += '- Format EXACT: [Nom de l\'article](URL_EXACTE)\n'
       context += '- L\'URL exacte est fournie pour chaque article\n'
-      context += '- Exemple: [Article 20 de la Constitution](/bibliotheque/constitution#article-20)\n\n'
+      context += '- Exemple: [Article 20 de la Constitution](/bibliotheque/constitution#article-20)\n'
+      context += '- ⚠️ ATTENTION: Si ces articles contredisent les procédures ci-dessus, PRIVILÉGIER LES PROCÉDURES\n\n'
 
       searchContext.articles.forEach((article, index) => {
         context += `### Article ${index + 1}:\n`
@@ -354,20 +396,9 @@ export class ExpertFormatterAgent {
       })
     }
 
-    // Procédures
-    if (searchContext.procedures.length > 0) {
-      context += '## Procédures administratives:\n\n'
-      searchContext.procedures.forEach(proc => {
-        context += `**${proc.name}**\n`
-        context += `- Description: ${proc.description}\n`
-        if (proc.costs) context += `- Coûts: ${proc.costs}\n`
-        if (proc.duration) context += `- Durée: ${proc.duration}\n`
-        if (proc.onlineUrl) context += `- Plateforme: ${proc.onlineUrl}\n`
-        context += '\n'
-      })
-    }
-
-    // Résultats web
+    // =====================================================
+    // PRIORITÉ 3: RÉSULTATS WEB (fallback)
+    // =====================================================
     if (searchContext.webResults) {
       context += searchContext.webResults
     }
@@ -395,8 +426,39 @@ ${context}
 **RÉSULTATS WEB:** ${searchContext.webResults ? 'OUI' : 'NON'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️  RÈGLES ABSOLUES - RÉPONSE OBLIGATOIRE  ⚠️
+🔴  HIÉRARCHIE DES SOURCES - ORDRE DE PRIORITÉ  🔴
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. **PRIORITÉ ABSOLUE: PROCÉDURES ADMINISTRATIVES**
+   - Les procédures contiennent les informations LES PLUS À JOUR
+   - TOUJOURS utiliser les procédures EN PREMIER si disponibles
+   - En cas de conflit avec d'autres sources, TOUJOURS privilégier les procédures
+
+2. **SECONDAIRE: ARTICLES JURIDIQUES (Codes, Constitution, Lois)**
+   - Utiliser seulement si:
+     * Aucune procédure ne répond à la question OU
+     * Question explicitement juridique (article, loi, code)
+   - Si un article contredit une procédure, IGNORER l'article
+
+3. **DERNIER RECOURS: Résultats web**
+   - Utiliser seulement si aucune source locale disponible
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${searchContext.procedures.length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅  PROCÉDURES DISPONIBLES - À UTILISER EN PRIORITÉ  ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu as ${searchContext.procedures.length} procédure(s) administrative(s) officielle(s).
+
+🔴 INSTRUCTIONS CRITIQUES:
+- TOUJOURS baser ta réponse sur ces procédures
+- Utilise les informations exactes (coûts, durée, étapes)
+- Ces informations sont À JOUR et reflètent la réalité actuelle
+- NE PAS utiliser d'anciennes informations des codes si elles contredisent
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+` : ''}
 
 🔴 INTERDICTIONS ABSOLUES:
 - ❌ NE DIS JAMAIS "Je n'ai pas d'informations"
@@ -405,14 +467,15 @@ ${context}
 - ❌ TU DOIS TOUJOURS FOURNIR UNE RÉPONSE
 
 ✅ OBLIGATION DE RÉPONSE:
-1. Si tu as des articles/procédures dans le contexte → Utilise-les avec liens cliquables
-2. Si tu as des résultats web → Résume-les et cite la source web
-3. Si tu n'as RIEN → Utilise tes connaissances générales sur le Cameroun
-4. TOUJOURS fournir une réponse utile, JAMAIS dire "je ne sais pas"
+1. Si tu as des PROCÉDURES dans le contexte → Utilise-les EN PRIORITÉ
+2. Si tu as des articles juridiques (et pas de procédures) → Utilise-les avec liens
+3. Si tu as des résultats web → Résume-les et cite la source web
+4. Si tu n'as RIEN → Utilise tes connaissances générales sur le Cameroun
+5. TOUJOURS fournir une réponse utile, JAMAIS dire "je ne sais pas"
 
 ${searchContext.questionType === 'juridique' && searchContext.articles.length > 0 ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️  CITATIONS OBLIGATOIRES POUR ARTICLES JURIDIQUES  ⚠️
+⚠️  CITATIONS POUR ARTICLES JURIDIQUES  ⚠️
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Tu as ${searchContext.articles.length} articles validés dans le contexte.
@@ -423,6 +486,8 @@ Tu as ${searchContext.articles.length} articles validés dans le contexte.
 ✅ EXEMPLE:
 "Selon l'[Article 20 de la Constitution](/bibliotheque/constitution#article-20),
 le Président de la République est élu au suffrage universel direct..."
+
+⚠️ RAPPEL: Si des procédures sont aussi disponibles, PRIVILÉGIER LES PROCÉDURES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''}
 
@@ -440,7 +505,7 @@ Mentionne "Selon des sources en ligne" et résume les informations.
 - Réponds TOUJOURS en français
 - Structure claire avec listes à puces si nécessaire
 - **Gras** pour les informations importantes
-- Sois précis et cite le contenu exact des articles
+- Sois précis et cite le contenu exact des sources prioritaires
 - TOUJOURS fournir une réponse, JAMAIS refuser de répondre`
 
     const model = genAI.getGenerativeModel({
