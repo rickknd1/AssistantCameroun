@@ -2,8 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { rateLimitMiddleware } from '@/lib/utils/rate-limit'
-import { IntelligentSearchAgent, ExpertFormatterAgent } from '@/lib/ai/multi-agent-system'
-import { QuestionCacheService } from '@/lib/ai/question-cache-service'
+import { IntelligentSearchAgent, WebSearchAgent, ExpertFormatterAgent } from '@/lib/ai/multi-agent-system'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
@@ -113,7 +112,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { message, conversationHistory, conversationId, sessionId } = await request.json()
+    const body = await request.json()
+    let { message, conversationHistory, conversationId, sessionId } = body
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -122,53 +122,43 @@ export async function POST(request: Request) {
       )
     }
 
+    // FIX ENCODAGE: Normaliser UTF-8 dès l'entrée
+    message = message.normalize('NFC') // Canonical composition
+
     const supabase = await createClient()
     const startTime = Date.now()
 
     // =====================================================
-    // ÉTAPE 0: RECHERCHE DANS LE CACHE INTELLIGENT
+    // SYSTÈME MULTI-AGENTS À 3 NIVEAUX
     // =====================================================
 
-    const cacheService = new QuestionCacheService(supabase)
-    const cacheResult = await cacheService.searchCache(message)
-
-    // Si question trouvée en cache avec haute similarité, retourner immédiatement
-    if (cacheResult.found && cacheResult.cached) {
-      console.log(`⚡ [CACHE HIT] Réponse instantanée (similarité: ${cacheResult.similarity}%)`)
-
-      // Incrémenter le compteur d'usage
-      await cacheService.incrementUsage(cacheResult.cached.id)
-
-      const processingTime = Date.now() - startTime
-
-      return NextResponse.json({
-        response: cacheResult.cached.response,
-        sources: cacheResult.cached.sources.slice(0, 4),
-        confidence: cacheResult.cached.confidence,
-        // Masqué pour l'utilisateur - juste pour analytics backend
-        _cached: true,
-        _cacheId: cacheResult.cached.id,
-        _similarity: cacheResult.similarity
-      })
-    }
-
-    console.log('❌ [CACHE MISS] Génération d\'une nouvelle réponse...')
-
-    // =====================================================
-    // SYSTÈME MULTI-AGENTS À 2 NIVEAUX
-    // =====================================================
-
-    console.log('🤖 [AGENT 1] Analyseur + Chercheur Intelligent - Démarrage...')
-
-    // Agent 1: Recherche intelligente avec validation
+    // Agent 1: Recherche locale (procédures + articles)
     const searchAgent = new IntelligentSearchAgent(supabase)
     const searchContext = await searchAgent.search(message)
 
-    console.log('📊 [AGENT 1] Résultats:')
-    console.log(`   - Type de question: ${searchContext.questionType}`)
-    console.log(`   - Articles validés: ${searchContext.articles.length}`)
-    console.log(`   - Procédures: ${searchContext.procedures.length}`)
-    console.log(`   - Web results: ${searchContext.webResults ? 'Oui' : 'Non'}`)
+    // Agent 2: Recherche web en parallèle
+
+    const webAgent = new WebSearchAgent()
+    let webSearchResults = []
+
+    // Activer la recherche web dans ces cas:
+    // 1. Question de type procédure (pour comparer avec les données locales)
+    // 2. Aucune source locale trouvée (articles + procédures = 0)
+    const shouldSearchWeb =
+      searchContext.questionType === 'procedure' ||
+      (searchContext.articles.length === 0 && searchContext.procedures.length === 0)
+
+    if (shouldSearchWeb) {
+      webSearchResults = await webAgent.search(message, searchContext.questionType)
+
+      // Comparer avec les données locales si procédures disponibles
+      if (searchContext.procedures.length > 0 && webSearchResults.length > 0) {
+        webAgent.compareWithLocal(webSearchResults, searchContext.procedures)
+      }
+    }
+
+    // Ajouter les résultats web au contexte
+    searchContext.webSearchResults = webSearchResults
 
     // 4. Construire l'historique de conversation
     let chatHistory: Array<{ role: string; parts: Array<{ text: string }> }> = []
@@ -180,17 +170,13 @@ export async function POST(request: Request) {
       }))
     }
 
-    console.log('🤖 [AGENT 2] Formateur Expert - Démarrage...')
-
-    // Agent 2: Génération de réponse formatée
+    // Agent 3: Génération de réponse formatée avec comparaison
     const formatterAgent = new ExpertFormatterAgent()
     const responseText = await formatterAgent.generateResponse(
       message,
       searchContext,
       chatHistory
     )
-
-    console.log('✅ [AGENT 2] Réponse générée')
 
     // 7. Extraire les sources citées de la réponse
     const sources = formatterAgent.extractSources(responseText, searchContext)
@@ -204,11 +190,27 @@ export async function POST(request: Request) {
 
       const alreadyAdded = sources.some(s => s.url === `/procedures/${proc.slug}`)
 
-      if (directMention && !alreadyAdded && sources.length < 4) {
+      if (directMention && !alreadyAdded && sources.length < 6) {
         sources.push({
           title: proc.name,
-          reference: `Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
+          reference: `📋 Procédure locale | Coût: ${proc.costs || 'N/A'} | Durée: ${proc.duration || 'N/A'}`,
           url: `/procedures/${proc.slug}`
+        })
+      }
+    })
+
+    // Ajouter les sources web si mentionnées dans la réponse
+    searchContext.webSearchResults.forEach((webResult: any) => {
+      const sourceMentioned = responseText.toLowerCase().includes(webResult.source.toLowerCase()) ||
+        responseText.toLowerCase().includes(webResult.title.toLowerCase().substring(0, 30))
+
+      const alreadyAdded = sources.some(s => s.url === webResult.link)
+
+      if (sourceMentioned && !alreadyAdded && sources.length < 6) {
+        sources.push({
+          title: `🌐 ${webResult.title}`,
+          reference: `Source web: ${webResult.source}`,
+          url: webResult.link
         })
       }
     })
@@ -256,25 +258,15 @@ export async function POST(request: Request) {
     // Limiter entre 50% et 95%
     confidence = Math.max(50, Math.min(95, confidence))
 
-    // Log pour debug
-    console.log('📊 [SOURCES] Sources finales:', sources.length)
-    sources.forEach((s, i) => console.log(`  ${i + 1}. ${s.title} (${s.url})`))
-    console.log('🎯 [CONFIDENCE] Niveau de confiance:', confidence + '%')
-
     // 9. Enregistrer la conversation et les messages dans la BD
     const processingTime = Date.now() - startTime
 
     try {
-      console.log('🔵 [DB] Starting database recording...')
-      console.log('🔵 [DB] conversationId:', conversationId)
-      console.log('🔵 [DB] sessionId:', sessionId)
-
       // Créer ou récupérer la conversation
       let dbConversationId = conversationId
 
       if (conversationId && sessionId) {
         // Vérifier si la conversation existe
-        console.log('🔵 [DB] Checking if conversation exists...')
         const { data: existingConv, error: checkError } = await supabase
           .from('Conversation')
           .select('id')
@@ -286,7 +278,6 @@ export async function POST(request: Request) {
         }
 
         if (!existingConv) {
-          console.log('🔵 [DB] Creating new conversation...')
           // Créer une nouvelle conversation
           const { data: newConv, error: convError } = await supabase
             .from('Conversation')
@@ -301,21 +292,14 @@ export async function POST(request: Request) {
 
           if (convError) {
             console.error('🔴 [DB] Conversation insert error:', convError)
-            console.error('🔴 [DB] Conversation error details:', JSON.stringify(convError, null, 2))
           } else {
-            console.log('✅ [DB] Conversation created:', newConv)
             dbConversationId = newConv.id
           }
-        } else {
-          console.log('✅ [DB] Conversation already exists')
         }
-      } else {
-        console.warn('⚠️ [DB] Missing conversationId or sessionId')
       }
 
       // Enregistrer le message utilisateur
       if (dbConversationId) {
-        console.log('🔵 [DB] Inserting user message...')
         const { data: userMsg, error: userMsgError } = await supabase
           .from('Message')
           .insert({
@@ -329,13 +313,9 @@ export async function POST(request: Request) {
 
         if (userMsgError) {
           console.error('🔴 [DB] User message insert error:', userMsgError)
-          console.error('🔴 [DB] User message error details:', JSON.stringify(userMsgError, null, 2))
-        } else {
-          console.log('✅ [DB] User message inserted:', userMsg?.id)
         }
 
         // Enregistrer le message assistant
-        console.log('🔵 [DB] Inserting assistant message...')
         const { data: assistantMsg, error: assistantMsgError } = await supabase
           .from('Message')
           .insert({
@@ -352,14 +332,10 @@ export async function POST(request: Request) {
 
         if (assistantMsgError) {
           console.error('🔴 [DB] Assistant message insert error:', assistantMsgError)
-          console.error('🔴 [DB] Assistant message error details:', JSON.stringify(assistantMsgError, null, 2))
-        } else {
-          console.log('✅ [DB] Assistant message inserted:', assistantMsg?.id)
         }
 
         // Enregistrer les citations (sources)
         if (assistantMsg && sources.length > 0) {
-          console.log('🔵 [DB] Inserting citations...')
           const citations = sources.map(source => ({
             messageId: assistantMsg.id,
             documentId: source.url.includes('/bibliotheque/')
@@ -370,21 +346,15 @@ export async function POST(request: Request) {
             relevance: 0.8
           })).filter(c => c.documentId) // Ne garder que les citations avec documentId
 
-          console.log('🔵 [DB] Citations to insert:', citations.length)
-
           if (citations.length > 0) {
             const { error: citationError } = await supabase.from('Citation').insert(citations)
             if (citationError) {
               console.error('🔴 [DB] Citation insert error:', citationError)
-              console.error('🔴 [DB] Citation error details:', JSON.stringify(citationError, null, 2))
-            } else {
-              console.log('✅ [DB] Citations inserted:', citations.length)
             }
           }
         }
 
         // Mettre à jour le compteur de messages de la conversation
-        console.log('🔵 [DB] Updating conversation message count...')
         const { error: updateError } = await supabase
           .from('Conversation')
           .update({
@@ -394,45 +364,17 @@ export async function POST(request: Request) {
 
         if (updateError) {
           console.error('🔴 [DB] Conversation update error:', updateError)
-          console.error('🔴 [DB] Conversation update error details:', JSON.stringify(updateError, null, 2))
-        } else {
-          console.log('✅ [DB] Conversation updated')
         }
-      } else {
-        console.warn('⚠️ [DB] No dbConversationId, skipping message recording')
       }
-
-      console.log('✅ [DB] Database recording completed')
     } catch (dbError) {
       console.error('🔴 [DB] Database logging error:', dbError)
       console.error('🔴 [DB] Error stack:', (dbError as Error).stack)
       // Ne pas bloquer la réponse si l'enregistrement échoue
     }
 
-    // =====================================================
-    // ÉTAPE FINALE: AJOUTER AU CACHE INTELLIGENT
-    // =====================================================
-
-    try {
-      const cacheId = await cacheService.addToCache(
-        message,
-        responseText,
-        sources,
-        confidence,
-        searchContext.questionType
-      )
-
-      if (cacheId) {
-        console.log(`✅ [CACHE] Question ajoutée au cache (ID: ${cacheId})`)
-      }
-    } catch (cacheError) {
-      console.error('🔴 [CACHE] Erreur ajout au cache:', cacheError)
-      // Ne pas bloquer la réponse si le cache échoue
-    }
-
     return NextResponse.json({
       response: responseText,
-      sources: sources.slice(0, 4), // Max 4 sources
+      sources: sources.slice(0, 6), // Max 6 sources (pour inclure web + local)
       confidence
     })
 

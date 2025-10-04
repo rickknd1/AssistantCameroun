@@ -1,6 +1,9 @@
 /**
- * SYSTÈME MULTI-AGENTS À 2 NIVEAUX
+ * SYSTÈME MULTI-AGENTS À 3 NIVEAUX
  * Architecture optimisée pour le chatbot camerounais
+ * Agent 1: Recherche locale (Procédures + Articles)
+ * Agent 2: Recherche web temps réel
+ * Agent 3: Formateur expert avec comparaison des sources
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -38,10 +41,18 @@ export interface ValidatedArticle {
   exists: boolean
 }
 
+export interface WebSearchResult {
+  title: string
+  snippet: string
+  link: string
+  source: string
+}
+
 export interface SearchContext {
   articles: ValidatedArticle[]
   procedures: any[]
   webResults: string
+  webSearchResults: WebSearchResult[]
   questionType: 'juridique' | 'procedure' | 'generale'
 }
 
@@ -103,13 +114,15 @@ export class IntelligentSearchAgent {
     // Mots-clés pour questions juridiques
     const juridiqueKeywords = [
       'article', 'code', 'loi', 'constitution', 'droit', 'juridique',
-      'légal', 'réglementation', 'texte de loi'
+      'légal', 'réglementation', 'texte de loi', 'décret', 'ordonnance'
     ]
 
     // Mots-clés pour procédures administratives
     const procedureKeywords = [
       'comment obtenir', 'procédure', 'démarche', 'cni', 'passeport',
-      'acte de naissance', 'étapes', 'documents requis', 'coût', 'durée'
+      'acte de naissance', 'étapes', 'documents requis', 'coût', 'durée',
+      'combien', 'prix', 'tarif', 'frais', 'obtenir', 'faire', 'demander',
+      'besoin', 'nécessaire', 'où', 'quand', 'délai'
     ]
 
     if (juridiqueKeywords.some(keyword => lowerMessage.includes(keyword))) {
@@ -124,55 +137,143 @@ export class IntelligentSearchAgent {
   }
 
   /**
+   * Calcule la similarité entre deux chaînes (algorithme Levenshtein simplifié)
+   */
+  private calculateSimilarity(str1: string, str2: string): number {
+    const longer = str1.length > str2.length ? str1 : str2
+    const shorter = str1.length > str2.length ? str2 : str1
+
+    if (longer.length === 0) return 1.0
+
+    // Vérification de sous-chaîne
+    if (longer.includes(shorter)) return 0.8
+
+    // Calcul de distance simple
+    let matches = 0
+    for (let i = 0; i < shorter.length; i++) {
+      if (longer.includes(shorter[i])) matches++
+    }
+
+    return (matches / longer.length) * 0.7
+  }
+
+  /**
+   * Génère des variations de mots-clés pour recherche floue
+   */
+  private generateKeywordVariations(keyword: string): string[] {
+    const variations = [keyword]
+
+    // Si le mot est court (>3 chars), ajouter des variations partielles
+    if (keyword.length > 3) {
+      variations.push(keyword.substring(0, keyword.length - 1)) // Enlever dernière lettre
+      variations.push(keyword.substring(0, keyword.length - 2)) // Enlever 2 dernières lettres
+    }
+
+    // Variations communes de typos pour mots camerounais
+    const typoMap: { [key: string]: string[] } = {
+      'passeport': ['passport', 'pasport', 'passepor'],
+      'identite': ['identité', 'idantite', 'identiter'],
+      'nationale': ['national', 'nationalle'],
+      'penal': ['pénal', 'penale', 'pénale'],
+      'cameroun': ['cameroon', 'camerun']
+    }
+
+    if (typoMap[keyword]) {
+      variations.push(...typoMap[keyword])
+    }
+
+    return [...new Set(variations)]
+  }
+
+  /**
    * Extraction des mots-clés intelligente
    */
   private extractKeywords(message: string): string[] {
-    const normalized = message.toLowerCase()
+    // IMPORTANT: Normaliser d'abord, puis mettre en minuscules
+    const normalized = message
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
     const keywords: string[] = []
 
-    // Extraire les numéros d'articles avec référence au document - AMÉLIORÉ
+    // Mapping des abréviations courantes
+    const abbreviationMap: { [key: string]: string[] } = {
+      'cni': ['Carte Nationale', 'Identité', 'CNI'],
+      'passeport': ['passeport', 'Passeport'],
+      'acte de naissance': ['acte', 'naissance']
+    }
+
+    // Ajouter les expansions des abréviations
+    Object.entries(abbreviationMap).forEach(([abbrev, expansions]) => {
+      if (normalized.includes(abbrev)) {
+        keywords.push(...expansions)
+      }
+    })
+
+    // Extraire les numéros d'articles de manière simplifiée
     const articleMatches = message.match(/article\s+(\d+|premier|première|1er|1ère)/gi)
 
     if (articleMatches) {
       articleMatches.forEach(match => {
-        keywords.push(match)
-        // Extraire le numéro
         const numberMatch = match.match(/\d+/)
         if (numberMatch) {
           const num = numberMatch[0]
-          // Ajouter multiples variations AVEC priorité haute
-          keywords.unshift(`ARTICLE ${num}`) // Priorité maximale - exactement comme dans la BD
           keywords.push(`article ${num}`)
-          keywords.push(`art. ${num}`)
           keywords.push(`art ${num}`)
-          keywords.push(`Article ${num}`)
-          keywords.push(`Art. ${num}`)
-          keywords.push(`Art ${num}`)
         }
         // Variations pour "premier" / "1"
-        if (match.toLowerCase().includes('premier') || match.toLowerCase().includes('1er') || match.includes(' 1')) {
-          keywords.unshift('ARTICLE 1') // Priorité maximale
-          keywords.push('article 1', 'art. 1', 'article premier', 'ARTICLE PREMIER', 'Article 1', 'art 1', 'Art. 1', 'Art 1')
+        if (match.toLowerCase().includes('premier') || match.toLowerCase().includes('1er')) {
+          keywords.push('article 1')
+          keywords.push('article premier')
         }
       })
     }
 
     // Détecter le document cible (IMPORTANT!)
-    // Mapping des mots-clés vers les noms EXACTS des documents dans la BD
+    // Mapping normalisé (lowercase, sans accents) pour recherche robuste
     const documentKeywords: { [key: string]: string[] } = {
-      'constitution': ['constitution', 'constitutionnelle'],
-      'code penal camerounais': ['pénal', 'penal', 'pénale', 'penale', 'criminel'],
+      'constitution': ['constitution', 'constitutionnelle', 'constitutionnel'],
+      'code penal camerounais': ['penal', 'penale', 'criminel', 'criminelle'],
       'code civil camerounais': ['civil', 'civile'],
-      'code du travail': ['travail', 'travailleur', 'employeur'],
-      'loi de finances': ['finances', 'budget', 'budgétaire']
+      'code du travail': ['travail', 'travailleur', 'employeur', 'salarie'],
+      'code de commerce': ['commerce', 'commercial', 'commerciale', 'societe'],
+      'loi de finances': ['finances', 'budget', 'budgetaire', 'fiscal']
+    }
+
+    // Détecter le document de manière plus précise
+    let detectedDoc: string | null = null
+
+    // Priorité 1: Détection explicite (mention directe du document)
+    // normalized est déjà sans accents et en minuscules
+    if (normalized.includes('code') && normalized.includes('penal')) {
+      detectedDoc = 'code penal camerounais'
+    } else if (normalized.includes('code civil')) {
+      detectedDoc = 'code civil camerounais'
+    } else if (normalized.includes('constitution')) {
+      detectedDoc = 'constitution'
+    } else if (normalized.includes('code du travail') || normalized.includes('code travail')) {
+      detectedDoc = 'code du travail'
+    } else if (normalized.includes('code de commerce') || normalized.includes('code commerce')) {
+      detectedDoc = 'code de commerce'
+    } else if (normalized.includes('loi de finances')) {
+      detectedDoc = 'loi de finances'
+    } else {
+      // Priorité 2: Détection par mots-clés (si pas de mention explicite)
+      for (const [docName, docKeys] of Object.entries(documentKeywords)) {
+        if (docKeys.some(key => {
+          const keyNormalized = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+          return normalized.includes(keyNormalized)
+        })) {
+          detectedDoc = docName
+          break // Prendre le premier match
+        }
+      }
     }
 
     // Ajouter le document détecté en priorité
-    Object.entries(documentKeywords).forEach(([docName, docKeys]) => {
-      if (docKeys.some(key => normalized.includes(key))) {
-        keywords.unshift(docName) // Ajouter en premier (priorité)
-      }
-    })
+    if (detectedDoc) {
+      keywords.unshift(detectedDoc)
+    }
 
     // Ajouter mots-clés généraux
     const words = normalized
@@ -192,50 +293,85 @@ export class IntelligentSearchAgent {
     const questionType = this.analyzeQuestionType(message)
     const keywords = this.extractKeywords(message)
 
-    console.log('🔍 Recherche intelligente:', { questionType, keywords })
+    // Normaliser le message pour comparaison de similarité
+    const normalized = message
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
 
     // =====================================================
     // ÉTAPE 1: TOUJOURS CHERCHER DANS LES PROCÉDURES D'ABORD
+    // Avec recherche floue (variations de mots-clés)
     // =====================================================
     let procedures: any[] = []
 
-    const procConditions = keywords.map(k =>
-      `name.ilike.%${k}%,description.ilike.%${k}%,steps.ilike.%${k}%`
-    ).join(',')
+    // Générer variations de chaque mot-clé pour recherche floue
+    const expandedKeywords: string[] = []
+    keywords.forEach(k => {
+      expandedKeywords.push(...this.generateKeywordVariations(k))
+    })
 
-    const { data: procs } = await this.supabase
+    // Construire condition OR avec variations
+    const procOrConditions: string[] = []
+    expandedKeywords.forEach(k => {
+      procOrConditions.push(`name.ilike.%${k}%`)
+      procOrConditions.push(`description.ilike.%${k}%`)
+    })
+
+    const { data: procs, error: procError } = await this.supabase
       .from('Procedure')
       .select('*')
-      .or(procConditions)
-      .limit(10)
+      .or(procOrConditions.join(','))
+      .limit(20) // Augmenter limite pour filtrage par similarité
 
-    procedures = procs || []
-    console.log(`📋 ${procedures.length} procédures trouvées`)
+    if (procError) {
+      console.error('❌ [SEARCH] Erreur recherche procédures:', procError)
+    }
+
+    // Filtrer et trier par similarité
+    if (procs && procs.length > 0) {
+      const scoredProcs = procs.map(proc => {
+        const nameSimilarity = this.calculateSimilarity(
+          normalized,
+          proc.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        )
+        const descSimilarity = this.calculateSimilarity(
+          normalized,
+          (proc.description || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        )
+        return {
+          ...proc,
+          similarity: Math.max(nameSimilarity, descSimilarity)
+        }
+      })
+
+      // Garder seulement les résultats avec similarité > 0.3
+      procedures = scoredProcs
+        .filter(p => p.similarity > 0.3)
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, 10)
+    }
 
     // =====================================================
     // ÉTAPE 2: CHERCHER DANS LES DOCUMENTS JURIDIQUES
-    // Seulement si:
-    // - Aucune procédure trouvée OU
-    // - Question explicitement juridique (article, code, loi)
+    // Seulement si aucune procédure trouvée
     // =====================================================
-
-    // Détecter le document cible prioritaire
-    const targetDocument = keywords.find(k =>
-      ['constitution', 'code penal camerounais', 'code civil camerounais', 'code du travail', 'loi de finances'].includes(k.toLowerCase())
-    )
-
-    console.log('📄 Document cible détecté:', targetDocument || 'aucun')
 
     let validatedArticles: ValidatedArticle[] = []
 
-    // Chercher dans les articles juridiques SI:
-    // - Pas de procédure trouvée OU question explicitement juridique
-    const shouldSearchArticles = procedures.length === 0 || questionType === 'juridique'
+    // Logique simplifiée: chercher articles SEULEMENT si pas de procédures
+    const shouldSearchArticles = procedures.length === 0
+
+    // Détecter le document cible prioritaire
+    const targetDocument = keywords.find(k => {
+      const kLower = k.toLowerCase()
+      return ['constitution', 'code penal camerounais', 'code civil camerounais', 'code du travail', 'code de commerce', 'loi de finances'].includes(kLower)
+    })
 
     if (shouldSearchArticles) {
-      // 2a. RECHERCHE CIBLÉE (si document spécifique détecté)
-      if (targetDocument && keywords.length > 1) {
-        const sectionKeywords = keywords.filter(k => k !== targetDocument)
+      // 2a. RECHERCHE CIBLÉE avec variations (si document spécifique détecté)
+      if (targetDocument && expandedKeywords.length > 0) {
+        const sectionKeywords = expandedKeywords.filter(k => k !== targetDocument)
         const conditions = sectionKeywords.map(k =>
           `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
         ).join(',')
@@ -249,7 +385,7 @@ export class IntelligentSearchAgent {
           .ilike('Document.title', `%${targetDocument}%`)
           .or(conditions)
           .order('level', { ascending: true })
-          .limit(30)
+          .limit(50)
 
         if (targetedSections && targetedSections.length > 0) {
           for (const section of targetedSections) {
@@ -259,11 +395,9 @@ export class IntelligentSearchAgent {
         }
       }
 
-      // 2b. RECHERCHE ÉLARGIE (si rien trouvé, chercher dans TOUS les documents)
+      // 2b. RECHERCHE ÉLARGIE avec variations (si rien trouvé)
       if (validatedArticles.length === 0) {
-        console.log('🔄 Recherche élargie dans TOUS les documents juridiques...')
-
-        const conditions = keywords.map(k =>
+        const conditions = expandedKeywords.map(k =>
           `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
         ).join(',')
 
@@ -284,8 +418,6 @@ export class IntelligentSearchAgent {
           }
         }
       }
-
-      console.log(`✅ ${validatedArticles.length} articles validés trouvés`)
     }
 
     // =====================================================
@@ -293,7 +425,6 @@ export class IntelligentSearchAgent {
     // =====================================================
     let webResults = ''
     if (validatedArticles.length === 0 && procedures.length === 0) {
-      console.log('🌐 Activation recherche web fallback...')
       webResults = await this.searchWeb(message)
     }
 
@@ -301,12 +432,13 @@ export class IntelligentSearchAgent {
       articles: validatedArticles,
       procedures,
       webResults,
+      webSearchResults: [],
       questionType
     }
   }
 
   /**
-   * Recherche web (fallback)
+   * Recherche web (fallback) - version texte simple
    */
   private async searchWeb(query: string): Promise<string> {
     if (!process.env.GOOGLE_SEARCH_API_KEY || !process.env.GOOGLE_SEARCH_ENGINE_ID) {
@@ -340,7 +472,101 @@ export class IntelligentSearchAgent {
 }
 
 // =====================================================
-// AGENT 2: FORMATEUR EXPERT
+// AGENT 2: CHERCHEUR WEB TEMPS RÉEL
+// =====================================================
+
+export class WebSearchAgent {
+  /**
+   * Recherche sur le web avec analyse des résultats
+   */
+  async search(query: string, questionType: string): Promise<WebSearchResult[]> {
+    if (!process.env.GOOGLE_SEARCH_API_KEY || !process.env.GOOGLE_SEARCH_ENGINE_ID) {
+      return []
+    }
+
+    try {
+      // Adapter la requête selon le type de question
+      let searchQuery = query
+      if (questionType === 'procedure') {
+        searchQuery = `${query} Cameroun procédure 2025 coût durée documents`
+      } else if (questionType === 'juridique') {
+        searchQuery = `${query} Cameroun loi code juridique 2025`
+      } else {
+        searchQuery = `${query} Cameroun informations officielles 2025`
+      }
+
+      const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_SEARCH_API_KEY}&cx=${process.env.GOOGLE_SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchQuery)}&num=5`
+
+      const response = await fetch(url)
+      const data = await response.json()
+
+      if (!data.items || data.items.length === 0) {
+        return []
+      }
+
+      const results: WebSearchResult[] = data.items.slice(0, 5).map((item: any) => {
+        // Extraire le nom de domaine comme source
+        const urlObj = new URL(item.link)
+        const source = urlObj.hostname.replace('www.', '')
+
+        return {
+          title: item.title,
+          snippet: item.snippet,
+          link: item.link,
+          source
+        }
+      })
+
+      return results
+    } catch (error) {
+      console.error('🔴 [WEB AGENT] Erreur:', error)
+      return []
+    }
+  }
+
+  /**
+   * Analyse si les résultats web contredisent les données locales
+   */
+  compareWithLocal(webResults: WebSearchResult[], procedures: any[]): {
+    hasConflict: boolean
+    conflicts: string[]
+  } {
+    const conflicts: string[] = []
+
+    // Exemple simple: vérifier si les montants diffèrent
+    for (const proc of procedures) {
+      const procName = proc.name.toLowerCase()
+
+      for (const webResult of webResults) {
+        const snippet = webResult.snippet.toLowerCase()
+
+        // Rechercher des montants dans le snippet
+        const webCostMatch = snippet.match(/(\d+[\s,.]?\d*)\s*(fcfa|cfa|francs?)/i)
+        const localCostMatch = proc.costs?.match(/(\d+[\s,.]?\d*)\s*(fcfa|cfa|francs?)/i)
+
+        if (webCostMatch && localCostMatch) {
+          const webCost = parseInt(webCostMatch[1].replace(/[\s,.]/g, ''))
+          const localCost = parseInt(localCostMatch[1].replace(/[\s,.]/g, ''))
+
+          if (Math.abs(webCost - localCost) > 5000 && snippet.includes(procName.split(' ')[0])) {
+            conflicts.push(
+              `Divergence sur ${proc.name}: Base locale indique ${proc.costs}, ` +
+              `source web (${webResult.source}) indique ${webCostMatch[0]}`
+            )
+          }
+        }
+      }
+    }
+
+    return {
+      hasConflict: conflicts.length > 0,
+      conflicts
+    }
+  }
+}
+
+// =====================================================
+// AGENT 3: FORMATEUR EXPERT AVEC COMPARAISON
 // =====================================================
 
 export class ExpertFormatterAgent {
@@ -397,9 +623,27 @@ export class ExpertFormatterAgent {
     }
 
     // =====================================================
-    // PRIORITÉ 3: RÉSULTATS WEB (fallback)
+    // PRIORITÉ 3: RÉSULTATS WEB TEMPS RÉEL
     // =====================================================
-    if (searchContext.webResults) {
+    if (searchContext.webSearchResults && searchContext.webSearchResults.length > 0) {
+      context += '## 🌐 RÉSULTATS WEB TEMPS RÉEL (2025) - POUR COMPARAISON 🌐\n\n'
+      context += '**INSTRUCTIONS:**\n'
+      context += '- Ces résultats proviennent du web et sont très récents\n'
+      context += '- Comparer avec les procédures locales pour détecter les divergences\n'
+      context += '- Si divergence significative, mentionner LES DEUX sources dans ta réponse\n'
+      context += '- Toujours privilégier les procédures locales sauf si web plus récent\n\n'
+
+      searchContext.webSearchResults.forEach((result, index) => {
+        context += `### Résultat ${index + 1}:\n`
+        context += `**Titre:** ${result.title}\n`
+        context += `**Extrait:** ${result.snippet}\n`
+        context += `**Source:** ${result.source}\n`
+        context += `**Lien:** ${result.link}\n\n`
+      })
+    }
+
+    // Fallback texte simple (pour compatibilité)
+    if (searchContext.webResults && !searchContext.webSearchResults.length) {
       context += searchContext.webResults
     }
 
@@ -423,7 +667,8 @@ ${context}
 **TYPE DE QUESTION:** ${searchContext.questionType}
 **NOMBRE D'ARTICLES TROUVÉS:** ${searchContext.articles.length}
 **NOMBRE DE PROCÉDURES:** ${searchContext.procedures.length}
-**RÉSULTATS WEB:** ${searchContext.webResults ? 'OUI' : 'NON'}
+**RÉSULTATS WEB STRUCTURÉS:** ${searchContext.webSearchResults.length}
+**RÉSULTATS WEB TEXTE:** ${searchContext.webResults ? 'OUI' : 'NON'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔴  HIÉRARCHIE DES SOURCES - ORDRE DE PRIORITÉ  🔴
@@ -440,8 +685,10 @@ ${context}
      * Question explicitement juridique (article, loi, code)
    - Si un article contredit une procédure, IGNORER l'article
 
-3. **DERNIER RECOURS: Résultats web**
-   - Utiliser seulement si aucune source locale disponible
+3. **COMPARAISON: Résultats web temps réel**
+   - Consulter pour détecter des divergences avec les procédures
+   - Si divergence majeure, mentionner LES DEUX sources
+   - Format: "Selon nos procédures: X. Sources web récentes indiquent: Y."
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -470,8 +717,9 @@ Tu as ${searchContext.procedures.length} procédure(s) administrative(s) officie
 1. Si tu as des PROCÉDURES dans le contexte → Utilise-les EN PRIORITÉ
 2. Si tu as des articles juridiques (et pas de procédures) → Utilise-les avec liens
 3. Si tu as des résultats web → Résume-les et cite la source web
-4. Si tu n'as RIEN → Utilise tes connaissances générales sur le Cameroun
-5. TOUJOURS fournir une réponse utile, JAMAIS dire "je ne sais pas"
+4. Si tu n'as RIEN → Utilise tes CONNAISSANCES INTERNES (Gemini) sur le Cameroun
+5. TOUJOURS fournir une réponse INFORMATIVE et UTILE
+6. JAMAIS dire "Je n'ai pas d'informations" - Utilise tes connaissances AI!
 
 ${searchContext.questionType === 'juridique' && searchContext.articles.length > 0 ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -491,7 +739,27 @@ le Président de la République est élu au suffrage universel direct..."
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''}
 
-${searchContext.webResults ? `
+${searchContext.webSearchResults.length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐  COMPARAISON AVEC SOURCES WEB RÉCENTES  🌐
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tu as ${searchContext.webSearchResults.length} résultat(s) web récent(s).
+
+🔴 INSTRUCTIONS POUR LA COMPARAISON:
+1. Compare les informations web avec les procédures locales
+2. Si DIVERGENCE SIGNIFICATIVE (ex: coûts, durée différents):
+   - Mentionne CLAIREMENT les deux sources
+   - Format: "📋 **Selon nos procédures:** [info locale]. 🌐 **Sources web récentes:** [info web]."
+   - Explique que les deux sources existent
+3. Si PAS de divergence:
+   - Utilise uniquement les procédures locales
+   - Pas besoin de mentionner le web
+4. Cite toujours les sources web par leur nom (ex: "selon cameroun24.net")
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+` : ''}
+
+${searchContext.webResults && !searchContext.webSearchResults.length ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️  UTILISATION DES RÉSULTATS WEB  ⚠️
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -506,7 +774,24 @@ Mentionne "Selon des sources en ligne" et résume les informations.
 - Structure claire avec listes à puces si nécessaire
 - **Gras** pour les informations importantes
 - Sois précis et cite le contenu exact des sources prioritaires
-- TOUJOURS fournir une réponse, JAMAIS refuser de répondre`
+- TOUJOURS fournir une réponse UTILE, JAMAIS refuser de répondre
+
+${searchContext.articles.length === 0 && searchContext.procedures.length === 0 && searchContext.webSearchResults.length === 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠  MODE CONNAISSANCES GEMINI ACTIVÉ  🧠
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ AUCUNE SOURCE LOCALE OU WEB DISPONIBLE
+
+🔴 INSTRUCTIONS CRITIQUES:
+- Tu dois utiliser tes CONNAISSANCES INTERNES (Gemini AI)
+- Fournis une réponse COMPLÈTE basée sur tes données d'entraînement
+- JAMAIS dire "Je n'ai pas d'informations"
+- Si tu connais la réponse → PARTAGE-LA directement
+- Mentionne: "D'après mes connaissances..." ou "Selon mes informations..."
+- Sois informatif, précis et utile
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+` : ''}`
 
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash-exp',

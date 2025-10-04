@@ -22,7 +22,12 @@
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Qui est le président du Cameroun?\"\"}\")",
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Combien coûte un passeport?\"\"}\")",
       "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Article 1 Code Pénal Cameroun infraction\"\"}\")",
-      "Read(//c/Users/kayze/Pictures/Screenshots/**)"
+      "Read(//c/Users/kayze/Pictures/Screenshots/**)",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Combien coûte un passeport au Cameroun?\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Passeport biométrique\"\"}\")",
+      "Bash(curl -s \"http://localhost:3000/api/procedures\")",
+      "Bash(curl -s \"http://localhost:3000/api/chat\" -X POST -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Prix passeport\"\"}\")",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
