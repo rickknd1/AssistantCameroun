@@ -2,7 +2,7 @@
 
 import { useLanguage } from "@/lib/i18n"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, AlertCircle, Users, Mail, Heart, Linkedin, Target, Sparkles } from "lucide-react"
+import { Shield, AlertCircle, Users, Mail, Heart, Linkedin, Target, Sparkles, MessageSquare, BookOpen, FileText, Brain } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function InfoContent() {
@@ -57,6 +57,67 @@ export function InfoContent() {
         </Card>
       </div>
 
+      {/* Features Section */}
+      <Card className="border-primary/20 mb-8 md:mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+            Fonctionnalités de la plateforme
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MessageSquare className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">Chatbot Intelligent (Cami)</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Assistant conversationnel disponible 24/7 qui répond à vos questions sur les démarches administratives, les textes juridiques et les procédures camerounaises.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-secondary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">Bibliothèque Juridique</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Accès complet aux textes de loi camerounais : Code Pénal, Code Civil, Constitution, Code du Travail, et bien d'autres documents juridiques officiels.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-accent-foreground" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">Guide des Procédures</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Guides détaillés pour toutes les démarches : CNI, passeport, acte de naissance, permis de conduire, etc. Avec les coûts, délais et documents requis.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Brain className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">Quiz Éducatifs</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Testez vos connaissances sur la culture camerounaise, les institutions, le droit et l'administration avec nos quiz interactifs par catégorie et difficulté.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Benefits Section */}
       <Card className="border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5 mb-8 md:mb-12">
         <CardHeader>
@@ -91,14 +152,6 @@ export function InfoContent() {
               </div>
             </div>
             <div className="space-y-3 text-sm md:text-base">
-              {/* Image Profile - Desktop Only */}
-              <div className="hidden md:flex items-center justify-center mb-4">
-                <img
-                  src="/rick-jilan.png"
-                  alt="KENDEM MBA Rick Dylan"
-                  className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-primary/20"
-                />
-              </div>
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
                 <div>
@@ -184,12 +237,12 @@ export function InfoContent() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Image Profile - Mobile Only */}
-            <div className="flex-shrink-0 md:hidden">
+            {/* Image Profile - Responsive */}
+            <div className="flex-shrink-0">
               <img
                 src="/rick-jilan.png"
                 alt="KENDEM MBA Rick Dylan"
-                className="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-primary/20"
+                className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover shadow-lg border-4 border-primary/20"
               />
             </div>
             <div className="flex-1 text-center md:text-left">

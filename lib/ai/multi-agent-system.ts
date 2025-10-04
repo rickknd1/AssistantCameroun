@@ -108,8 +108,16 @@ export class IntelligentSearchAgent {
   /**
    * Analyse la question et détermine le type
    */
-  private analyzeQuestionType(message: string): 'juridique' | 'procedure' | 'generale' {
+  private analyzeQuestionType(message: string): 'juridique' | 'procedure' | 'actualite' | 'generale' {
     const lowerMessage = message.toLowerCase()
+
+    // Mots-clés pour questions d'actualité
+    const actualiteKeywords = [
+      '2025', '2024', 'actualité', 'récent', 'dernier', 'nouveau',
+      'candidat', 'élection', 'présidentielle', 'législative',
+      'nomination', 'ministre', 'gouvernement', 'politique',
+      'aujourd\'hui', 'hier', 'cette semaine', 'ce mois'
+    ]
 
     // Mots-clés pour questions juridiques
     const juridiqueKeywords = [
@@ -124,6 +132,11 @@ export class IntelligentSearchAgent {
       'combien', 'prix', 'tarif', 'frais', 'obtenir', 'faire', 'demander',
       'besoin', 'nécessaire', 'où', 'quand', 'délai'
     ]
+
+    // Vérifier actualité en premier
+    if (actualiteKeywords.some(k => lowerMessage.includes(k))) {
+      return 'actualite'
+    }
 
     if (juridiqueKeywords.some(keyword => lowerMessage.includes(keyword))) {
       return 'juridique'
@@ -245,7 +258,8 @@ export class IntelligentSearchAgent {
 
     // Priorité 1: Détection explicite (mention directe du document)
     // normalized est déjà sans accents et en minuscules
-    if (normalized.includes('code') && normalized.includes('penal')) {
+    // IMPORTANT: gérer aussi les encodages corrompus (p�nal au lieu de penal)
+    if (normalized.includes('code') && (normalized.includes('penal') || normalized.includes('p�nal') || normalized.includes('pén'))) {
       detectedDoc = 'code penal camerounais'
     } else if (normalized.includes('code civil')) {
       detectedDoc = 'code civil camerounais'
@@ -273,6 +287,18 @@ export class IntelligentSearchAgent {
     // Ajouter le document détecté en priorité
     if (detectedDoc) {
       keywords.unshift(detectedDoc)
+      // Ajouter aussi le titre exact du document pour la recherche
+      const docTitles: { [key: string]: string } = {
+        'code penal camerounais': 'Code Pénal Camerounais',
+        'constitution': 'Constitution',
+        'code civil camerounais': 'Code Civil Camerounais',
+        'code du travail': 'Code du Travail',
+        'code de commerce': 'Code de Commerce',
+        'loi de finances': 'Loi de Finances'
+      }
+      if (docTitles[detectedDoc]) {
+        keywords.push(docTitles[detectedDoc])
+      }
     }
 
     // Ajouter mots-clés généraux
@@ -360,21 +386,38 @@ export class IntelligentSearchAgent {
     let validatedArticles: ValidatedArticle[] = []
 
     // Logique simplifiée: chercher articles SEULEMENT si pas de procédures
-    const shouldSearchArticles = procedures.length === 0
+    // EXCEPTION: Si l'utilisateur mentionne explicitement "article X", toujours chercher articles
+    const explicitArticleRequest = /article\s+\d+/i.test(message) || /art\.?\s+\d+/i.test(message)
+    const shouldSearchArticles = procedures.length === 0 || explicitArticleRequest
 
     // Détecter le document cible prioritaire
     const targetDocument = keywords.find(k => {
       const kLower = k.toLowerCase()
-      return ['constitution', 'code penal camerounais', 'code civil camerounais', 'code du travail', 'code de commerce', 'loi de finances'].includes(kLower)
+      return ['constitution', 'code penal camerounais', 'code pénal camerounais', 'code civil camerounais', 'code du travail', 'code de commerce', 'loi de finances'].includes(kLower)
     })
 
     if (shouldSearchArticles) {
       // 2a. RECHERCHE CIBLÉE avec variations (si document spécifique détecté)
       if (targetDocument && expandedKeywords.length > 0) {
-        const sectionKeywords = expandedKeywords.filter(k => k !== targetDocument)
+        const sectionKeywords = expandedKeywords.filter(k =>
+          k.toLowerCase() !== targetDocument.toLowerCase()
+        )
         const conditions = sectionKeywords.map(k =>
           `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
         ).join(',')
+
+        // Mapping pour les titres exacts des documents (avec accents)
+        const exactTitles: { [key: string]: string } = {
+          'code penal camerounais': 'Code Pénal Camerounais',
+          'code pénal camerounais': 'Code Pénal Camerounais',
+          'constitution': 'Constitution',
+          'code civil camerounais': 'Code Civil Camerounais',
+          'code du travail': 'Code du Travail',
+          'code de commerce': 'Code de Commerce',
+          'loi de finances': 'Loi de Finances'
+        }
+
+        const exactTitle = exactTitles[targetDocument.toLowerCase()] || targetDocument
 
         const { data: targetedSections } = await this.supabase
           .from('Section')
@@ -382,7 +425,7 @@ export class IntelligentSearchAgent {
             id, title, content, reference, level, position, documentId,
             Document!inner(id, slug, title, type, category)
           `)
-          .ilike('Document.title', `%${targetDocument}%`)
+          .ilike('Document.title', `%${exactTitle}%`)
           .or(conditions)
           .order('level', { ascending: true })
           .limit(50)
@@ -424,7 +467,10 @@ export class IntelligentSearchAgent {
     // ÉTAPE 3: RECHERCHE WEB EN FALLBACK
     // =====================================================
     let webResults = ''
-    if (validatedArticles.length === 0 && procedures.length === 0) {
+    // Rechercher sur le web si:
+    // 1. Aucun résultat trouvé (fallback), OU
+    // 2. Question d'actualité détectée (force web search)
+    if ((validatedArticles.length === 0 && procedures.length === 0) || questionType === 'actualite') {
       webResults = await this.searchWeb(message)
     }
 
