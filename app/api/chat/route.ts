@@ -136,25 +136,17 @@ export async function POST(request: Request) {
     const searchAgent = new IntelligentSearchAgent(supabase)
     const searchContext = await searchAgent.search(message)
 
-    // Agent 2: Recherche web en parallèle
-
+    // Agent 2: Recherche web en fallback SEULEMENT
     const webAgent = new WebSearchAgent()
     let webSearchResults = []
 
-    // Activer la recherche web dans ces cas:
-    // 1. Question de type procédure (pour comparer avec les données locales)
-    // 2. Aucune source locale trouvée (articles + procédures = 0)
+    // Activer la recherche web SEULEMENT si aucune source locale trouvée
+    // Priorité : Procédures → Bibliothèque → Web
     const shouldSearchWeb =
-      searchContext.questionType === 'procedure' ||
-      (searchContext.articles.length === 0 && searchContext.procedures.length === 0)
+      searchContext.articles.length === 0 && searchContext.procedures.length === 0
 
     if (shouldSearchWeb) {
       webSearchResults = await webAgent.search(message, searchContext.questionType)
-
-      // Comparer avec les données locales si procédures disponibles
-      if (searchContext.procedures.length > 0 && webSearchResults.length > 0) {
-        webAgent.compareWithLocal(webSearchResults, searchContext.procedures)
-      }
     }
 
     // Ajouter les résultats web au contexte

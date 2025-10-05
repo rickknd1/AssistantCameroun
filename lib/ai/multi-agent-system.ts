@@ -379,16 +379,24 @@ export class IntelligentSearchAgent {
     }
 
     // =====================================================
-    // ÉTAPE 2: CHERCHER DANS LES DOCUMENTS JURIDIQUES
-    // Seulement si aucune procédure trouvée
+    // ÉTAPE 2: CHERCHER DANS LES DOCUMENTS JURIDIQUES (BIBLIOTHÈQUE)
+    // Toujours chercher, sauf si question explicitement de type procédure ET procédures trouvées
     // =====================================================
 
     let validatedArticles: ValidatedArticle[] = []
 
-    // Logique simplifiée: chercher articles SEULEMENT si pas de procédures
-    // EXCEPTION: Si l'utilisateur mentionne explicitement "article X", toujours chercher articles
+    // Détection de demande explicite d'article ou de document juridique
     const explicitArticleRequest = /article\s+\d+/i.test(message) || /art\.?\s+\d+/i.test(message)
-    const shouldSearchArticles = procedures.length === 0 || explicitArticleRequest
+    const mentionsJuridique = /(code|loi|constitution|article|juridique|légal)/i.test(message)
+
+    // Chercher dans la bibliothèque si :
+    // 1. Aucune procédure trouvée OU
+    // 2. Demande explicite d'article OU
+    // 3. Question de type juridique
+    const shouldSearchArticles =
+      procedures.length === 0 ||
+      explicitArticleRequest ||
+      (questionType === 'juridique' && mentionsJuridique)
 
     // Détecter le document cible prioritaire
     const targetDocument = keywords.find(k => {
