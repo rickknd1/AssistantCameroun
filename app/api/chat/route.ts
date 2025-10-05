@@ -161,14 +161,8 @@ export async function POST(request: Request) {
     searchContext.webSearchResults = webSearchResults
 
     // 4. Construire l'historique de conversation
-    let chatHistory: Array<{ role: string; parts: Array<{ text: string }> }> = []
-
-    if (conversationHistory && Array.isArray(conversationHistory)) {
-      chatHistory = conversationHistory.map((msg: any) => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
-      }))
-    }
+    // On garde le format simple {role, content} et on laisse generateResponse le transformer
+    const chatHistory = conversationHistory && Array.isArray(conversationHistory) ? conversationHistory : []
 
     // Agent 3: Génération de réponse formatée avec comparaison
     const formatterAgent = new ExpertFormatterAgent()
