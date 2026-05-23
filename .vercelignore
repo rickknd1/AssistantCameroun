@@ -1,0 +1,5 @@
+# Fichiers de travail temporaires (récupération de documents) — ne pas déployer
+scripts/_*
+*.pdf
+.env.prod.local
+.env.local

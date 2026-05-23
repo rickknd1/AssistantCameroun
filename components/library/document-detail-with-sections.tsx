@@ -62,21 +62,11 @@ export function DocumentDetailWithSections({ slug }: DocumentDetailWithSectionsP
         const doc = docResult.data[0]
         setDocument(doc)
 
-        // Charger les sections
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-
-        const { data: sectionsData, error: sectionsError } = await supabase
-          .from('Section')
-          .select('*')
-          .eq('documentId', doc.id)
-          .order('position', { ascending: true })
-
-        if (sectionsError) {
-          console.error('Erreur chargement sections:', sectionsError)
-        } else if (sectionsData) {
-          setSections(sectionsData)
-        }
+        // Les sections sont désormais incluses dans la réponse (stockage statique)
+        const docSections: Section[] = (doc.sections || [])
+          .slice()
+          .sort((a: Section, b: Section) => (a.position || 0) - (b.position || 0))
+        setSections(docSections)
       } catch (err) {
         console.error('Error fetching data:', err)
         setError('Erreur lors du chargement')

@@ -1,117 +1,55 @@
-import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import type { Document } from '@/lib/types/database'
+import { listDocuments, getDocumentBySlug } from '@/lib/documents'
 import { translateArray } from '@/lib/services/translate'
 
+// Source des documents : fichiers statiques versionnés (content/documents/*.json)
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     const slug = searchParams.get('slug')
-    const type = searchParams.get('type')
-    const category = searchParams.get('category')
+    const type = searchParams.get('type') || undefined
+    const category = searchParams.get('category') || undefined
     const status = searchParams.get('status') || 'ACTIVE'
     const limit = parseInt(searchParams.get('limit') || '50')
-    const search = searchParams.get('search')
-    const lang = searchParams.get('lang') as 'en' | 'fr' || 'fr'
+    const search = searchParams.get('search') || undefined
+    const lang = (searchParams.get('lang') as 'en' | 'fr') || 'fr'
 
-    // Si slug fourni, retourner un seul document
+    // Document unique par slug (avec son contenu intégral + sections)
     if (slug) {
-      const { data, error } = await supabase
-        .from('Document')
-        .select('*')
-        .eq('slug', slug)
-        .eq('status', status)
-        .single()
-
-      if (error || !data) {
+      const doc = getDocumentBySlug(slug)
+      if (!doc || (doc.status || 'ACTIVE') !== status) {
         return NextResponse.json({ error: 'Document not found' }, { status: 404 })
       }
-
-      return NextResponse.json({ data: [data] })
+      return NextResponse.json({ data: [doc] })
     }
 
-    let query = supabase
-      .from('Document')
-      .select('*')
-      .eq('status', status)
-      .order('createdAt', { ascending: false })
-      .limit(limit)
+    // Liste filtrée (version allégée)
+    let data = listDocuments({ status, type, category, search, limit })
 
-    if (type) {
-      query = query.eq('type', type)
-    }
-
-    if (category) {
-      query = query.eq('category', category)
-    }
-
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,reference.ilike.%${search}%`)
-    }
-
-    const { data, error, count } = await query
-
-    if (error) {
-      console.error('Error fetching documents:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    // Traduire si langue = EN
-    let translatedData = data || []
-    if (lang === 'en' && data && data.length > 0) {
+    // Traduction optionnelle EN (repli silencieux sur le FR en cas d'échec)
+    if (lang === 'en' && data.length > 0) {
       try {
-        translatedData = await translateArray(
-          data,
-          ['title', 'description'],
-          'en',
-          'fr'
-        )
-        console.log(`✅ Documents traduits en anglais (${translatedData.length} docs)`)
+        data = await translateArray(data, ['title', 'summary'], 'en', 'fr')
       } catch (translateError) {
         console.error('⚠️ Erreur traduction documents, données FR retournées:', translateError)
       }
     }
 
-    return NextResponse.json({
-      data: translatedData,
-      count: translatedData?.length || 0
-    })
+    return NextResponse.json({ data, count: data.length })
   } catch (error) {
     console.error('Unexpected error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function POST(request: Request) {
-  try {
-    const supabase = await createClient()
-    const body = await request.json()
-
-    // TODO: Add authentication check for admin
-    // const { data: { user } } = await supabase.auth.getUser()
-    // if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const { data, error } = await supabase
-      .from('Document')
-      .insert(body)
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ data }, { status: 201 })
-  } catch (error) {
-    console.error('Unexpected error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+// Les documents sont gérés via des fichiers versionnés dans Git : écriture désactivée.
+export async function POST() {
+  return NextResponse.json(
+    {
+      error:
+        'Lecture seule : les documents sont des fichiers versionnés (content/documents). Ajoutez/éditez le JSON puis relancez `node scripts/gen-documents-registry.mjs`.',
+    },
+    { status: 405 },
+  )
 }

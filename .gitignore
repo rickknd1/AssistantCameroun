@@ -46,6 +46,10 @@ NEXT_STEPS.md
 *.temp
 nul
 
+# fichiers de travail de récupération des documents (sources brutes)
+scripts/_*
+*.pdf
+
 # IDE
 .vscode/
 .idea/

@@ -51,7 +51,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-6 border-t border-border pt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Conçu par <a href="https://eoweb.site" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground">eoweb</a> • © {new Date().getFullYear()} Assistant Digital Cameroun. Tous droits réservés.
+            Conçu par <a href="https://v0-image-analysis-6b-rouge.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground">eoweb</a> • © {new Date().getFullYear()} Assistant Digital Cameroun. Tous droits réservés.
           </p>
         </div>
       </div>
