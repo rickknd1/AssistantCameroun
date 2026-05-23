@@ -76,3 +76,41 @@ export function getSectionsByDocumentId(documentId: string): Section[] {
   if (!doc) return []
   return [...(doc.sections || [])].sort((a, b) => (a.position || 0) - (b.position || 0))
 }
+
+export interface SectionWithDocument {
+  id: string
+  title: string
+  content: string
+  reference: string
+  level: number
+  position: number
+  documentId: string
+  Document: { id: string; slug: string; title: string; type: string; category: string }
+}
+
+/** Toutes les sections de tous les documents, enrichies de leur document parent
+ *  (remplace l'ancien join Supabase Section + Document pour la recherche RAG). */
+export function getAllSections(): SectionWithDocument[] {
+  const out: SectionWithDocument[] = []
+  for (const doc of all) {
+    for (const s of doc.sections || []) {
+      out.push({
+        id: s.id,
+        title: s.title,
+        content: s.content,
+        reference: s.reference || s.title,
+        level: s.level,
+        position: s.position,
+        documentId: doc.id,
+        Document: {
+          id: doc.id,
+          slug: doc.slug,
+          title: doc.title,
+          type: doc.type,
+          category: doc.category,
+        },
+      })
+    }
+  }
+  return out
+}

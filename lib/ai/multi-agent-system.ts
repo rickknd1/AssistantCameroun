@@ -8,8 +8,13 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getAllSections } from '@/lib/documents'
+import { listProcedures } from '@/lib/procedures'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+
+// Modèle Gemini utilisé par l'assistant (gemini-2.0-flash-exp a été retiré)
+const GEMINI_MODEL = 'gemini-2.5-flash'
 
 // =====================================================
 // TYPES
@@ -82,18 +87,11 @@ export class IntelligentSearchAgent {
   }
 
   /**
-   * Valide qu'une section existe réellement
+   * Construit l'article validé (les sections proviennent du stockage statique Git)
    */
-  private async validateSection(section: Section): Promise<ValidatedArticle> {
+  private validateSection(section: Section): ValidatedArticle {
     const anchorId = this.generateAnchorId(section.reference || section.title)
     const url = `/bibliotheque/${section.Document.slug}#${anchorId}`
-
-    // Vérifier que la section existe vraiment
-    const { data: exists } = await this.supabase
-      .from('Section')
-      .select('id')
-      .eq('id', section.id)
-      .single()
 
     return {
       reference: section.reference,
@@ -101,7 +99,7 @@ export class IntelligentSearchAgent {
       content: section.content,
       url,
       documentTitle: section.Document.title,
-      exists: !!exists
+      exists: true,
     }
   }
 
@@ -337,22 +335,15 @@ export class IntelligentSearchAgent {
       expandedKeywords.push(...this.generateKeywordVariations(k))
     })
 
-    // Construire condition OR avec variations
-    const procOrConditions: string[] = []
-    expandedKeywords.forEach(k => {
-      procOrConditions.push(`name.ilike.%${k}%`)
-      procOrConditions.push(`description.ilike.%${k}%`)
+    // Helper de normalisation (sans accents, minuscule)
+    const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    const normKeywords = [...new Set(expandedKeywords.map(norm).filter(k => k.length > 1))]
+
+    // Recherche dans les procédures STATIQUES (variations floues)
+    const procs = listProcedures().filter(p => {
+      const hay = norm(p.name) + ' ' + norm(p.description)
+      return normKeywords.some(k => hay.includes(k))
     })
-
-    const { data: procs, error: procError } = await this.supabase
-      .from('Procedure')
-      .select('*')
-      .or(procOrConditions.join(','))
-      .limit(20) // Augmenter limite pour filtrage par similarité
-
-    if (procError) {
-      console.error('❌ [SEARCH] Erreur recherche procédures:', procError)
-    }
 
     // Filtrer et trier par similarité
     if (procs && procs.length > 0) {
@@ -427,22 +418,17 @@ export class IntelligentSearchAgent {
 
         const exactTitle = exactTitles[targetDocument.toLowerCase()] || targetDocument
 
-        const { data: targetedSections } = await this.supabase
-          .from('Section')
-          .select(`
-            id, title, content, reference, level, position, documentId,
-            Document!inner(id, slug, title, type, category)
-          `)
-          .ilike('Document.title', `%${exactTitle}%`)
-          .or(conditions)
-          .order('level', { ascending: true })
-          .limit(50)
+        const targetedSections = getAllSections()
+          .filter(s => norm(s.Document.title).includes(norm(exactTitle)))
+          .filter(s => sectionKeywords.some(k => {
+            const nk = norm(k)
+            return norm(s.reference).includes(nk) || norm(s.title).includes(nk) || norm(s.content).includes(nk)
+          }))
+          .sort((a, b) => a.level - b.level)
+          .slice(0, 50)
 
-        if (targetedSections && targetedSections.length > 0) {
-          for (const section of targetedSections) {
-            const validated = await this.validateSection(section as any as Section)
-            if (validated.exists) validatedArticles.push(validated)
-          }
+        for (const section of targetedSections) {
+          validatedArticles.push(this.validateSection(section as any as Section))
         }
       }
 
@@ -452,21 +438,15 @@ export class IntelligentSearchAgent {
           `reference.ilike.%${k}%,title.ilike.%${k}%,content.ilike.%${k}%`
         ).join(',')
 
-        const { data: allSections } = await this.supabase
-          .from('Section')
-          .select(`
-            id, title, content, reference, level, position, documentId,
-            Document!inner(id, slug, title, type, category)
-          `)
-          .or(conditions)
-          .order('level', { ascending: true })
-          .limit(50)
+        const allSections = getAllSections()
+          .filter(s => normKeywords.some(k =>
+            norm(s.reference).includes(k) || norm(s.title).includes(k) || norm(s.content).includes(k)
+          ))
+          .sort((a, b) => a.level - b.level)
+          .slice(0, 50)
 
-        if (allSections && allSections.length > 0) {
-          for (const section of allSections) {
-            const validated = await this.validateSection(section as any as Section)
-            if (validated.exists) validatedArticles.push(validated)
-          }
+        for (const section of allSections) {
+          validatedArticles.push(this.validateSection(section as any as Section))
         }
       }
     }
@@ -848,7 +828,7 @@ ${searchContext.articles.length === 0 && searchContext.procedures.length === 0 &
 ` : ''}`
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
+      model: GEMINI_MODEL,
       systemInstruction
     })
 
