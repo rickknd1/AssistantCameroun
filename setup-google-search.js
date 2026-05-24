@@ -69,7 +69,7 @@ async function setup() {
   // Étape 4: Tester
   console.log('📋 ÉTAPE 4: Test de l\'API...\n');
 
-  const API_KEY = process.env.GOOGLE_SEARCH_API_KEY || 'AIzaSyAoW9PQLCDIDvjdEKBh8X_MoMvYo_ko6A0';
+  const API_KEY = process.env.GOOGLE_SEARCH_API_KEY || '';
   const query = encodeURIComponent('candidats présidentielle cameroun 2025');
   const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${searchEngineId.trim()}&q=${query}&num=3`;
 

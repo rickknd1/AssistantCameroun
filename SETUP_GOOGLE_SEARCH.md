@@ -41,7 +41,7 @@ L'API Google Search ne fonctionne pas car le `GOOGLE_SEARCH_ENGINE_ID` n'est pas
 ## Vérification
 Après configuration, tester avec:
 ```bash
-curl -s "https://www.googleapis.com/customsearch/v1?key=AIzaSyAoW9PQLCDIDvjdEKBh8X_MoMvYo_ko6A0&cx=VOTRE_ID&q=candidats+presidentielle+cameroun+2025&num=3"
+curl -s "https://www.googleapis.com/customsearch/v1?key=VOTRE_CLE_API&cx=VOTRE_ID&q=candidats+presidentielle+cameroun+2025&num=3"
 ```
 
 Si ça fonctionne, vous devriez voir des résultats JSON avec des liens et des snippets.
